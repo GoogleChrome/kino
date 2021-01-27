@@ -6,16 +6,32 @@ Description @todo
 
 ## Running the site locally
 
-Start by cloning this repository.
+Start by creating a new Firebase project from the [console](https://console.firebase.google.com/) and then setup the Firebase CLI.
+
+**Important**: This project uses a local Firebase emulator, which mean you need to install the Firebase CLI globally.
+
+    npm install -g firebase-tools
+
+Clone this repository:
 
     git clone git@github.com:xwp/web-dev-media.git
 
-Next, you will need to follow these steps.
+Go to the project folder:
 
-1. `cd web-dev-media`
-1. `npm install`
-1. `npm start`
+    cd web-dev-media
 
-**Important**: `npm start` uses a local Firebase emulator, you must install the Firebase CLI globally for this command to work.
+Login to Firebase:
 
-    npm install -g firebase-tools
+    firebase login
+
+Initialize Firebase:
+
+    firebase init
+
+Install the dependencies:
+
+    npm install
+
+Start the Firebase emulator:
+
+    npm start
