@@ -1,0 +1,7 @@
+{
+  "extends": [
+    "airbnb-base",
+    "plugin:jest/recommended",
+    "plugin:jsdoc/recommended"
+  ]
+}
