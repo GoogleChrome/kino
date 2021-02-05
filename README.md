@@ -35,3 +35,11 @@ Install the dependencies:
 Start the Firebase emulator:
 
     npm start
+
+## Build process
+
+Project uses Rollup to build the main application JS file and the Service Worker file. No transpilation is done, the tooling exists
+mostly just to resolve ES Modules in the Service Worker context. Usage:
+
+* `npm run build`: Build the `/public/js/index.js` and `/public/sw.js` files.
+* `npm run watch`: Watch for changes to files in `/src` and rebuild files as necessary on the fly.
