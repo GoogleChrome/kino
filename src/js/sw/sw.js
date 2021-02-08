@@ -8,18 +8,17 @@ import IDBConnection from '../modules/IDBConnection.module';
  *
  * Currently the whole video is pushed to the stream and `206 Partial Content` is not sent.
  *
+ * @param {Request} request   Request object.
  * @param {IDBConnection} db  IDBConnection instance.
  * @param {object} metaEntry  Video metadata from the IDB.
- * @param {number} streamFrom To support byte range requests. WIP.
- * @param {number} streamTo   To support byte range requests. WIP.
  *
  * @returns {Response} Response object.
  */
-const getResponseStream = (db, metaEntry, streamFrom = null, streamTo = null) => {
-  /* eslint-disable no-unused-vars */
-  streamFrom = streamFrom || 0;
-  streamTo = streamTo || metaEntry.sizeInBytes;
-  /* eslint-enable no-unused-vars */
+const getResponseStream = (request, db, metaEntry) => {
+  const rangeRequest = request.headers.get('range') || '';
+  const byteRanges = rangeRequest.match(/bytes=(?<from>[0-9]+)?-(?<to>[0-9]+)?/);
+  const rangeFrom = byteRanges.groups?.from || 0;
+  const rangeTo = byteRanges.groups?.to || metaEntry.sizeInBytes - 1;
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -27,28 +26,52 @@ const getResponseStream = (db, metaEntry, streamFrom = null, streamTo = null) =>
       const transaction = rawIDB.transaction(STORAGE_SCHEMA.data.name, 'readonly');
       const store = transaction.objectStore(STORAGE_SCHEMA.data.name);
       const index = store.index('offset');
-      const request = index.openCursor();
+      const cursor = index.openCursor();
 
-      request.onsuccess = (e) => {
-        const cursor = e.target.result;
+      cursor.onsuccess = (e) => {
+        const newCursor = e.target.result;
+        if (newCursor) {
+          const dataObject = newCursor.value;
+          const previousDataLength = dataObject.offset - dataObject.size;
 
-        if (cursor) {
-          controller.enqueue(cursor.value.data);
-          cursor.continue();
+          if (rangeFrom < dataObject.offset && rangeTo > previousDataLength) {
+            const overlapFrom = Math.max(rangeFrom, previousDataLength);
+            const overlapTo = Math.min(rangeTo, dataObject.offset - 1);
+
+            if (overlapTo - overlapFrom !== dataObject.size - 1) {
+              const sliceBufferFrom = overlapFrom - previousDataLength;
+              const sliceBufferTo = overlapTo - previousDataLength + 1;
+
+              const bufferSlice = new Uint8Array(
+                newCursor.value.data.slice(sliceBufferFrom, sliceBufferTo),
+              );
+              controller.enqueue(bufferSlice);
+            } else {
+              controller.enqueue(newCursor.value.data);
+            }
+          }
+          newCursor.continue();
         } else {
           controller.close();
         }
       };
-      request.onerror = () => controller.close();
+      cursor.onerror = () => controller.close();
     },
   });
 
-  const response = new Response(stream, {
+  const responseOpts = {
+    status: rangeRequest ? 206 : 200,
+    statusText: rangeRequest ? 'Partial Content' : 'OK',
     headers: {
+      'Accept-Ranges': 'bytes',
       'Content-Type': metaEntry.mime || 'application/octet-stream',
-      'Content-Length': metaEntry.sizeInBytes,
+      'Content-Length': rangeTo - rangeFrom + 1,
     },
-  });
+  };
+  if (rangeRequest) {
+    responseOpts.headers['Content-Range'] = `bytes ${rangeFrom}-${rangeTo}/${metaEntry.sizeInBytes}`;
+  }
+  const response = new Response(stream, responseOpts);
   return response;
 };
 
@@ -63,7 +86,7 @@ const maybeGetVideoResponse = async (event) => {
   const db = await IDBConnection.getConnection();
   const metaEntry = await db.meta.get(event.request.url);
 
-  return metaEntry.done ? getResponseStream(db, metaEntry) : null;
+  return metaEntry.done ? getResponseStream(event.request, db, metaEntry) : null;
 };
 
 /**
