@@ -4,3 +4,6 @@ node_modules/
 vendor/
 .firebaserc
 firebase-debug.log
+/.firebase
+/public/sw.js
+/public/dist

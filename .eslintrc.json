@@ -1,7 +1,27 @@
 {
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+        "babelOptions": {
+            "configFile": "./.babelrc"
+        },
+        "ecmaVersion": 2018
+    },
+    "plugins": ["@babel"],
   "extends": [
     "airbnb-base",
     "plugin:jest/recommended",
     "plugin:jsdoc/recommended"
-  ]
+  ],
+  "env": {
+    "browser": true,
+    "es6": true,
+    "es2017": true
+  },
+  "rules": {
+    "no-underscore-dangle": "off",
+    "no-param-reassign": "off",
+    "max-classes-per-file": "off",
+    "prefer-promise-reject-errors": "off",
+    "class-methods-use-this": "off"
+  }
 }
