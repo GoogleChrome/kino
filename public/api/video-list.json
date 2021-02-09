@@ -5,7 +5,7 @@
 		"categories": [ "sample" ],
 		"video-sources": [
 			{
-				"src": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+				"src": "https://storage.googleapis.com/wdm-assets/videos/ForBiggerEscapes.mp4",
 				"type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
 			}
 		],
@@ -14,18 +14,18 @@
 				"default": true,
 				"kind": "subtitles",
 				"label": "English",
-				"src": "subtitles/subtitles-en.vtt",
+				"src": "https://storage.googleapis.com/wdm-assets/subtitles/ForBiggerEscapes-en.vtt",
 				"srclang": "en"
 			},
 			{
 				"default": true,
 				"kind": "subtitles",
 				"label": "Czech",
-				"src": "subtitles/subtitles-cz.vtt",
+				"src": "https://storage.googleapis.com/wdm-assets/subtitles/ForBiggerEscapes-cz.vtt",
 				"srclang": "cz"
 			}
 		],
-		"thumbnail": "images/video-still.jpg"
+		"thumbnail": "https://storage.googleapis.com/wdm-assets/images/video-still.jpg"
 	},
 	{
 		"title": "Sample Video #2",
@@ -33,11 +33,11 @@
 		"categories": [ "sample" ],
 		"video-sources": [
 			{
-				"src": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+				"src": "https://storage.googleapis.com/wdm-assets/videos/ForBiggerEscapes.mp4",
 				"type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
 			}
 		],
-		"thumbnail": "images/video-still.jpg"
+		"thumbnail": "https://storage.googleapis.com/wdm-assets/images/video-still.jpg"
 	},
 	{
 		"title": "Sample Video #3",
@@ -45,11 +45,11 @@
 		"categories": [ "sample" ],
 		"video-sources": [
 			{
-				"src": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+				"src": "https://storage.googleapis.com/wdm-assets/videos/ForBiggerEscapes.mp4",
 				"type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
 			}
 		],
-		"thumbnail": "images/video-still.jpg"
+		"thumbnail": "https://storage.googleapis.com/wdm-assets/images/video-still.jpg"
 	},
 	{
 		"title": "Sample Video #4",
@@ -57,11 +57,11 @@
 		"categories": [ "sample" ],
 		"video-sources": [
 			{
-				"src": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+				"src": "https://storage.googleapis.com/wdm-assets/videos/ForBiggerEscapes.mp4",
 				"type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
 			}
 		],
-		"thumbnail": "images/video-still.jpg"
+		"thumbnail": "https://storage.googleapis.com/wdm-assets/images/video-still.jpg"
 	},
 	{
 		"title": "Sample Video #5",
@@ -69,10 +69,10 @@
 		"categories": [ "sample" ],
 		"video-sources": [
 			{
-				"src": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+				"src": "https://storage.googleapis.com/wdm-assets/videos/ForBiggerEscapes.mp4",
 				"type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
 			}
 		],
-		"thumbnail": "images/video-still.jpg"
+		"thumbnail": "https://storage.googleapis.com/wdm-assets/images/video-still.jpg"
 	}
 ]

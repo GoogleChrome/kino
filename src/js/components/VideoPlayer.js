@@ -39,7 +39,7 @@ export default class extends HTMLElement {
     );
 
     const markup = `${style}
-    <video ${videoData.thumbnail ? `poster="${videoData.thumbnail}"` : ''} controls>
+    <video ${videoData.thumbnail ? `poster="${videoData.thumbnail}"` : ''} controls crossorigin="anonymous">
       ${sourcesHTML}
       ${tracksHTML}
     </video>
