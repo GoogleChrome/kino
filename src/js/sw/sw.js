@@ -4,9 +4,7 @@ import IDBConnection from '../modules/IDBConnection.module';
 /**
  * Respond to a request to fetch offline video and contruct a response stream.
  *
- * @todo Support byte range requests properly.
- *
- * Currently the whole video is pushed to the stream and `206 Partial Content` is not sent.
+ * Includes support for `Range` requests.
  *
  * @param {Request} request   Request object.
  * @param {IDBConnection} db  IDBConnection instance.

@@ -260,8 +260,6 @@ export default class extends HTMLElement {
   /**
    * Heuristic method to get video MIME type.
    *
-   * @todo Implement properly, returning a hardcoded default now.
-   *
    * @param {string} videoURL Video URL.
    *
    * @returns {string} Video MIME type string.
@@ -273,7 +271,17 @@ export default class extends HTMLElement {
 
     switch (extension) {
       case 'mp4': return 'video/mp4';
-      default: return 'video/mp4';
+      case 'webm': return 'video/webm';
+      case 'ogv': return 'video/ogg';
+      case 'mpeg': return 'video/mpeg';
+      case 'mov': return 'video/quicktime';
+      case 'avi': return 'video/x-msvideo';
+      case 'ts': return 'video/mp2t';
+      case '3gp': return 'video/3gpp';
+      case '3g2': return 'video/3gpp2';
+      case 'wmv': return 'video/x-ms-wmv';
+      case 'flv': return 'video/x-flv';
+      default: return `video/${extension}`;
     }
   }
 
