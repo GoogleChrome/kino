@@ -10,7 +10,8 @@
   "extends": [
     "airbnb-base",
     "plugin:jest/recommended",
-    "plugin:jsdoc/recommended"
+    "plugin:jsdoc/recommended",
+    "plugin:compat/recommended"
   ],
   "env": {
     "browser": true,
