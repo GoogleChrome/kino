@@ -1,4 +1,4 @@
-import IDBConnection from '../modules/IDBConnection.module';
+import getIDBConnection from '../modules/IDBConnection.module';
 
 const style = `
 <style>
@@ -305,7 +305,7 @@ export default class extends HTMLElement {
   async storeVideoChunk({
     data, offset, done, mime, sizeInBytes, index, url,
   }) {
-    const db = await IDBConnection.getConnection();
+    const db = await getIDBConnection();
     const size = data ? data.length : 0;
 
     db.meta.put({
@@ -354,7 +354,7 @@ export default class extends HTMLElement {
    * @returns {Promise} Promise that resolves with the last chunk data.
    */
   async getLastChunk() {
-    const db = await IDBConnection.getConnection();
+    const db = await getIDBConnection();
     const rawDb = db.unwrap();
     const transaction = rawDb.transaction([db.data.name], 'readonly');
     const store = transaction.objectStore(db.data.name);
@@ -374,7 +374,7 @@ export default class extends HTMLElement {
    * @returns {Promise} Promise that resolves with the total video size in bytes.
    */
   async getTotalSize() {
-    const db = await IDBConnection.getConnection();
+    const db = await getIDBConnection();
     const rawDb = db.unwrap();
     const transaction = rawDb.transaction([db.data.name], 'readonly');
     const store = transaction.objectStore(db.data.name);
@@ -424,7 +424,7 @@ export default class extends HTMLElement {
    * component's `state` and `progress` attribute values.
    */
   async _setDownloadState() {
-    const db = await IDBConnection.getConnection();
+    const db = await getIDBConnection();
     const url = this.getDownloadableURL();
     const videoMeta = await db.meta.get(url);
 

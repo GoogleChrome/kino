@@ -1,5 +1,5 @@
 import { SW_CACHE_NAME, STORAGE_SCHEMA } from '../constants';
-import IDBConnection from '../modules/IDBConnection.module';
+import getIDBConnection from '../modules/IDBConnection.module';
 
 /**
  * Respond to a request to fetch offline video and contruct a response stream.
@@ -7,7 +7,7 @@ import IDBConnection from '../modules/IDBConnection.module';
  * Includes support for `Range` requests.
  *
  * @param {Request} request   Request object.
- * @param {IDBConnection} db  IDBConnection instance.
+ * @param {IDBDatabase} db    IDBDatabase instance.
  * @param {object} metaEntry  Video metadata from the IDB.
  *
  * @returns {Response} Response object.
@@ -81,7 +81,7 @@ const getResponseStream = (request, db, metaEntry) => {
  * @returns {Response|null} Response stream or null.
  */
 const maybeGetVideoResponse = async (event) => {
-  const db = await IDBConnection.getConnection();
+  const db = await getIDBConnection();
   const metaEntry = await db.meta.get(event.request.url);
 
   return metaEntry.done ? getResponseStream(event.request, db, metaEntry) : null;
