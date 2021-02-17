@@ -33,6 +33,14 @@
 		"categories": [ "sample" ],
 		"video-sources": [
 			{
+				"src": "./video/output-4/output.mpd",
+				"type": "application/dash+xml"
+			},
+      {
+				"src": "./video/output-4/master.m3u8",
+				"type": "application/vnd.apple.mpegurl"
+			},
+      {
 				"src": "https://storage.googleapis.com/wdm-assets/videos/ForBiggerEscapes.mp4",
 				"type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
 			}
