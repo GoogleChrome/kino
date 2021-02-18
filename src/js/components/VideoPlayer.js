@@ -170,6 +170,8 @@ export default class extends HTMLElement {
 
     if (!parser) return;
 
-    this.internal.streamer = new Streamer(this._videoElement, parser);
+    this.internal.streamer = new Streamer(this._videoElement, parser, {
+      manifestSrc: streamingSource.src,
+    });
   }
 }

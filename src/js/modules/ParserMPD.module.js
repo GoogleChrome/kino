@@ -40,6 +40,8 @@ export default class {
     if (lang) adaptationSetsQuery += `[lang="${lang}"]`;
 
     const adaptationSet = this.internal.root.querySelector(adaptationSetsQuery);
+    if (!adaptationSet) return [];
+
     const representationElements = [...adaptationSet.querySelectorAll(`Representation${representationQuery}`)];
 
     return representationElements.map(
