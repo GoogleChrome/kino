@@ -2,7 +2,7 @@
 	{
 		"title": "Sample Video #1",
 		"description": "Sample Video #1 Description Text",
-		"categories": [ "sample" ],
+		"categories": [ "Sample Category", "Sample Category 3" ],
 		"video-sources": [
 			{
 				"src": "https://storage.googleapis.com/wdm-assets/videos/ForBiggerEscapes.mp4",
@@ -25,54 +25,54 @@
 				"srclang": "cz"
 			}
 		],
-		"thumbnail": "https://storage.googleapis.com/wdm-assets/images/video-still.jpg"
+		"thumbnail": "/poster1.jpeg"
 	},
 	{
 		"title": "Sample Video #2",
 		"description": "Sample Video #2 Description Text",
-		"categories": [ "sample" ],
+		"categories": [ "Sample Category", "Sample Category 3", "Sample Category 4" ],
 		"video-sources": [
 			{
 				"src": "https://storage.googleapis.com/wdm-assets/videos/ForBiggerEscapes.mp4",
 				"type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
 			}
 		],
-		"thumbnail": "https://storage.googleapis.com/wdm-assets/images/video-still.jpg"
+		"thumbnail": "/poster2.jpeg"
 	},
 	{
 		"title": "Sample Video #3",
 		"description": "Sample Video #3 Description Text",
-		"categories": [ "sample" ],
+		"categories": [ "Sample Category" ],
 		"video-sources": [
 			{
 				"src": "https://storage.googleapis.com/wdm-assets/videos/ForBiggerEscapes.mp4",
 				"type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
 			}
 		],
-		"thumbnail": "https://storage.googleapis.com/wdm-assets/images/video-still.jpg"
+		"thumbnail": "/poster1.jpeg"
 	},
 	{
 		"title": "Sample Video #4",
 		"description": "Sample Video #4 Description Text",
-		"categories": [ "sample" ],
+		"categories": [ "Sample Category" ],
 		"video-sources": [
 			{
 				"src": "https://storage.googleapis.com/wdm-assets/videos/ForBiggerEscapes.mp4",
 				"type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
 			}
 		],
-		"thumbnail": "https://storage.googleapis.com/wdm-assets/images/video-still.jpg"
+		"thumbnail": "/poster3.jpeg"
 	},
 	{
-		"title": "Sample Video #5",
-		"description": "Sample Video #5 Description Text",
-		"categories": [ "sample" ],
+		"title": "2015 Sizzle Reel",
+		"description": "The sizzle reel for the Polymer Summit 2015.",
+		"categories": [ "Sample Category", "Sample Category 2" ],
 		"video-sources": [
 			{
 				"src": "https://storage.googleapis.com/wdm-assets/videos/ForBiggerEscapes.mp4",
 				"type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
 			}
 		],
-		"thumbnail": "https://storage.googleapis.com/wdm-assets/images/video-still.jpg"
+		"thumbnail": "/poster4.jpeg"
 	}
 ]

@@ -1,50 +1,379 @@
 <!DOCTYPE html>
-<link rel="icon" href="favicon.svg">
-<style>
-	html, body {
-		margin: 0;
-		background: #f4f4f4;
-	}
-	body {
-		padding: 2rem;
-	}
-	.gallery {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		grid-auto-rows: auto;
-		gap: 2rem;
-	}
-	.gallery > * {
-		background: white;
-		box-shadow: 5px 5px 10px rgba( 0, 0, 0, 0.05 );
+<html>
+<head>
+  <link rel="icon" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* http://meyerweb.com/eric/tools/css/reset/
+     v2.0 | 20110126
+     License: none (public domain)
+    */
+    html, body, div, span, applet, object, iframe,
+    h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+    a, abbr, acronym, address, big, cite, code,
+    del, dfn, em, img, ins, kbd, q, s, samp,
+    small, strike, strong, sub, sup, tt, var,
+    b, u, i, center,
+    dl, dt, dd, ol, ul, li,
+    fieldset, form, label, legend,
+    table, caption, tbody, tfoot, thead, tr, th, td,
+    article, aside, canvas, details, embed,
+    figure, figcaption, footer, header, hgroup,
+    menu, nav, output, ruby, section, summary,
+    time, mark, audio, video {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      font-size: 100%;
+      font: inherit;
+      vertical-align: baseline;
+    }
+    /* HTML5 display-role reset for older browsers */
+    article, aside, details, figcaption, figure,
+    footer, header, hgroup, menu, nav, section {
+      display: block;
+    }
+    body {
+      line-height: 1;
+    }
+    ol, ul {
+      list-style: none;
+    }
+    blockquote, q {
+      quotes: none;
+    }
+    blockquote:before, blockquote:after,
+    q:before, q:after {
+      content: '';
+      content: none;
+    }
+    table {
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
 
-	}
-	@media screen and ( max-width: 800px ) {
-		.gallery {
-			grid-template-columns: 1fr;
-		}
-	}
-	#connection-status {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		width: 100%;
-		font: bold 1em sans-serif;
-		color: #fff;
-		padding: 0.5em;
-		text-transform: uppercase;
-	}
-	.online {
-		background: #2eb872;
-	}
-	.offline {
-		background: #fa4659;
-	}
-</style>
+    /* App Styles */
+    html, body {
+      margin: 0;
+      background: #f4f4f4;
+      background: var(--background-dark);
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    #connection-status {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      width: auto;
+      font: normal 0.8em sans-serif;
+      color: #fff;
+      padding: 0.5em;
+      text-transform: uppercase;
+      border-top-left-radius: 5px;
+    }
+    .online {
+      background: #2eb872;
+    }
+    .offline {
+      background: #fa4659;
+    }
 
+    h3 {
+      background: #039be5;
+    }
 
-<div class="gallery"></div>
+    :root {
+      --background-dark: #12283C;
+      --background-light: #304B63;
+      --text-dark: #667F96;
+      --text-light: #FFFFFF;
+      --text-gray: #B9B9B9;
+      --text-footer: #97ADC0;
+      --accent: #24CCAE;
+    }
+    video-card p {
+      background: var(--background-dark);
+    }
+
+    header {
+      /*background: linear-gradient(180deg, #223D55 0%, rgba(34, 61, 85, 0.729176) 10%, rgba(34, 61, 85, 0) 30%), linear-gradient(0deg, #223D55 0%, rgba(34, 61, 85, 0.729176) 10%, rgba(34, 61, 85, 0) 30%), url('https://storage.googleapis.com/biograf-video-files/videos/nic-ep-56/poster.jpg');*/
+      /*background-size: cover;*/
+      /*background-position: center center;*/
+      /*height: 700px;*/
+      color: #FFF;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      width: 100%;
+    }
+    .poster-bg {
+      background: linear-gradient(180deg, #223D55 0%, rgba(34, 61, 85, 0.729176) 10%, rgba(34, 61, 85, 0) 30%), linear-gradient(0deg, #223D55 0%, rgba(34, 61, 85, 0.729176) 10%, rgba(34, 61, 85, 0) 30%), url('https://storage.googleapis.com/biograf-video-files/videos/nic-ep-56/poster.jpg');
+      background-position: center center;
+      background-size: cover !important;
+      height: 50vw;
+      position: relative;
+    }
+    header.with-video {
+      background: #12283C;
+    }
+    .poster-bg .play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      color: #000;
+    }
+    .poster-bg .play {
+      background: transparent;
+      border-radius: 50%;
+      width: 79px;
+      height: 79px;
+      padding: 0;
+      border: none;
+      cursor: pointer;
+    }
+    .poster-bg .main-player {
+      display: none;
+      background: #000;
+      height: 600px;
+    }
+    .poster-bg.has-player {
+      background: #223D55 !important;
+      height: auto;
+      padding-top: 96px;
+    }
+    .poster-bg.has-player .play {
+      display: none;
+    }
+    .poster-bg.has-player .main-player {
+      display: block;
+      height: calc(50vw - 96px);
+    }
+    header h1 {
+      font-size: 2rem;
+    }
+    header h1 a {
+      color: #FFF;
+      text-decoration: none;
+    }
+    header .menu a {
+      margin-left: 1.5rem;
+      font-size: 1rem;
+      font-weight: normal;
+      text-decoration: none;
+      color: #FFF;
+    }
+    header .container {
+      padding: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    @media screen and (max-width: 700px) {
+      header .menu {
+        display: none;
+      }
+    }
+
+    article {
+      background: #FFF;
+      padding: 4rem 2rem;
+    }
+    article h2 {
+      font-size: 2rem;
+      font-weight: bold;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+      color: #12283C;
+    }
+    article .info {
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+    }
+    article .info .date {
+      color: #304B63;
+    }
+    article .info .length {
+      color: #6F889F;
+      margin-left: 1rem;
+    }
+    button.primary {
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: bold;
+      letter-spacing: 0.085em;
+      border-radius: 5px;
+      padding: 0.5rem 1rem 0.5rem 1rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: transparent;
+    }
+    button.icon-download {
+      padding: 0.5rem 1rem 0.5rem 3rem;
+      background: url('/download.svg') transparent no-repeat 1rem center;
+    }
+    article p {
+      color: var(--text-dark);
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-bottom: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    div.card {
+      overflow: hidden;
+    }
+    .card .poster {
+      background-image: url("https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-2/poster.jpg");
+      background-size: cover;
+      height: 0;
+      padding-top: 56.25%;
+    }
+    .card .info {
+      padding: 1rem;
+    }
+    .card .info .title-icon {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    .card .info .title-icon .icon {
+      margin-top: 2px;
+      margin-left: 10px;
+    }
+    .card .info .title {
+      font-size: 1.3rem;
+      line-height: 1.5;
+      font-weight: bold;
+      color: #12283C;
+    }
+    .card .info .desc {
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #667F96;
+    }
+
+    footer {
+      background: var(--background-dark);
+      color: var(--text-footer);
+      padding: 2rem;
+      font-size: 1rem;
+    }
+    footer span {
+      white-space: pre;
+    }
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+    }
+    @media screen and (max-width: 770px) {
+      footer .container {
+        flex-direction: column-reverse;
+        align-items: center;
+      }
+      footer span:first-child {
+        margin-top: 1rem;
+      }
+    }
+
+    main {
+    }
+
+    .menu-spacer {
+      height: 96px;
+      background: var(--background-dark);
+    }
+
+    .page-title {
+      background: var(--background-light);
+      font-size: 2rem;
+      font-weight: bold;
+      color: #FFF;
+      text-align: center;
+      padding: calc(96px + 80px) 0 30px 0;
+    }
+    .page-title img {
+      margin-top: 30px;
+    }
+    .settings {
+      min-height: 400px;
+      max-width: 80%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      padding: 4rem 2rem;
+    }
+    .settings .option {
+      display: flex;
+      margin-bottom: 2rem;
+    }
+    .settings .option > div {
+      margin: 8px 0 0 1rem;
+    }
+    .settings .option h4 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #FFF;
+      margin-bottom: 1rem;
+    }
+    .settings .option p {
+      color: #97ADC0;
+      line-height: 1.5rem;
+    }
+    .downloads {
+      min-height: 400px;
+      padding: 2rem;
+    }
+    .downloads .header span {
+      color: #FFF;
+    }
+    .downloads .header span span {
+      opacity: 0.45;
+    }
+    .downloads .header {
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+<header class="_with-video">
+  <div class="container">
+    <h1><a href="/">KINO</a></h1>
+    <div class="menu">
+      <a href="/">Home</a>
+      <a href="/downloads">Manage Downloads</a>
+      <a href="/settings">Settings</a>
+    </div>
+  </div>
+
+<!--  <button class="play" onclick="document.querySelector('header').classList.add('with-video')">PLAY</button>-->
+
+<!--  <div class="video">-->
+<!--    test-->
+<!--  </div>-->
+</header>
+
+<main></main>
+
+<footer>
+  <div class="container">
+    <span>© Google 2021</span>
+    <span>Google Privacy Policy and Terms of Service    |    See the source code</span>
+  </div>
+</footer>
 
 <div id="connection-status"></div>
 
-<script type="module" src="dist/js/index.js"></script>
+<script type="module" src="/dist/js/index.js"></script>
+
+</body>
+</html>

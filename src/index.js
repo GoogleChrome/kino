@@ -1,7 +1,8 @@
 /**
- * Shared constants.
+ * Router, Connection util
  */
-import { SW_CACHE_NAME } from './js/constants';
+import Router from './js/modules/Router.module';
+import updateOnlineStatus from './js/utils/updateOnlineStatus';
 
 /**
  * Web Components implementation.
@@ -9,6 +10,18 @@ import { SW_CACHE_NAME } from './js/constants';
 import VideoPlayerComponent from './js/components/VideoPlayer';
 import VideoCardComponent from './js/components/VideoCard';
 import VideoDownloaderComponent from './js/components/VideoDownloader';
+import VideoGrid from './js/components/VideoGrid';
+import ToggleButton from './js/components/ToggleButton';
+import DownloadCard from './js/components/DownloadCard';
+
+/**
+ * Pages
+ */
+import HomePage from './js/pages/Home';
+import VideoPage from './js/pages/Video';
+import CategoryPage from './js/pages/Category';
+import DownloadsPage from './js/pages/Downloads';
+import SettingsPage from './js/pages/Settings';
 
 /**
  * Custom Elements definition.
@@ -16,48 +29,30 @@ import VideoDownloaderComponent from './js/components/VideoDownloader';
 customElements.define('video-player', VideoPlayerComponent);
 customElements.define('video-card', VideoCardComponent);
 customElements.define('video-downloader', VideoDownloaderComponent);
+customElements.define('video-grid', VideoGrid);
+customElements.define('toggle-button', ToggleButton);
+customElements.define('download-card', DownloadCard);
 
 /**
  * Video Application Logic
  */
-const videoGallery = document.querySelector('.gallery');
-
-/**
- * Build out the gallery view.
- */
-fetch('api/video-list.json')
-  .then((response) => response.json())
-  .then((videoDataArray) => videoDataArray.forEach((videoData) => {
-    const card = document.createElement('video-card');
-    const downloader = document.createElement('video-downloader');
-    const player = document.createElement('video-player');
-
-    downloader.init(videoData, SW_CACHE_NAME);
-    card.render(videoData);
-    card.shadowRoot.appendChild(downloader);
-    player.render(videoData);
-
-    videoGallery.appendChild(card);
-    videoGallery.appendChild(player);
-  }));
+const router = new Router();
+router.route('/', HomePage);
+router.route('/settings', SettingsPage);
+router.route('/downloads', DownloadsPage);
+router.route(RegExp('/category/(.*)'), CategoryPage);
+router.route('*', VideoPage);
 
 /**
  * Register Service Worker
  */
-if ('serviceWorker' in navigator) {
+if (false && 'serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
 
 /**
  * Connection status
  */
-function updateOnlineStatus() {
-  const status = document.getElementById('connection-status');
-  const condition = navigator.onLine ? 'online' : 'offline';
-  status.className = condition;
-  status.innerHTML = condition;
-}
-
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
 updateOnlineStatus();
