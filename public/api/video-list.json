@@ -1,31 +1,29 @@
 [
 	{
-		"title": "Sample Video #1",
-		"description": "Sample Video #1 Description Text",
+		"title": "HTTP203: JavaScript for-loops are… complicated",
+		"description": "HTTP203: JavaScript for-loops are… complicated – description text.",
 		"categories": [ "sample" ],
 		"video-sources": [
 			{
-				"src": "https://storage.googleapis.com/wdm-assets/videos/ForBiggerEscapes.mp4",
-				"type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
+				"src": "https://storage.googleapis.com/wdm-assets/videos/http-203/http-203-for-loops.mp4",
+				"type": "video/mp4; codecs=\"avc1.4d401f,mp4a.40.2\""
 			}
 		],
-		"video-subtitles": [
-			{
-				"default": true,
-				"kind": "subtitles",
-				"label": "English",
-				"src": "https://storage.googleapis.com/wdm-assets/subtitles/ForBiggerEscapes-en.vtt",
-				"srclang": "en"
-			},
-			{
-				"default": true,
-				"kind": "subtitles",
-				"label": "Czech",
-				"src": "https://storage.googleapis.com/wdm-assets/subtitles/ForBiggerEscapes-cz.vtt",
-				"srclang": "cz"
-			}
-		],
-		"thumbnail": "https://storage.googleapis.com/wdm-assets/images/video-still.jpg"
+		"thumbnail": [
+      {
+        "src": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-for-loops.avif",
+        "type": "image/avif"
+      },
+      {
+        "src": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-for-loops.webp",
+        "type": "image/webp"
+      },
+      {
+        "src": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-for-loops.jpg",
+        "type": "image/jpg",
+        "default": true
+      }
+    ]
 	},
 	{
 		"title": "Sample Video #2",
@@ -55,6 +53,22 @@
 			{
 				"src": "https://storage.googleapis.com/wdm-assets/videos/ForBiggerEscapes.mp4",
 				"type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
+			}
+		],
+    "video-subtitles": [
+			{
+				"default": true,
+				"kind": "subtitles",
+				"label": "English",
+				"src": "https://storage.googleapis.com/wdm-assets/subtitles/ForBiggerEscapes-en.vtt",
+				"srclang": "en"
+			},
+			{
+				"default": true,
+				"kind": "subtitles",
+				"label": "Czech",
+				"src": "https://storage.googleapis.com/wdm-assets/subtitles/ForBiggerEscapes-cz.vtt",
+				"srclang": "cz"
 			}
 		],
 		"thumbnail": "https://storage.googleapis.com/wdm-assets/images/video-still.jpg"

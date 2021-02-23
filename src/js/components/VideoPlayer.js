@@ -98,8 +98,12 @@ export default class extends HTMLElement {
   render(videoData) {
     this._videoData = videoData;
 
+    const thumbnailUrl = Array.isArray(videoData.thumbnail)
+      ? (videoData.thumbnail.find((t) => t.default)).src
+      : videoData.thumbnail;
+
     const markup = `${style}
-    <video ${videoData.thumbnail ? `poster="${videoData.thumbnail}"` : ''} controls crossorigin="anonymous">
+    <video ${videoData.thumbnail ? `poster="${thumbnailUrl}"` : ''} controls crossorigin="anonymous">
       ${this.getSourcesHTML()}
       ${this.getTracksHTML()}
     </video>

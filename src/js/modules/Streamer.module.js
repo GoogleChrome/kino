@@ -60,6 +60,10 @@ export default class {
     this.videoEl.addEventListener('timeupdate', () => {
       if (!this.stream.buffer.throttled) this.bufferAhead();
     });
+    this.videoEl.addEventListener('seeking', () => {
+      this.unthrottleBuffer();
+      this.bufferAhead();
+    });
   }
 
   getRepresentationMimeString(representation) {
@@ -152,6 +156,7 @@ export default class {
   }
 
   unthrottleBuffer() {
+    this.stream.buffer.throttled = false;
     if (this.stream.buffer.throttleTimeout) {
       clearTimeout(this.stream.buffer.throttleTimeout);
       this.stream.buffer.throttleTimeout = null;
