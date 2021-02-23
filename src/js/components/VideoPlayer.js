@@ -50,4 +50,9 @@ export default class extends HTMLElement {
     }
     this._root.innerHTML = markup;
   }
+
+  play() {
+    const videoEl = this._root.querySelector('video');
+    if (videoEl) videoEl.play();
+  }
 }
