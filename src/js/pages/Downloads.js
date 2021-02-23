@@ -1,5 +1,13 @@
 export default ({ mainContent }) => {
   mainContent.innerHTML = `
+    <style>
+      .grid {
+        margin-top: 2rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(450px, 100%), 1fr));
+        grid-gap: 2rem;
+      }
+    </style>
     <div class="page-title">
         <h2>Manage your downloads</h2>
         <img src="/arrow-down.svg" alt="" />
@@ -11,10 +19,10 @@ export default ({ mainContent }) => {
                 <button class="primary">Delete all</button>
             </div>
         </div>
-        <div class="content"></div>
+        <div class="grid"></div>
     </div>
   `;
-  mainContent.querySelector('.content').innerHTML = `
+  mainContent.querySelector('.grid').innerHTML = `
     <download-card></download-card>
     <download-card></download-card>
   `;

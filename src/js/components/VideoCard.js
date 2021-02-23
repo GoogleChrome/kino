@@ -74,10 +74,6 @@ export default class extends HTMLElement {
     this.navigate = navigate;
     const templateElement = document.createElement('template');
     templateElement.innerHTML = `${style}
-            <img src="${videoData.thumbnail}" width="1280" height="720" alt="${videoData.title} - Thumbnail">
-            <h2><a href="/${slugify(videoData.title)}">${videoData.title}</a></h2>
-            <p>${videoData.description}</p>`;
-    templateElement.innerHTML = `${style}
         <a href="/${slugify(videoData.title)}" class="poster" style="background-image: url('${videoData.thumbnail}')"></a>
         <div class="info">
           <div class="title-icon">
