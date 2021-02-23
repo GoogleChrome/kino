@@ -10,7 +10,7 @@ function findCategoryNameBySlug(slug, videoArray) {
       }
     }
   }
-  return undefined;
+  return '';
 }
 
 export default ({ mainContent, videoDataArray, path, navigate }) => {

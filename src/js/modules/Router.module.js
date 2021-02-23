@@ -1,7 +1,6 @@
 export default class Router {
   constructor() {
     this.routes = [];
-    this.init();
 
     window.addEventListener('popstate', (event) => {
       console.log(`location: ${event.target.location.pathname}, state: ${JSON.stringify(event.state)}`, event);
@@ -15,6 +14,8 @@ export default class Router {
       e.preventDefault();
       navigate(this.href);
     }));
+
+    this.init();
   }
 
   route(path, callback) {
