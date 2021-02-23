@@ -25,6 +25,19 @@ const metaAccessorFactory = (abstractedIDB) => ({
     return data;
   },
 
+  async getAll() {
+    const transaction = abstractedIDB.db.transaction([this.name], 'readonly');
+    const store = transaction.objectStore(this.name);
+    const data = await new Promise((resolve, reject) => {
+      const request = store.getAll();
+
+      request.onsuccess = (e) => resolve(e.target.result);
+      request.onerror = () => reject('Unable to fetch meta information.');
+    });
+
+    return data;
+  },
+
   async put(videoMetaData) {
     return abstractedIDB.defaultAccesor.put(videoMetaData, this.name);
   },
