@@ -1,4 +1,4 @@
-import IDBConnection from '../modules/IDBConnection.module';
+import getIDBConnection from '../modules/IDBConnection.module';
 
 const style = `
 <style>
@@ -130,22 +130,56 @@ export default class extends HTMLElement {
   }
 
   /**
-   * Downloads the video using a stream reader and invokes `storeVideoChunk` to store individual
-   * video chunks in IndexedDB.
+   * Returns the thumbnail image URL.
    *
-   * @returns {Promise} Promise that resolves with boolean `true` when download succeeds.
+   * @returns {string} URL.
+   */
+  getPosterURL() {
+    return this._videoData.thumbnail;
+  }
+
+  /**
+   * Returns the subtitles URLs.
+   *
+   * @returns {string[]} URLs.
+   */
+  getSubtitlesUrls() {
+    const subtitlesObjects = this._videoData['video-subtitles'] || [];
+    const subtitlesUrls = subtitlesObjects.map((subObject) => subObject.src);
+
+    return subtitlesUrls;
+  }
+
+  /**
+   * Saves assets to the specified cache using Cache API.
+   *
+   * @param {string[]} urls Array of URLs to be saved to the cache.
+   *
+   * @returns {Promise} Resolves when the assets are stored in the cache.
+   */
+  async saveToCache(urls) {
+    const cache = await caches.open(this._cacheName);
+    return cache.addAll(urls);
+  }
+
+  /**
+   * Downloads the current video and its assets to the cache and IDB.
    */
   async download() {
     const videoURL = this.getDownloadableURL();
-    const posterURL = this._videoData.thumbnail;
-    const subtitlesURLs = (this._videoData['video-subtitles'] || []).map((subObject) => subObject.src);
+    const posterURL = this.getPosterURL();
+    const subtitlesURLs = this.getSubtitlesUrls();
 
-    caches.open(this._cacheName).then(
-      (cache) => {
-        cache.addAll([posterURL, ...subtitlesURLs]);
-      },
-    );
+    this.saveToCache([posterURL, ...subtitlesURLs]);
+    this.saveToIDB(videoURL);
+  }
 
+  /**
+   * Returns data used to download the video to IDB.
+   *
+   * @returns {object} Init data.
+   */
+  async initDownload() {
     const fetchOpts = {
       headers: {},
     };
@@ -154,7 +188,7 @@ export default class extends HTMLElement {
     let videoSizeInBytes = null;
 
     /**
-     * Resume incomplete downloads.
+     * Support incomplete downloads.
      */
     if (this.state === 'partial' && this._videoData.meta) {
       const lastChunk = await this.getLastChunk();
@@ -171,60 +205,89 @@ export default class extends HTMLElement {
       }
     }
 
-    return new Promise((resolve) => {
-      fetch(videoURL, fetchOpts)
-        .then((response) => {
-          /**
-           * We're in the middle of the download.
-           * Set the component state to `partial` to indicate that.
-           */
-          this.state = 'partial';
+    return {
+      firstIndex,
+      firstOffset,
+      videoSizeInBytes,
+      fetchOpts,
+    };
+  }
 
-          /**
-           * @see https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream
-           */
-          const reader = response.body.getReader();
+  /**
+   * Takes a video URL, downloads the video using a stream reader
+   * and invokes `storeVideoChunk` to store individual video chunks in IndexedDB.
+   *
+   * @param {string} videoURL Video URL to be downloaded and saved to IDB.
+   *
+   * @returns {object} Last chunk object that was generated for IDB.
+   */
+  async saveToIDB(videoURL) {
+    const {
+      firstIndex, firstOffset, videoSizeInBytes, fetchOpts,
+    } = await this.initDownload();
 
-          const chunk = {
-            url: videoURL,
-            offset: firstOffset,
-            mime: response.headers.get('Content-Type') || this.getVideoMimeByURL(videoURL),
-            sizeInBytes: videoSizeInBytes || parseInt(response.headers.get('Content-Length'), 10) || 1,
-          };
-          const index = firstIndex;
+    /**
+     * Set the component state to `partial` to indicate that we've started the process.
+     */
+    this.state = 'partial';
 
-          const readChunk = () => {
-            reader.read().then(({ done, value }) => {
-              chunk.offset += value ? value.length : 0;
-              chunk.data = value;
-              chunk.done = done;
-              chunk.index = index + 1;
+    /**
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream
+     */
+    const response = await fetch(videoURL, fetchOpts);
+    const reader = response.body.getReader();
 
-              /**
-               * Triggers the `progress` setter, which reflects to the `progress` attribute
-               * and the `<progress>` element.
-               */
-              this.progress = chunk.offset / chunk.sizeInBytes;
+    /**
+     * Some common metadata to be passed together with every chunk of data.
+     */
+    const commonChunkData = {
+      url: videoURL,
+      mime: response.headers.get('Content-Type') || this.getVideoMimeByURL(videoURL),
+      sizeInBytes: videoSizeInBytes || parseInt(response.headers.get('Content-Length'), 10) || 1,
+    };
 
-              /**
-               * Invoke the actual logic that stores received chunk data in IDB.
-               */
-              this.storeVideoChunk(chunk);
+    let index = firstIndex;
+    let offset = firstOffset;
 
-              /**
-               * Repeat until we're done.
-               *
-               * This is a bit stupid, because the recursion here could leads to very deep
-               * call-stacks when we try to download huge video files.
-               *
-               * But it's OK for now.
-               */
-              return done ? resolve(true) : readChunk();
-            });
-          };
-          readChunk();
-        });
-    });
+    const processChunk = ({ done, value }) => {
+      offset += value ? value.length : 0;
+      index += 1;
+
+      const chunk = {
+        data: value,
+        offset,
+        index,
+        done,
+        ...commonChunkData,
+      };
+
+      /**
+       * Triggers the `progress` setter, which reflects to the `progress` attribute
+       * and the `<progress>` element.
+       */
+      this.progress = chunk.offset / chunk.sizeInBytes;
+
+      /**
+       * Invoke the actual logic that stores received chunk data in IDB.
+       */
+      this.storeVideoChunk(chunk);
+
+      return chunk;
+    };
+
+    let streamChunk;
+    let videoChunk;
+
+    do {
+      /* eslint-disable no-await-in-loop */
+      // Await in loop is OK. The processing is sequential and can't be parallelized.
+      streamChunk = await reader.read();
+      /* eslint-eanble no-await-in-loop */
+
+      videoChunk = processChunk(streamChunk);
+    } while (streamChunk && !streamChunk.done);
+
+    return videoChunk;
   }
 
   /**
@@ -242,7 +305,7 @@ export default class extends HTMLElement {
   async storeVideoChunk({
     data, offset, done, mime, sizeInBytes, index, url,
   }) {
-    const db = await IDBConnection.getConnection();
+    const db = await getIDBConnection();
     const size = data ? data.length : 0;
 
     db.meta.put({
@@ -291,7 +354,7 @@ export default class extends HTMLElement {
    * @returns {Promise} Promise that resolves with the last chunk data.
    */
   async getLastChunk() {
-    const db = await IDBConnection.getConnection();
+    const db = await getIDBConnection();
     const rawDb = db.unwrap();
     const transaction = rawDb.transaction([db.data.name], 'readonly');
     const store = transaction.objectStore(db.data.name);
@@ -311,7 +374,7 @@ export default class extends HTMLElement {
    * @returns {Promise} Promise that resolves with the total video size in bytes.
    */
   async getTotalSize() {
-    const db = await IDBConnection.getConnection();
+    const db = await getIDBConnection();
     const rawDb = db.unwrap();
     const transaction = rawDb.transaction([db.data.name], 'readonly');
     const store = transaction.objectStore(db.data.name);
@@ -361,7 +424,7 @@ export default class extends HTMLElement {
    * component's `state` and `progress` attribute values.
    */
   async _setDownloadState() {
-    const db = await IDBConnection.getConnection();
+    const db = await getIDBConnection();
     const url = this.getDownloadableURL();
     const videoMeta = await db.meta.get(url);
 
