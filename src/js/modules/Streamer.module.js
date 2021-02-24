@@ -259,13 +259,14 @@ export default class {
            */
           representations[contentType] = this.parser.queryRepresentations(query, contentType, 'eng');
           representations[contentType] = representations[contentType].filter(canPlayFilter);
-        } while (query);
+        } while (!representations[contentType]);
       },
     );
 
     if (representations.video.length === 0) {
       throw new Error('[Streamer] No playable video representation found.');
     }
+    console.log(representations);
 
     return representations;
   }
