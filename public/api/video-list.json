@@ -1,8 +1,8 @@
 [
 	{
 		"title": "HTTP203: JavaScript for-loops are… complicated",
-		"description": "HTTP203: JavaScript for-loops are… complicated – description text.",
-		"categories": [ "sample" ],
+		"description": "HTTP203: JavaScript for-loops are… complicated – Description Text",
+		"categories": [ "http203" ],
 		"video-sources": [
 			{
 				"src": "https://storage.googleapis.com/wdm-assets/videos/http-203/http-203-for-loops.mp4",
@@ -26,24 +26,30 @@
     ]
 	},
 	{
-		"title": "Sample Video #2",
-		"description": "Sample Video #2 Description Text",
-		"categories": [ "sample" ],
+		"title": "HTTP203: Background Fetch",
+		"description": "HTTP203: Background Fetch – Description Text",
+		"categories": [ "http203" ],
 		"video-sources": [
 			{
-				"src": "./video/output-4/output.mpd",
+				"src": "https://storage.googleapis.com/wdm-assets/videos/http-203/background-fetch/manifest.mpd",
 				"type": "application/dash+xml"
-			},
-      {
-				"src": "./video/output-4/master.m3u8",
-				"type": "application/vnd.apple.mpegurl"
-			},
-      {
-				"src": "https://storage.googleapis.com/wdm-assets/videos/ForBiggerEscapes.mp4",
-				"type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
 			}
 		],
-		"thumbnail": "https://storage.googleapis.com/wdm-assets/images/video-still.jpg"
+    "thumbnail": [
+      {
+        "src": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-background-fetch.avif",
+        "type": "image/avif"
+      },
+      {
+        "src": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-background-fetch.webp",
+        "type": "image/webp"
+      },
+      {
+        "src": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-background-fetch.jpg",
+        "type": "image/jpg",
+        "default": true
+      }
+    ]
 	},
 	{
 		"title": "Sample Video #3",
