@@ -14,7 +14,7 @@ const interpolateChunkURL = (chunkURL, representationObject, chunkIndex = 0) => 
 
   const replaceTuples = [
     [/\$RepresentationID\$/, representationObject.id],
-    [/\$Number%([0-9]+)d\$/, (match, repeats) => chunkIndex.padStart(parseInt(repeats, 10), 0)],
+    [/\$Number%([0-9]+)d\$/, (_, repeats) => chunkIndex.padStart(parseInt(repeats, 10), 0)],
   ];
 
   replaceTuples.forEach(
@@ -43,7 +43,7 @@ const getSegmentByIndex = (representationObject, index) => {
 /**
  * Returns the initial segment filename.
  *
- * @param {object} representationObject Representation object.
+ * @param {RepresentationObject} representationObject Representation object.
  *
  * @returns {string} Interpolated chunk filename.
  */
@@ -54,11 +54,20 @@ const getInitialSegment = (representationObject) => {
   return interpolateChunkURL(chunkURLTemplate, representationObject);
 };
 
+/**
+ * Returns the index of the segment that corresponds with the provided time.
+ *
+ * @param {RepresentationObject} representationObject         The representation object.
+ * @param {Element}              representationObject.element The <Representation> element.
+ * @param {number}               time                         Time in seconds.
+ *
+ * @returns {number} Chunk index.
+ */
 const getSegmentIndexByTime = (representationObject, time) => {
   const segmentTemplate = representationObject.element.querySelector('SegmentTemplate');
   const segmentTimeline = segmentTemplate.querySelector('SegmentTimeline');
   const segmentElements = [...segmentTimeline.querySelectorAll('S')];
-  const timescale = parseInt(segmentTemplate.getAttribute('timescale'), 10);
+  const timescale = Number(segmentTemplate.getAttribute('timescale'));
 
   if (!timescale) return null;
 
@@ -69,6 +78,13 @@ const getSegmentIndexByTime = (representationObject, time) => {
   let currentIndex = 1;
   let returnIndex = null;
 
+  /**
+   * Iterate over all <S> elements and find out which <S>
+   * element corresponds with the provided `time`.
+   *
+   * Then figure out the chunk index based on information
+   * associated with the `<S>` element.
+   */
   segmentElements.forEach(
     (segmentEl) => {
       const duration = Number(segmentEl.getAttribute('d'));
@@ -90,6 +106,29 @@ const getSegmentIndexByTime = (representationObject, time) => {
   return returnIndex;
 };
 
+/**
+ * @typedef  {object}  RepresentationObject
+ * @property {string}  id                    Representation ID.
+ * @property {string}  mimeType              Representation MIME type.
+ * @property {string}  codecs                Representation codec.
+ * @property {string}  bandwidth             Bandwidth in bits required to play media.
+ * @property {string}  width                 [Video] Width of the video frame.
+ * @property {string}  height                [Video] Height of the video frame.
+ * @property {string}  frameRate             [Video] Framerate.
+ * @property {string}  audioSamplingRate     [Audio] Audio sampling rate.
+ * @property {Element} element               The <Representation> element.
+ * @property {number}  maxChunkIndex         The last media chunk index.
+ */
+
+/**
+ * Converts the <Represenetation> element from the MPD to a more
+ * structured `representation` object containing information associated
+ * with the representation.
+ *
+ * @param {Element} representationElement The <Representation> element from MPD.
+ *
+ * @returns {RepresentationObject} Representation object.
+ */
 const representationElementToObject = (representationElement) => {
   const representation = [...representationElement.attributes].reduce(
     (carry, attr) => {
@@ -130,10 +169,14 @@ export default class {
 
     // Public properties.
     this.minBufferTime = this.getMinBufferTime();
-
     this.duration = this.getDuration();
   }
 
+  /**
+   * Returns the minimum healthy buffer duration.
+   *
+   * @returns {number} Healthy buffer duration.
+   */
   getMinBufferTime() {
     const minBufferTimeDuration = this.internal.root.getAttribute('minBufferTime');
     const minBufferTimeSeconds = iso8601TimeDurationToSeconds(minBufferTimeDuration);
@@ -141,6 +184,11 @@ export default class {
     return minBufferTimeSeconds || 3;
   }
 
+  /**
+   * Returns the duration of the whole media in seconds.
+   *
+   * @returns {number} Media duration.
+   */
   getDuration() {
     const duration = this.internal.root.getAttribute('mediaPresentationDuration');
     const durationInSeconds = iso8601TimeDurationToSeconds(duration);
@@ -148,7 +196,16 @@ export default class {
     return durationInSeconds;
   }
 
-  queryRepresentations(representationQuery, contentType, lang = null) {
+  /**
+   * Queries the representations.
+   *
+   * @param {string} representationQuery Query representation attrs, e.g. '[mimeType="video/webm"]'
+   * @param {string} contentType         Requested content type, e.g. 'video'.
+   * @param {string} lang                Requested language.
+   *
+   * @returns {RepresentationObject[]} Representation objects.
+   */
+  queryRepresentations(representationQuery, contentType, lang = '') {
     let adaptationSetsQuery = `AdaptationSet[contentType="${contentType}"]`;
     if (lang) adaptationSetsQuery += `[lang="${lang}"]`;
 

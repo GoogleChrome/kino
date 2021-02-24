@@ -1,6 +1,5 @@
 import Streamer from '../modules/Streamer.module';
 import ParserMPD from '../modules/ParserMPD.module';
-import ParserM3U8 from '../modules/ParserM3U8.module';
 
 const style = `
 <style>
@@ -59,6 +58,12 @@ export default class extends HTMLElement {
     return sources;
   }
 
+  /**
+   * Returns the <source> tags HTML to be included in the
+   * <video> element.
+   *
+   * @returns {string} Sources HTML.
+   */
   getSourcesHTML() {
     const sources = this.getAppropriateSources();
     return sources.reduce(
@@ -70,6 +75,12 @@ export default class extends HTMLElement {
     );
   }
 
+  /**
+   * Returns the <track> tags HTML to be included in the
+   * <video> element.
+   *
+   * @returns {string} Tracks HTML.
+   */
   getTracksHTML() {
     return (this._videoData['video-subtitles'] || []).reduce(
       (markup, trackObject) => {
@@ -95,9 +106,17 @@ export default class extends HTMLElement {
     return streamingSources.length > 0;
   }
 
+  /**
+   * Renders the component.
+   *
+   * @param {object} videoData Video data.
+   */
   render(videoData) {
     this._videoData = videoData;
 
+    /**
+     * Returns either the default thumbnail `src` from an array or directly the `src` from a string.
+     */
     const thumbnailUrl = Array.isArray(videoData.thumbnail)
       ? (videoData.thumbnail.find((t) => t.default)).src
       : videoData.thumbnail;
@@ -168,8 +187,6 @@ export default class extends HTMLElement {
 
     if (mimeType === 'application/dash+xml') {
       parser = new ParserMPD(manifestDocument);
-    } else if (mimeType === 'application/vnd.apple.mpegurl') {
-      parser = new ParserM3U8(manifestDocument);
     }
 
     if (!parser) return;
