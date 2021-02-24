@@ -266,7 +266,6 @@ export default class {
     if (representations.video.length === 0) {
       throw new Error('[Streamer] No playable video representation found.');
     }
-    console.log(representations);
 
     return representations;
   }
