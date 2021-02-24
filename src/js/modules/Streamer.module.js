@@ -1,13 +1,28 @@
+/**
+ * Some video types and codecs leads to smaller file sizes
+ * for comparable video qualities.
+ *
+ * If the client supports those, we want to prioritize those sources
+ * over the others available in the MPD manifest.
+ */
 const DEFAULT_VIDEO_PRIORITIES = [
   '[mimeType="video/webm"][codecs^="vp09"]',
   '[mimeType="video/webm"]',
   '[mimeType="video/mp4"]',
 ];
 
+/**
+ * Same for audio, but right now we have no real preference here.
+ */
 const DEFAULT_AUDIO_PRIORITIES = [
   '[mimeType="audio/mp4"]',
 ];
 
+/**
+ * A stream can be composed from multiple media, e.g. video, audio, subtitles etc.
+ *
+ * These are all the types the Streamer has support for.
+ */
 const ALL_STREAM_TYPES = ['audio', 'video'];
 
 /**
@@ -18,6 +33,7 @@ export default class {
     this.videoEl = videoEl;
     this.parser = parser;
     this.opts = opts;
+
     this.stream = {
       media: {
         baseURL: '/',
@@ -42,20 +58,82 @@ export default class {
     // Iterate which stream types we have separate representations for.
     this.stream.media.streamTypes = Object.keys(this.stream.media.representations);
 
-    if (this.opts.manifestSrc) {
-      const manifestURL = new URL(this.opts.manifestSrc);
-      this.stream.media.baseURL = `${manifestURL.origin}${manifestURL.pathname.replace(/[^/]+$/, '')}`;
+    /**
+     * Define a base URL for the files referenced in the manifest file.
+     */
+    const manifestSrc = this.getOpt('manifestSrc');
+    if (manifestSrc) {
+      const manifestURL = new URL(manifestSrc);
+      const manifestPathDir = manifestURL.pathname.replace(/[^/]+$/, ''); // Strip trailing filename.
+
+      this.stream.media.baseURL = `${manifestURL.origin}${manifestPathDir}`;
     }
 
     this.initializeStream();
   }
 
-  getDownlink() {
-    return this.stream.measuredDownlink
-      || navigator.connection?.downlink
-      || 10; // Assume broadband if we don't know.
+  /**
+   * Initializes all the differents parts of the stream.
+   */
+  async initializeStream() {
+    /**
+     * Create and attach a `MediaSource` element.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/MediaSource
+     */
+    await this.initializeMediaSource();
+
+    /**
+     * Create, extend and attach the `SourceBuffer` objects.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/SourceBuffer
+     */
+    this.initializeBuffers();
+
+    /**
+     * Respond to video playback and seek operations to buffer enough data
+     * ahead at any point.
+     */
+    this.observeVideoUpdates();
   }
 
+  /**
+   * Initializes the Media Source and appends it to a video element.
+   *
+   * @returns {Promise} Promise that resolves with opened MediaSource instance.
+   */
+  initializeMediaSource() {
+    const mediaSource = new MediaSource();
+    this.videoEl.src = URL.createObjectURL(mediaSource);
+
+    return new Promise((resolve) => {
+      mediaSource.addEventListener('sourceopen', (e) => {
+        this.stream.buffer.mediaSource = e.target;
+        this.stream.buffer.mediaSource.duration = this.stream.media.duration;
+        resolve();
+      });
+    });
+  }
+
+  /**
+   * Initialize a `SourceBuffer` for each component of the stream,
+   * e.g. one for video, one for audio.
+   */
+  initializeBuffers() {
+    const { streamTypes, representations } = this.stream.media;
+
+    streamTypes.forEach((streamType) => {
+      const mimeString = this.getRepresentationMimeString(representations[streamType][0]);
+      this.stream.buffer.sourceBuffers[streamType] = this.initializeSourceBuffer(mimeString);
+    });
+
+    this.bufferAhead();
+  }
+
+  /**
+   * Observes the video player for `currentTime` updates and add more data
+   * to the buffer if necessary.
+   */
   observeVideoUpdates() {
     this.videoEl.addEventListener('timeupdate', () => {
       if (!this.stream.buffer.throttled) this.bufferAhead();
@@ -66,14 +144,44 @@ export default class {
     });
   }
 
+  /**
+   * Returns a reported or measured downlink capacity in MBits per second.
+   *
+   * @returns {number} Reported or measured downlink capacity in MBits per second.
+   */
+  getDownlink() {
+    return this.stream.measuredDownlink
+      || navigator.connection?.downlink
+      || 10; // Assume broadband if we don't know.
+  }
+
+  /**
+   * Returns the MIME type for a representation.
+   *
+   * @param {object} representation Information about the representation.
+   *
+   * @returns {string} MIME type, optionally with codecs string, too.
+   */
   getRepresentationMimeString(representation) {
     return representation.mimeType && representation.codecs
       ? `${representation.mimeType}; codecs="${representation.codecs}"`
       : `${representation.mimeType}`;
   }
 
+  /**
+   * Get a combination of video and audio media representations
+   * that will fit currently available bandwidth.
+   *
+   * @todo Select appropriate audio, too.
+   *
+   * @returns {object} Selected `video` and `audio` representations.
+   */
   getRepresentationsByBandwidth() {
     const representations = {
+      /*
+       * Right now, if we have any `audio` representations, we just pick the first one,
+       * because audio isn't really too much data.
+       */
       audio: this.stream.media.representations.audio[0] || null,
       video: null,
     };
@@ -83,6 +191,11 @@ export default class {
     if (representations.audio) {
       usedBandwidth += parseInt(representations.audio.bandwidth || 200000, 10);
     }
+
+    /**
+     * From all video representations, pick the best quality one that
+     * still fits the available bandwidth.
+     */
     representations.video = this.stream.media.representations.video.reduce(
       (previous, current) => {
         const currentBandwidth = parseInt(current.bandwidth, 10);
@@ -102,7 +215,20 @@ export default class {
     return representations;
   }
 
+  /**
+   * Fetch all representations present in the MPD file and filter
+   * those that the current client can't play out.
+   *
+   * @returns {object[]} All representations that the current client is able to play.
+   */
   initRepresentations() {
+    /**
+     * Returns whether the provided representation is playable by the current client.
+     *
+     * @param {object} representation Representation object returned by parser.queryRepresentations.
+     *
+     * @returns {boolean} Is this representation playable by the current client.
+     */
     const canPlayFilter = (representation) => {
       const testMime = this.getRepresentationMimeString(representation);
       return this.videoEl.canPlayType(testMime) === 'probably';
@@ -140,14 +266,31 @@ export default class {
     return representations;
   }
 
+  /**
+   * Get a value from options passed to the Streamer constructor.
+   *
+   * @param {string} name         Name of the option to be retrived.
+   * @param {*}      defaultValue Value returned if the option doesn't exist.
+   *
+   * @returns {*} Option value.
+   */
   getOpt(name, defaultValue = null) {
     return this.opts[name] || defaultValue;
   }
 
+  /**
+   * Sets an option value.
+   *
+   * @param {string} name   Name of the option to be used for storage.
+   * @param {*}      value  Value to be stored.
+   */
   setOpt(name, value) {
     this.opts[name] = value;
   }
 
+  /**
+   * "Locks" buffering for 0.5 second.
+   */
   throttleBuffer() {
     this.stream.buffer.throttled = true;
     this.stream.buffer.throttleTimeout = setTimeout(() => {
@@ -155,6 +298,9 @@ export default class {
     }, 500);
   }
 
+  /**
+   * "Unlocks" buffering.
+   */
   unthrottleBuffer() {
     this.stream.buffer.throttled = false;
     if (this.stream.buffer.throttleTimeout) {
@@ -163,43 +309,46 @@ export default class {
     }
   }
 
-  async initializeStream() {
-    await this.initializeMediaSource();
-    this.initializeBuffers();
-    this.observeVideoUpdates();
-  }
-
   /**
-   * Initializes the Media Source and appends it to a video element.
+   * Initializes and returns a SourceBuffer.
    *
-   * @returns {Promise} Promise that resolves with opened MediaSource instance.
+   * Also extends it with `dataQueue` and `fileQueue` objects that
+   * simplify pumping chunks of data into them.
+   *
+   * @param {string} mimeString Mime string for the SourceBuffer.
+   *
+   * @returns {SourceBuffer} Initialized `SourceBuffer`.
    */
-  initializeMediaSource() {
-    const mediaSource = new MediaSource();
-    this.videoEl.src = URL.createObjectURL(mediaSource);
-
-    return new Promise((resolve) => {
-      mediaSource.addEventListener('sourceopen', (e) => {
-        this.stream.buffer.mediaSource = e.target;
-        this.stream.buffer.mediaSource.duration = this.stream.media.duration;
-        resolve();
-      });
-    });
-  }
-
   initializeSourceBuffer(mimeString) {
     const sourceBuffer = this.stream.buffer.mediaSource.addSourceBuffer(mimeString);
+
+    /**
+     * The `dataQueue` object simplifies pumping binary data into the buffer. It makes
+     * sure the buffer is always done writing previous chunk of data before another
+     * append request takes place.
+     */
     sourceBuffer.dataQueue = {
       internal: {
         entries: [],
         updating: false,
       },
+
+      /**
+       * Appends data to the buffer.
+       *
+       * @param {Uint8Array} data Data.
+       */
       append(data) {
         this.internal.entries.push(data);
         if (!this.internal.updating) {
           this.step();
         }
       },
+
+      /**
+       * Buffer is ready to accept more data. Check the internal queue to see
+       * if we have more data lined up.
+       */
       step() {
         const data = this.internal.entries.shift();
         if (data) {
@@ -209,12 +358,30 @@ export default class {
       },
     };
 
+    /**
+     * The `fileQueue` object simplifies loading chunk files into the `SourceBuffer`.
+     *
+     * It internally tracks all files already added to the buffer and refuses adding
+     * them twice unless that operation is forced.
+     *
+     * It also implements a way to access the file chunks and pump data out of them
+     * through to the `dataQueue` in the order of addition.
+     */
     sourceBuffer.fileQueue = {
       internal: {
         files: [],
         bufferedFiles: new Set(),
         reading: false,
       },
+
+      /**
+       * Adds a file to be appended to the buffer.
+       *
+       * @param {object}  fileObj        File object.
+       * @param {boolean} fileObj.force  Force the file to the buffer even if we appended it before.
+       * @param {string}  fileObj.url    URL of the chunk to be appended to the buffer.
+       * @param {string}  fileObj.id     ID of the file to be appended.
+       */
       add(fileObj) {
         if (!fileObj.force && this.internal.bufferedFiles.has(fileObj.id)) return;
 
@@ -223,6 +390,11 @@ export default class {
 
         if (!this.internal.reading) this.step();
       },
+
+      /**
+       * Check if the previous read and write is finished and if yes,
+       * get the next file in queue and process that.
+       */
       step() {
         const filename = this.internal.files.shift();
         if (!filename) return;
@@ -230,6 +402,9 @@ export default class {
         this.internal.reading = true;
         fetch(filename).then((response) => response.body).then(
           async (body) => {
+            /**
+             * @see https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream/getReader
+             */
             const reader = body.getReader();
             const readChunk = async () => {
               const { value, done } = await reader.read();
@@ -257,23 +432,29 @@ export default class {
       e.target.dataQueue.internal.updating = false;
       e.target.dataQueue.step();
     });
+
+    /**
+     * Expose public methods to avoid using `dataQueue` and `fileQueue` directly.
+     */
     sourceBuffer.enqueueAppendBuffer = sourceBuffer.dataQueue.append.bind(sourceBuffer.dataQueue);
     sourceBuffer.enqueueFile = sourceBuffer.fileQueue.add.bind(sourceBuffer.fileQueue);
 
     return sourceBuffer;
   }
 
-  initializeBuffers() {
-    const { streamTypes, representations } = this.stream.media;
+  /**
+   * @typedef {object} healthResult
+   * @property {boolean} isHealthy      Whether the `heathyDuration` of the buffer is loaded ahead.
+   * @property {number}  bufferEndTime  The end time of the current buffer range ahead.
+   */
 
-    streamTypes.forEach((streamType) => {
-      const mimeString = this.getRepresentationMimeString(representations[streamType][0]);
-      this.stream.buffer.sourceBuffers[streamType] = this.initializeSourceBuffer(mimeString);
-    });
-
-    this.bufferAhead();
-  }
-
+  /**
+   * Returns health information about the provided buffer.
+   *
+   * @param {SourceBuffer} buffer SourceBuffer to determine health for.
+   *
+   * @returns {healthResult} Health result of the provided source buffer.
+   */
   getBufferHealth(buffer) {
     const currentPlaybackTime = this.videoEl.currentTime;
     const { healthyDuration } = this.stream.buffer;
@@ -282,6 +463,9 @@ export default class {
     let bufferLeft = 0;
     let bufferEndTime = currentPlaybackTime;
 
+    /**
+     * Find the buffered time range the playback is currently in if there is one.
+     */
     for (let i = 0; i < bufferedTimeRanges.length; i += 1) {
       const start = bufferedTimeRanges.start(i);
       const end = bufferedTimeRanges.end(i);
@@ -298,6 +482,10 @@ export default class {
     };
   }
 
+  /**
+   * Inspects buffer health and loads more upcoming data to the buffer
+   * if the amount of data in the buffer is considered unhealthy low.
+   */
   bufferAhead() {
     this.throttleBuffer();
 
@@ -322,6 +510,10 @@ export default class {
       const lastRepresentationId = lastRepresentationsIds[streamType];
       const filesToBuffer = [];
 
+      /**
+       * If we switch between representations mid-stream, we need to inject a so-called
+       * initialization chunk again to indicate the parameters of the data ahead changed.
+       */
       if (representation.id !== lastRepresentationId) {
         filesToBuffer.push({
           id: `initial-${representation.id}`,
