@@ -150,8 +150,12 @@ export default class {
    * @returns {number} Reported or measured downlink capacity in MBits per second.
    */
   getDownlink() {
+    let navigatorDownlink = 10;
+    if (navigator.connection) {
+      navigatorDownlink = navigator.connection.downlink;
+    }
     return this.stream.measuredDownlink
-      || navigator.connection?.downlink
+      || navigatorDownlink
       || 10; // Assume broadband if we don't know.
   }
 
