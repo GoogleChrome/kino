@@ -45,7 +45,7 @@ export default class extends HTMLElement {
     let videoImageHTML;
 
     if (Array.isArray(thumbnail)) {
-      const sources = thumbnail.filter((t) => !t.default).map((t) => `<source src="${t.src}" type="${t.type}">`).join('');
+      const sources = thumbnail.filter((t) => !t.default).map((t) => `<source srcset="${t.src}" type="${t.type}">`).join('');
       const defaultSource = thumbnail.find((t) => t.default);
       const defaultSourceHTML = `<img src="${defaultSource.src}" width="1280" height="720" alt="${videoData.title} - Thumbnail">`;
 
