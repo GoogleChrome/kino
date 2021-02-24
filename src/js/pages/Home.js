@@ -1,14 +1,12 @@
 import appendVideoToGallery from '../utils/appendVideoToGallery';
+import getPoster from './partials/Poster.partial';
 
 export default ({ mainContent, videoDataArray, navigate }) => {
-  mainContent.innerHTML = `
-    <div class="poster-bg">
-      <button class="play" onclick="document.querySelector('.poster-bg').classList.add('has-player')"><img src="/play.svg" alt="" /></button>
-      <div class="main-player">
-        test
-      </div>
-    </div>
-    `;
+  if (videoDataArray[0]) {
+    const mainVideoData = videoDataArray[0] || {};
+    mainContent.appendChild(getPoster(mainVideoData));
+  }
+
   const videosByCategories = videoDataArray.reduce((acc, videoData) => {
     videoData.categories.forEach((category) => {
       if (!(category in acc)) acc[category] = [];
