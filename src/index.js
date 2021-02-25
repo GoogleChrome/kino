@@ -1,5 +1,5 @@
 /**
- * Router, Connection util
+ * Router, Connection utils.
  */
 import Router from './js/modules/Router.module';
 import updateOnlineStatus from './js/utils/updateOnlineStatus';
@@ -13,9 +13,10 @@ import VideoDownloaderComponent from './js/components/VideoDownloader';
 import VideoGrid from './js/components/VideoGrid';
 import ToggleButton from './js/components/ToggleButton';
 import DownloadCard from './js/components/DownloadCard';
+import ProgressRing from './js/components/ProgressRing';
 
 /**
- * Pages
+ * Pages.
  */
 import HomePage from './js/pages/Home';
 import VideoPage from './js/pages/Video';
@@ -32,9 +33,10 @@ customElements.define('video-downloader', VideoDownloaderComponent);
 customElements.define('video-grid', VideoGrid);
 customElements.define('toggle-button', ToggleButton);
 customElements.define('download-card', DownloadCard);
+customElements.define('progress-ring', ProgressRing);
 
 /**
- * Video Application Logic
+ * Router setup.
  */
 const router = new Router();
 router.route('/', HomePage);
@@ -44,14 +46,14 @@ router.route(RegExp('/category/(.*)'), CategoryPage);
 router.route('*', VideoPage);
 
 /**
- * Register Service Worker
+ * Register Service Worker.
  */
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
 
 /**
- * Connection status
+ * Connection status.
  */
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);

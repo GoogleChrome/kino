@@ -1,6 +1,7 @@
 import slugify from '../utils/slugify';
 import appendVideoToGallery from '../utils/appendVideoToGallery';
 import getPoster from './partials/Poster.partial';
+import { SW_CACHE_NAME } from '../constants';
 
 export default ({
   mainContent,
@@ -21,11 +22,17 @@ export default ({
       </div>
       <p>${videoData.description}</p>
       <button class="primary icon-download">Make available offline</button>
+      <button class="primary downloader">Make available offline</button>
     </div>
   </article>
   <div class="category"></div>
 `;
   mainContent.prepend(posterWrapper);
+
+  const downloader = document.createElement('video-downloader');
+  downloader.init(videoData, SW_CACHE_NAME);
+  mainContent.querySelector('article').appendChild();
+  mainContent.querySelector('.downloader').prepend(downloader);
 
   const content = mainContent.querySelector('.category');
   appendVideoToGallery(videoDataArray, navigate, '', content);

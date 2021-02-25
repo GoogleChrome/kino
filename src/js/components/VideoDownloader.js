@@ -3,26 +3,48 @@ import getIDBConnection from '../modules/IDBConnection.module';
 const style = `
 <style>
     :host,
-    :host * {
+    :host > * {
         display: none;
     }
     :host( :not( [state="not-initialized"] ) ) {
         display: block;
     }
-    :host( [state="ready"] ) button,
-    :host( [state="partial"] ) button {
+    :host( [state="ready"] ) .ready {
         display: block;
     }
-    :host( [state="partial"] ) progress {
+    :host( [state="partial"] ) .partial {
         display: block;
-        width: 100%;
+        position: relative;
+        /*transform: translate(-1px, -1px);*/
     }
-    :host( [state="done"] ) span {
+    :host( [state="partial"] ) .partial .resume {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-40%, -50%);
+    }
+    :host( [state="done"] ) .done {
         display: block;
-        color: green;
+    }
+    :host( [state="done"] ) button .delete {
+        display: none;
+        cursor: pointer;
+    }
+    :host( [state="done"] ) button:hover .delete {
+        display: block;
+    }
+    :host( [state="done"] ) button:hover .ok {
+        display: none;
     }
     button {
         cursor: pointer;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        line-height: 0;
+    }
+    :host( [state="ready"] ) button:hover {
+        filter: brightness(95%);
     }
 </style>
 `;
@@ -82,7 +104,7 @@ export default class extends HTMLElement {
    */
   attributeChangedCallback(name, old, value) {
     if (name === 'progress') {
-      this._progressEl.value = value;
+      this._progressEl.setAttribute('progress', value);
     }
   }
 
@@ -99,10 +121,20 @@ export default class extends HTMLElement {
     this._setDownloadState();
     this._renderUI();
 
-    this._progressEl = this._root.querySelector('progress');
-    this._buttonEl = this._root.querySelector('button');
+    this._progressEl = this._root.querySelector('progress-ring');
+    this._buttonEls = this._root.querySelectorAll('button');
 
-    this._buttonEl.addEventListener('click', this.download.bind(this));
+    this._buttonEls.forEach((button) => {
+      button.addEventListener('click', this.click.bind(this));
+    });
+  }
+
+  click() {
+    if (this.state === 'done') {
+      console.log('remove');
+    } else {
+      this.download();
+    }
   }
 
   /**
@@ -407,9 +439,17 @@ export default class extends HTMLElement {
   _renderUI() {
     const templateElement = document.createElement('template');
     templateElement.innerHTML = `${style}
-            <button>Download for Offline playback</button>
-            <span>✔ Ready for offline playback.</span>
-            <progress max="1" value="0"></progress>`;
+            <button class="ready">
+              <img src="/download-circle.svg" alt="Download" />
+            </button>
+            <button class="partial">
+              <progress-ring stroke="2" radius="14" progress="0"></progress-ring>
+              <img class="resume" src="/download-resume.svg" alt="Resume" />
+            </button>
+            <button class="done">
+              <img class="ok" src="/download-done.svg" alt="Done" />
+              <img class="delete" src="/download-delete.svg" alt="Delete" title="Delete the video from cache." />
+            </button>`;
 
     while (this._root.firstChild) {
       this._root.removeChild(this._root.firstChild);
@@ -435,7 +475,7 @@ export default class extends HTMLElement {
     } else if (videoMeta.offset > 0) {
       this.state = 'partial';
       this.progress = videoMeta.offset / videoMeta.sizeInBytes;
-      this._buttonEl.innerHTML = 'Resume Download';
+      // this._buttonEl.innerHTML = 'Resume Download';
     } else {
       this.state = 'ready';
     }

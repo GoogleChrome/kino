@@ -78,7 +78,8 @@ export default class extends HTMLElement {
         <div class="info">
           <div class="title-icon">
             <a href="/${slugify(videoData.title)}" class="title">${videoData.title}</a>
-            <img class="icon" src="download-circle.svg"  alt=""/>
+            <div class="downloader"></div>
+<!--            <img class="icon" src="download-circle.svg"  alt=""/>-->
           </div>
           <div class="desc">${videoData.description}</div>
         </div>

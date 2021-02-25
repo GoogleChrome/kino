@@ -13,7 +13,7 @@ function appendVideoToGallery(videoDataArray, navigate, category, mainContent, i
     const player = document.createElement('video-player');
     downloader.init(videoData, SW_CACHE_NAME);
     card.render(videoData, navigate);
-    // card.shadowRoot.appendChild(downloader);
+    card.shadowRoot.querySelector('.downloader').appendChild(downloader);
     player.render(videoData);
     videoGallery.appendChild(card);
   });
