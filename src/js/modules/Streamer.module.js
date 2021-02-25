@@ -52,7 +52,10 @@ export default class {
           video: null,
         },
       },
-      measuredDownlink: null,
+      downlink: {
+        value: null,
+        entries: [],
+      },
     };
 
     // Iterate which stream types we have separate representations for.
@@ -68,6 +71,27 @@ export default class {
 
       this.stream.media.baseURL = `${manifestURL.origin}${manifestPathDir}`;
     }
+
+    /**
+     * Measure real downlink speeds.
+     */
+    document.body.addEventListener('downlink', (e) => {
+      const downlinkInBits = e.detail;
+      let downlinkEntries = this.stream.downlink.entries;
+
+      downlinkEntries.unshift(downlinkInBits);
+      downlinkEntries = downlinkEntries.slice(0, 10);
+
+      this.stream.downlink.entries = downlinkEntries;
+
+      // Make sure we have large enough sample size to draw any conclusions.
+      if (downlinkEntries.length === 10) {
+        this.stream.downlink.value = downlinkEntries.reduce(
+          (a, b) => a + b,
+          downlinkEntries[0],
+        ) / downlinkEntries.length;
+      }
+    });
 
     this.initializeStream();
   }
@@ -150,13 +174,13 @@ export default class {
    * @returns {number} Reported or measured downlink capacity in MBits per second.
    */
   getDownlink() {
-    let navigatorDownlink = 10;
+    let navigatorDownlink;
     if (navigator.connection) {
       navigatorDownlink = navigator.connection.downlink;
     }
-    return this.stream.measuredDownlink
+    return this.stream.downlink.value
       || navigatorDownlink
-      || 10; // Assume broadband if we don't know.
+      || 10; // Assume broadband if we really don't know.
   }
 
   /**
@@ -418,12 +442,32 @@ export default class {
             let data;
             let done;
 
-            /* eslint-disable no-await-in-loop */
             do {
+              const startTime = performance.now();
+
+              /* eslint-disable no-await-in-loop */
               [data, done] = await readChunk(); // await here is fine, the process is sequential.
+              /* eslint-enable no-await-in-loop */
+
+              /**
+               * Report on real downlink speeds.
+               *
+               * @todo Make this more robust.
+               *
+               * Maybe cancel chunk loading if it takes too long and swap for lower quality in place
+               */
+              if (data) {
+                const elapsedInSecons = (performance.now() - startTime) / 1000;
+                const downlinkInBits = Math.round((data.length / elapsedInSecons) * 8);
+                const downlinkInMBits = downlinkInBits / 1000000;
+                const downlinkEvent = new CustomEvent('downlink', {
+                  detail: downlinkInMBits,
+                });
+                document.body.dispatchEvent(downlinkEvent);
+              }
+
               if (!done) sourceBuffer.enqueueAppendBuffer(data);
             } while (!done);
-            /* eslint-enable no-await-in-loop */
 
             this.internal.reading = false;
             this.step();
