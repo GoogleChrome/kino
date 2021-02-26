@@ -12,7 +12,6 @@ import VideoCardComponent from './js/components/VideoCard';
 import VideoDownloaderComponent from './js/components/VideoDownloader';
 import VideoGrid from './js/components/VideoGrid';
 import ToggleButton from './js/components/ToggleButton';
-import DownloadCard from './js/components/DownloadCard';
 import ProgressRing from './js/components/ProgressRing';
 
 /**
@@ -32,7 +31,6 @@ customElements.define('video-card', VideoCardComponent);
 customElements.define('video-downloader', VideoDownloaderComponent);
 customElements.define('video-grid', VideoGrid);
 customElements.define('toggle-button', ToggleButton);
-customElements.define('download-card', DownloadCard);
 customElements.define('progress-ring', ProgressRing);
 
 /**

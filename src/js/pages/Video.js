@@ -22,7 +22,6 @@ export default ({
       </div>
       <p>${videoData.description}</p>
       <button class="primary icon-download">Make available offline</button>
-      <button class="primary downloader">Make available offline</button>
     </div>
   </article>
   <div class="category"></div>
@@ -31,8 +30,7 @@ export default ({
 
   const downloader = document.createElement('video-downloader');
   downloader.init(videoData, SW_CACHE_NAME);
-  mainContent.querySelector('article').appendChild();
-  mainContent.querySelector('.downloader').prepend(downloader);
+  mainContent.querySelector('.icon-download').appendChild(downloader);
 
   const content = mainContent.querySelector('.category');
   appendVideoToGallery(videoDataArray, navigate, '', content);
