@@ -15,6 +15,9 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
         grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
         grid-gap: 2rem;
       }
+      .delete-all.clearing {
+        opacity: 0.3;
+      }
     </style>
     <div class="page-title">
         <h2>Manage your downloads</h2>
@@ -24,7 +27,7 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
         <div class="header">
             <span>20 GB available <span>of 220 GB</span></span>
             <div>
-                <button class="primary">Delete all</button>
+                <button class="primary delete-all">Delete all</button>
             </div>
         </div>
         <div class="grid"></div>
@@ -33,6 +36,7 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
   const db = await getIDBConnection();
   const allMeta = await db.meta.getAll();
 
+  const deleteAllBtn = mainContent.querySelector('.delete-all');
   const grid = mainContent.querySelector('.grid');
 
   // Should partial downloads also be visible here?
@@ -45,5 +49,18 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
     card.render(videoData, navigate);
     card.shadowRoot.querySelector('.downloader').appendChild(downloader);
     grid.appendChild(card);
+  });
+
+  /**
+   * Removes all entries from the database on a click event.
+   *
+   * @param {Event} e Click event.
+   */
+  deleteAllBtn.addEventListener('click', async (e) => {
+    const btn = e.target;
+
+    btn.classList.add('clearing');
+    await db.clearAll();
+    btn.classList.remove('clearing');
   });
 };
