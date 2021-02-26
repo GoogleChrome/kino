@@ -25,7 +25,7 @@ const metaAccessorFactory = (abstractedIDB) => ({
     return data;
   },
 
-  async put(videoMetaData) {
+  put(videoMetaData) {
     return abstractedIDB.defaultAccesor.put(videoMetaData, this.name);
   },
 });
@@ -33,7 +33,7 @@ const metaAccessorFactory = (abstractedIDB) => ({
 const dataAccessorFactory = (abstractedIDB) => ({
   name: STORAGE_SCHEMA.data.name,
 
-  async put(videoData) {
+  put(videoData) {
     return abstractedIDB.defaultAccesor.put(videoData, this.name);
   },
 });
@@ -62,7 +62,7 @@ export default () => {
         this.db = db;
 
         this.defaultAccesor = {
-          async put(data, storeName) {
+          put(data, storeName) {
             const transaction = abstractedIDB.db.transaction([storeName], 'readwrite');
             const store = transaction.objectStore(storeName);
 

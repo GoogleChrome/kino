@@ -41,11 +41,11 @@ const getResponseStream = (request, db, metaEntry) => {
               const sliceBufferTo = overlapTo - previousDataLength + 1;
 
               const bufferSlice = new Uint8Array(
-                newCursor.value.data.slice(sliceBufferFrom, sliceBufferTo),
+                dataObject.data.slice(sliceBufferFrom, sliceBufferTo),
               );
               controller.enqueue(bufferSlice);
             } else {
-              controller.enqueue(newCursor.value.data);
+              controller.enqueue(dataObject.data);
             }
           }
           newCursor.continue();
@@ -53,7 +53,7 @@ const getResponseStream = (request, db, metaEntry) => {
           controller.close();
         }
       };
-      cursor.onerror = () => controller.close();
+      cursor.onerror = controller.close;
     },
   });
 
@@ -78,13 +78,19 @@ const getResponseStream = (request, db, metaEntry) => {
  *
  * @param {Event} event The `fetch` event.
  *
- * @returns {Response|null} Response stream or null.
+ * @returns {Promise} Promise that resolves with a `Response` object.
  */
 const maybeGetVideoResponse = async (event) => {
   const db = await getIDBConnection();
   const metaEntry = await db.meta.get(event.request.url);
 
-  return metaEntry.done ? getResponseStream(event.request, db, metaEntry) : null;
+  if (metaEntry.done) {
+    return new Promise((resolve) => {
+      const offlineStreamResponse = getResponseStream(event.request, db, metaEntry);
+      resolve(offlineStreamResponse);
+    });
+  }
+  return fetch(event.request);
 };
 
 /**
@@ -117,11 +123,7 @@ const fetchHandler = (event) => {
     caches.open(SW_CACHE_NAME)
       .then(async (cache) => cache.match(event.request).then(async (response) => {
         if (response) return response;
-
-        const videoResponse = await maybeGetVideoResponse(event);
-        if (videoResponse) return videoResponse;
-
-        return fetch(event.request);
+        return maybeGetVideoResponse(event);
       })),
   );
 };
