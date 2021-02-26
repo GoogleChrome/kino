@@ -125,13 +125,13 @@ export default class extends HTMLElement {
     this._buttonEls = this._root.querySelectorAll('button');
 
     this._buttonEls.forEach((button) => {
-      button.addEventListener('click', this.click.bind(this));
+      button.addEventListener('click', this.clickHandler.bind(this));
     });
   }
 
-  click() {
+  clickHandler() {
     if (this.state === 'done') {
-      console.log('remove');
+      this.removeFromIDB();
     } else {
       this.download();
     }
@@ -479,5 +479,17 @@ export default class extends HTMLElement {
     } else {
       this.state = 'ready';
     }
+  }
+
+  /**
+   * Removes the current video from IDB.
+   */
+  async removeFromIDB() {
+    const db = await getIDBConnection();
+    const url = this.getDownloadableURL();
+
+    this.state = 'removing';
+    await db.removeVideoByUrl(url);
+    this.state = 'ready';
   }
 }

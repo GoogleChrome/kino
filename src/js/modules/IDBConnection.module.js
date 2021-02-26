@@ -92,6 +92,52 @@ export default () => {
     abstractedIDB.meta = metaAccessorFactory(abstractedIDB);
     abstractedIDB.data = dataAccessorFactory(abstractedIDB);
 
+    /**
+     * Removes all entries from the database used for video storage.
+     *
+     * @returns {Promise} Promise that resolves when the DB is deleted.
+     */
+    abstractedIDB.clearAll = () => new Promise((resolve, reject) => {
+      const transaction = abstractedIDB.db.transaction([abstractedIDB.meta.name, abstractedIDB.data.name], 'readwrite');
+      const metaStore = transaction.objectStore(abstractedIDB.meta.name);
+      const dataStore = transaction.objectStore(abstractedIDB.data.name);
+
+      metaStore.clear();
+      dataStore.clear();
+
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject();
+    });
+
+    /**
+     * Removes the video from IDB by its URL.
+     *
+     * @param {string} url URL of the video to be removed.
+     *
+     * @returns {Promise} Promise that resolves when the video data is removed.
+     */
+    abstractedIDB.removeVideoByUrl = (url) => new Promise((resolve, reject) => {
+      const transaction = abstractedIDB.db.transaction([abstractedIDB.meta.name, abstractedIDB.data.name], 'readwrite');
+      const metaStore = transaction.objectStore(abstractedIDB.meta.name);
+      const dataStore = transaction.objectStore(abstractedIDB.data.name);
+
+      const dataUrlIndex = dataStore.index('url');
+      const dataAllChunksCursor = dataUrlIndex.openKeyCursor(IDBKeyRange.only(url));
+
+      dataAllChunksCursor.onsuccess = (e) => {
+        const cursor = e.target.result;
+
+        if (cursor) {
+          dataStore.delete(cursor.primaryKey);
+          cursor.continue();
+        }
+      };
+      metaStore.delete(url);
+
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject();
+    });
+
     return abstractedIDB;
   };
 
