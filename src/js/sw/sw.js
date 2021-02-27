@@ -78,19 +78,16 @@ const getResponseStream = (request, db, metaEntry) => {
  *
  * @param {Event} event The `fetch` event.
  *
- * @returns {Promise} Promise that resolves with a `Response` object.
+ * @returns {Promise|Response} Promise that resolves with a `Response` object.
  */
 const maybeGetVideoResponse = async (event) => {
   const db = await getIDBConnection();
   const metaEntry = await db.meta.get(event.request.url);
 
   if (metaEntry.done) {
-    return new Promise((resolve) => {
-      const offlineStreamResponse = getResponseStream(event.request, db, metaEntry);
-      resolve(offlineStreamResponse);
-    });
+    return getResponseStream(event.request, db, metaEntry);
   }
-  return fetch(event.request);
+  return null;
 };
 
 /**
@@ -118,14 +115,19 @@ const precacheAssets = (event) => {
  *
  * @param {Event} event Featch event.
  */
-const fetchHandler = (event) => {
-  event.respondWith(
-    caches.open(SW_CACHE_NAME)
-      .then(async (cache) => cache.match(event.request).then(async (response) => {
-        if (response) return response;
-        return maybeGetVideoResponse(event);
-      })),
-  );
+const fetchHandler = async (event) => {
+  const getResponse = async () => {
+    const openedCache = await caches.open(SW_CACHE_NAME);
+
+    const cacheResponse = await openedCache.match(event.request);
+    if (cacheResponse) return cacheResponse;
+
+    const videoResponse = await maybeGetVideoResponse(event);
+    if (videoResponse) return videoResponse;
+
+    return fetch(event.request);
+  };
+  event.respondWith(getResponse());
 };
 
 /* eslint-disable no-restricted-globals */

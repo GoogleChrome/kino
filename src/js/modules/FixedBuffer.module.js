@@ -62,7 +62,27 @@ export default class {
   flush(opts = {}) {
     const data = new Uint8Array(this.buffer.ab, 0, this.buffer.pointerPosition);
 
-    if (this.onflush) this.onflush(data, opts);
+    /**
+     * We need to clone the data to ensure they are don't change while
+     * the `onflush` handlers run.
+     */
+    const clonedData = this.cloneBuffer(data);
+
+    if (this.onflush) this.onflush(clonedData, opts);
     this.buffer.pointerPosition = 0;
+  }
+
+  /**
+   * Clones an `Uint8Array` object.
+   *
+   * @param {Uint8Array} source Source buffer typed array.
+   *
+   * @returns {Uint8Array} Cloned array;
+   */
+  cloneBuffer(source) {
+    const clone = new Uint8Array(source.length);
+    clone.set(source);
+
+    return clone;
   }
 }
