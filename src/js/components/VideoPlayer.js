@@ -1,6 +1,4 @@
-/**
- * WIP
- */
+import { MEDIA_SESSION_DEFAULT_ARTWORK } from '../constants';
 
 const style = `
 <style>
@@ -14,6 +12,7 @@ const style = `
   }
 </style>
 `;
+
 export default class extends HTMLElement {
   constructor() {
     super();
@@ -80,25 +79,27 @@ export default class extends HTMLElement {
         title: this.internal.videoData.title || '',
         artist: this.internal.videoData.artist || '',
         album: this.internal.videoData.album || '',
-        artwork: [
-          { src: '/images/media-session/artwork-96x96.jpg', sizes: '96x96', type: 'image/jpeg' },
-          { src: '/images/media-session/artwork-128x128.jpg', sizes: '128x128', type: 'image/jpeg' },
-          { src: '/images/media-session/artwork-192x192.jpg', sizes: '192x192', type: 'image/jpeg' },
-          { src: '/images/media-session/artwork-256x256.jpg', sizes: '256x256', type: 'image/jpeg' },
-          { src: '/images/media-session/artwork-384x384.jpg', sizes: '384x384', type: 'image/jpeg' },
-          { src: '/images/media-session/artwork-512x512.jpg', sizes: '512x512', type: 'image/jpeg' },
-        ],
+        artwork: MEDIA_SESSION_DEFAULT_ARTWORK,
       });
 
       /**
        * Updates the position state in the Session notification.
        */
       const updatePositionState = () => {
-        navigator.mediaSession.setPositionState({
-          duration: this.videoElement.duration,
-          playbackRate: this.videoElement.playbackRate,
-          position: this.videoElement.currentTime,
-        });
+        const duration = parseFloat(this.videoElement.duration);
+        const playbackRate = parseFloat(this.videoElement.playbackRate);
+        const currentTime = parseFloat(this.videoElement.currentTime);
+        const isValid = Number.isFinite(duration)
+          && Number.isFinite(playbackRate)
+          && Number.isFinite(currentTime);
+
+        if (isValid) {
+          navigator.mediaSession.setPositionState({
+            duration: this.videoElement.duration,
+            playbackRate: this.videoElement.playbackRate,
+            position: this.videoElement.currentTime,
+          });
+        }
       };
 
       /**

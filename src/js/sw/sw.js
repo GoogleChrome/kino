@@ -1,4 +1,10 @@
-import { SW_CACHE_NAME, STORAGE_SCHEMA } from '../constants';
+import {
+  SW_CACHE_NAME,
+  STORAGE_SCHEMA,
+  IDB_CHUNK_INDEX,
+  MEDIA_SESSION_DEFAULT_ARTWORK,
+} from '../constants';
+
 import getIDBConnection from '../modules/IDBConnection.module';
 
 /**
@@ -23,8 +29,12 @@ const getResponseStream = (request, db, metaEntry) => {
       const rawIDB = db.unwrap();
       const transaction = rawIDB.transaction(STORAGE_SCHEMA.data.name, 'readonly');
       const store = transaction.objectStore(STORAGE_SCHEMA.data.name);
-      const index = store.index('offset');
-      const cursor = index.openCursor();
+      const allEntriesForUrlRange = IDBKeyRange.bound(
+        [request.url, 0, 0],
+        [request.url, Infinity, Infinity],
+      );
+      const index = store.index(IDB_CHUNK_INDEX);
+      const cursor = index.openCursor(allEntriesForUrlRange);
 
       cursor.onsuccess = (e) => {
         const newCursor = e.target.result;
@@ -104,6 +114,13 @@ const precacheAssets = (event) => {
     '/api/video-list.json',
     '/favicon.svg',
   ];
+
+  /**
+   * Default artwork for Media Session API.
+   */
+  MEDIA_SESSION_DEFAULT_ARTWORK.forEach(
+    (artworkObject) => assetsToCache.push(artworkObject.src),
+  );
 
   event.waitUntil(
     caches.open(SW_CACHE_NAME).then((cache) => cache.addAll(assetsToCache)),

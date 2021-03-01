@@ -1,5 +1,6 @@
 import FixedBuffer from '../modules/FixedBuffer.module';
 import getIDBConnection from '../modules/IDBConnection.module';
+import { IDB_CHUNK_INDEX } from '../constants';
 
 const style = `
 <style>
@@ -378,19 +379,37 @@ export default class extends HTMLElement {
   }
 
   /**
+   * Returns IDBIndex instance and a key range to iterate over a video URL.
+   *
+   * @param {string} url Video URL.
+   *
+   * @returns {Array} IDBIndex and IDBKeyRange objects.
+   */
+  async accessVideo(url) {
+    const db = await getIDBConnection();
+    const rawDb = db.unwrap();
+    const transaction = rawDb.transaction([db.data.name], 'readonly');
+    const store = transaction.objectStore(db.data.name);
+    const index = store.index(IDB_CHUNK_INDEX);
+    const range = IDBKeyRange.bound(
+      [url, 0, 0],
+      [url, Infinity, Infinity],
+    );
+
+    return [index, range];
+  }
+
+  /**
    * Retrieves the last stored data chunk for the current video.
    *
    * @returns {Promise} Promise that resolves with the last chunk data.
    */
   async getLastChunk() {
-    const db = await getIDBConnection();
-    const rawDb = db.unwrap();
-    const transaction = rawDb.transaction([db.data.name], 'readonly');
-    const store = transaction.objectStore(db.data.name);
-    const index = store.index('index');
+    const url = this.getDownloadableURL();
+    const [index, range] = await this.accessVideo(url);
 
     return new Promise((resolve, reject) => {
-      const request = index.openCursor(null, 'prev');
+      const request = index.openCursor(range, 'prev');
 
       request.onsuccess = (e) => resolve(e.target.result.value);
       request.onerror = (e) => reject(e);
@@ -403,14 +422,11 @@ export default class extends HTMLElement {
    * @returns {Promise} Promise that resolves with the total video size in bytes.
    */
   async getTotalSize() {
-    const db = await getIDBConnection();
-    const rawDb = db.unwrap();
-    const transaction = rawDb.transaction([db.data.name], 'readonly');
-    const store = transaction.objectStore(db.data.name);
-    const index = store.index('index');
+    const url = this.getDownloadableURL();
+    const [index, range] = this.accessVideo(url);
 
     return new Promise((resolve, reject) => {
-      const request = index.openCursor();
+      const request = index.openCursor(range);
 
       let totalSize = 0;
 

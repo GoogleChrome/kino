@@ -1,4 +1,4 @@
-import { STORAGE_SCHEMA } from '../constants';
+import { STORAGE_SCHEMA, IDB_CHUNK_INDEX } from '../constants';
 
 const dbName = 'webdev-offline-storage';
 const schemaVersion = 1;
@@ -144,9 +144,7 @@ export default () => {
        *
        * @see https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB#structuring_the_database
        */
-      dataOS.createIndex('url', 'url', { unique: false });
-      dataOS.createIndex('index', 'index', { unique: false });
-      dataOS.createIndex('offset', 'offset', { unique: false });
+      dataOS.createIndex(IDB_CHUNK_INDEX, ['url', 'index', 'offset'], { unique: true });
     };
   });
 
