@@ -1,4 +1,4 @@
-import { STORAGE_SCHEMA } from '../constants';
+import { STORAGE_SCHEMA, IDB_CHUNK_INDEX } from '../constants';
 
 const dbName = 'webdev-offline-storage';
 const schemaVersion = 1;
@@ -25,7 +25,7 @@ const metaAccessorFactory = (abstractedIDB) => ({
     return data;
   },
 
-  async put(videoMetaData) {
+  put(videoMetaData) {
     return abstractedIDB.defaultAccesor.put(videoMetaData, this.name);
   },
 });
@@ -33,7 +33,7 @@ const metaAccessorFactory = (abstractedIDB) => ({
 const dataAccessorFactory = (abstractedIDB) => ({
   name: STORAGE_SCHEMA.data.name,
 
-  async put(videoData) {
+  put(videoData) {
     return abstractedIDB.defaultAccesor.put(videoData, this.name);
   },
 });
@@ -62,7 +62,7 @@ export default () => {
         this.db = db;
 
         this.defaultAccesor = {
-          async put(data, storeName) {
+          put(data, storeName) {
             const transaction = abstractedIDB.db.transaction([storeName], 'readwrite');
             const store = transaction.objectStore(storeName);
 
@@ -144,9 +144,7 @@ export default () => {
        *
        * @see https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB#structuring_the_database
        */
-      dataOS.createIndex('url', 'url', { unique: false });
-      dataOS.createIndex('index', 'index', { unique: false });
-      dataOS.createIndex('offset', 'offset', { unique: false });
+      dataOS.createIndex(IDB_CHUNK_INDEX, ['url', 'index', 'offset'], { unique: true });
     };
   });
 

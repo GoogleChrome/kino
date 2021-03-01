@@ -45,7 +45,9 @@ fetch('api/video-list.json')
  * Register Service Worker
  */
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js');
+  });
 }
 
 /**
