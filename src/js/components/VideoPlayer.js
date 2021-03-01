@@ -171,7 +171,7 @@ export default class extends HTMLElement {
      * @see https://html.spec.whatwg.org/multipage/embedded-content.html#the-source-element
      */
     if (isSourceTagLast && this.hasStreamingSource()) {
-      this.playStream();
+      this.initializeStream();
     }
   }
 
@@ -180,7 +180,7 @@ export default class extends HTMLElement {
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/Media_Source_Extensions_API
    */
-  async playStream() {
+  async initializeStream() {
     const sourceEls = [...this.videoElement.querySelectorAll('source')];
     const streamingSource = sourceEls.find(
       (sourceEl) => STREAMING_MIME_TYPES.includes(sourceEl.type),
