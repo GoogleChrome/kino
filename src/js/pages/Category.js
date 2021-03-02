@@ -1,10 +1,16 @@
 import slugify from '../utils/slugify';
 import appendVideoToGallery from '../utils/appendVideoToGallery';
 
-function findCategoryNameBySlug(slug, videoArray) {
-  for (let i = 0; i < videoArray.length; i++) {
-    for (let j = 0; j < videoArray[i].categories.length; j++) {
-      const cat = videoArray[i].categories[j];
+/**
+ * @param {string} slug Slug.
+ * @param {object[]} videoDataArray Array of video metadata objects.
+ *
+ * @returns {string} Category name or empty string.
+ */
+function findCategoryNameBySlug(slug, videoDataArray) {
+  for (let i = 0; i < videoDataArray.length; i++) {
+    for (let j = 0; j < videoDataArray[i].categories.length; j++) {
+      const cat = videoDataArray[i].categories[j];
       if (slugify(cat) === slug) {
         return cat;
       }
@@ -13,7 +19,9 @@ function findCategoryNameBySlug(slug, videoArray) {
   return '';
 }
 
-export default ({ mainContent, videoDataArray, path, navigate }) => {
+export default ({
+  mainContent, videoDataArray, path, navigate,
+}) => {
   const categorySlug = path.replace('/category/', '');
   const categoryName = findCategoryNameBySlug(categorySlug, videoDataArray);
   mainContent.innerHTML = `
@@ -24,6 +32,8 @@ export default ({ mainContent, videoDataArray, path, navigate }) => {
     <div class="category"></div>
   `;
   const content = mainContent.querySelector('.category');
-  const filteredVideoDataArray = videoDataArray.filter((videoData) => videoData.categories.includes(categoryName));
+  const filteredVideoDataArray = videoDataArray.filter(
+    (videoData) => videoData.categories.includes(categoryName),
+  );
   appendVideoToGallery(filteredVideoDataArray, navigate, '', content);
-}
+};

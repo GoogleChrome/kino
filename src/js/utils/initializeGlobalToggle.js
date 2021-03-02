@@ -5,6 +5,9 @@ const onChange = (key) => ({ detail }) => {
   window.dispatchEvent(new CustomEvent(`${detail.value ? 'offline' : 'online'}-mock`));
 };
 
+/**
+ * Initialize the offline/online toggle from the header.
+ */
 export default function initializeGlobalToggle() {
   const toggleButtonOffline = document.querySelector('header toggle-button#offline-content-only');
   toggleButtonOffline.addEventListener('change', onChange('offline-content-only'));

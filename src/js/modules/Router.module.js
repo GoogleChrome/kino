@@ -2,14 +2,11 @@ export default class Router {
   constructor() {
     this.routes = [];
 
-    window.addEventListener('popstate', (event) => {
-      console.log(`location: ${event.target.location.pathname}, state: ${JSON.stringify(event.state)}`, event);
-      this.run();
-    });
+    window.addEventListener('popstate', () => this.run());
 
     // Upgrade static links
     const navigate = this.navigate.bind(this);
-    document.querySelectorAll('a[href]').forEach((link) => link.addEventListener('click', function(e) {
+    document.querySelectorAll('a[href]').forEach((link) => link.addEventListener('click', function (e) {
       if (e.ctrlKey || e.metaKey) return;
       e.preventDefault();
       navigate(this.href);

@@ -1,5 +1,8 @@
 import { saveSetting } from './settings';
 
+/**
+ * Update online status helper.
+ */
 export default function updateOnlineStatus() {
   const status = document.getElementById('connection-status');
   const condition = navigator.onLine ? 'online' : 'offline';

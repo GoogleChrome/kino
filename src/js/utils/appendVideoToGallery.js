@@ -1,5 +1,12 @@
 import { SW_CACHE_NAME } from '../constants';
 
+/**
+ * @param {object[]} videoDataArray Array of video metadata objects.
+ * @param {Function} navigate Navigate function.
+ * @param {string} category Video category.
+ * @param {HTMLElement} mainContent Main content DOM node.
+ * @param {number} index Index of the gallery/section, for background purposes.
+ */
 function appendVideoToGallery(videoDataArray, navigate, category, mainContent, index) {
   const videoGrid = document.createElement('video-grid');
   videoGrid.category = category;
@@ -18,7 +25,6 @@ function appendVideoToGallery(videoDataArray, navigate, category, mainContent, i
     videoGallery.appendChild(card);
   });
 
-  // videoGallery.appendChild(player);
   mainContent.appendChild(videoGrid);
 }
 

@@ -6,7 +6,7 @@ export default class ProgressRing extends HTMLElement {
     const normalizedRadius = radius - stroke;
     this._circumference = normalizedRadius * 2 * Math.PI;
 
-    this._root = this.attachShadow({mode: 'open'});
+    this._root = this.attachShadow({ mode: 'open' });
     this._root.innerHTML = `
       <svg
         height="${radius * 2}"

@@ -1,5 +1,5 @@
 import slugify from '../utils/slugify';
-import { loadSetting } from '../utils/settings'
+import { loadSetting } from '../utils/settings';
 
 const style = `
 <style>

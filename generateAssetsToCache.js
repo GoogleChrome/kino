@@ -4,6 +4,9 @@ const apiJSON = require('./public/api/video-list.json');
 const rootFolder = 'public';
 const assetsToCache = ['/'];
 
+/**
+ * @param {string} folder Folder to browse.
+ */
 function browseAllFilesInDirectory(folder) {
   const filesRegExp = /\.(html|css|js|svg|png|jpeg")$/i;
   const excludeFiles = ['sw.js', '404.html'];
