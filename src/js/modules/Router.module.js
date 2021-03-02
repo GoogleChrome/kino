@@ -6,6 +6,7 @@ export default class Router {
 
     // Upgrade static links
     const navigate = this.navigate.bind(this);
+    // eslint-disable-next-line func-names
     document.querySelectorAll('a[href]').forEach((link) => link.addEventListener('click', function (e) {
       if (e.ctrlKey || e.metaKey) return;
       e.preventDefault();

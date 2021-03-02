@@ -8,8 +8,8 @@ import appendVideoToGallery from '../utils/appendVideoToGallery';
  * @returns {string} Category name or empty string.
  */
 function findCategoryNameBySlug(slug, videoDataArray) {
-  for (let i = 0; i < videoDataArray.length; i++) {
-    for (let j = 0; j < videoDataArray[i].categories.length; j++) {
+  for (let i = 0; i < videoDataArray.length; i += 1) {
+    for (let j = 0; j < videoDataArray[i].categories.length; j += 1) {
       const cat = videoDataArray[i].categories[j];
       if (slugify(cat) === slug) {
         return cat;
