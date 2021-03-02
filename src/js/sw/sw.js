@@ -1,5 +1,6 @@
 import { SW_CACHE_NAME, STORAGE_SCHEMA } from '../constants';
 import getIDBConnection from '../modules/IDBConnection.module';
+import assetsToCache from '../../../assetsToCache';
 
 /**
  * Respond to a request to fetch offline video and contruct a response stream.
@@ -93,15 +94,6 @@ const maybeGetVideoResponse = async (event) => {
  * @param {Event} event Install event.
  */
 const precacheAssets = (event) => {
-  // In the future we can generate this list with a simple script (looking at video-list.json)
-  const assetsToCache = [
-    '/',
-    '/index.html',
-    '/dist/js/index.js',
-    '/api/video-list.json',
-    '/favicon.svg',
-  ];
-
   event.waitUntil(
     caches.open(SW_CACHE_NAME).then((cache) => cache.addAll(assetsToCache)),
   );
