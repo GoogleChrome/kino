@@ -35,7 +35,7 @@ const style = `
       align-items: flex-start;
       margin-bottom: 1rem;
     }
-    .info .title-icon .icon {
+    .info .title-icon .downloader {
       margin-top: 2px;
       margin-left: 10px;
     }

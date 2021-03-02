@@ -17,7 +17,25 @@ const style = `
     :host( [state="partial"] ) .partial {
         display: block;
         position: relative;
-        /*transform: translate(-1px, -1px);*/
+    }
+    :host( [state="partial"][downloading="true"] ) .cancel {
+        display: none;
+    }
+    :host( [state="partial"][downloading="false"] ) .cancel {
+        display: block;
+        position: absolute;
+        bottom: 0;
+        background: #FFF;
+        padding: 0.5rem;
+        border-radius: 5px;
+        left: 50%;
+        transform: translate(-50%, 0);
+        color: #FF8383;
+        font-size: 0.7rem;
+        font-weight: bold;
+        line-height: initial;
+        cursor: pointer;
+        text-transform: uppercase;
     }
     :host( [state="partial"][downloading="false"] ) .resume {
         display: block;
@@ -158,8 +176,10 @@ export default class extends HTMLElement {
     });
   }
 
-  clickHandler() {
+  clickHandler(e) {
     if (this.state === 'done') {
+      this.removeFromIDB();
+    } else if (e.target.className === 'cancel') {
       this.removeFromIDB();
     } else if (this.downloading === false) {
       this.download();
@@ -522,8 +542,11 @@ export default class extends HTMLElement {
             <button class="ready">
               <img src="/download-circle.svg" alt="Download" />
             </button>
+            <span class="partial">
+              <button class="cancel" title="Cancel and remove">Cancel</button>
+            </span>
             <button class="partial">
-              <progress-ring stroke="2" radius="14" progress="0"></progress-ring>
+              <progress-ring stroke="2" radius="13" progress="0"></progress-ring>
               <img class="resume" src="/download-resume.svg" alt="Resume" />
               <img class="pause" src="/download-pause.svg" alt="Pause" />
             </button>
@@ -556,7 +579,6 @@ export default class extends HTMLElement {
     } else if (videoMeta.offset > 0) {
       this.state = 'partial';
       this.progress = videoMeta.offset / videoMeta.sizeInBytes;
-      // this._buttonEl.innerHTML = 'Resume Download';
     } else {
       this.state = 'ready';
     }
