@@ -1,4 +1,5 @@
 import slugify from '../utils/slugify';
+import { loadSetting } from '../utils/settings'
 
 const style = `
 <style>
@@ -8,11 +9,13 @@ const style = `
       box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.28);
       transition: all 120ms;
     }
-    :host(:hover) {
+    :host(:hover:not(.disabled)) {
         box-shadow: 0px 10px 13px rgba(0, 0, 0, 0.30);
         transform: scale(1.02);
-        /*filter: grayscale(100%);*/
-        /*opacity: 0.5;*/
+    }
+    :host(.disabled) {
+      filter: grayscale(100%);
+      opacity: 0.5;
     }
     .poster {
       background-image: url("https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-2/poster.jpg");
@@ -44,7 +47,7 @@ const style = `
       text-decoration: none;
     }
     .info .title:hover {
-        text-decoration: underline;
+      text-decoration: underline;
     }
     .info .desc {
       font-size: 1rem;
@@ -56,18 +59,39 @@ const style = `
 export default class extends HTMLElement {
   constructor() {
     super();
-
     this._root = this.attachShadow({ mode: 'open' });
+
+    window.addEventListener('online', this.updateOnlineStatus.bind(this));
+    window.addEventListener('online-mock', this.updateOnlineStatus.bind(this, 'online'));
+    window.addEventListener('offline', this.updateOnlineStatus.bind(this));
+    window.addEventListener('offline-mock', this.updateOnlineStatus.bind(this, 'offline'));
+  }
+
+  updateOnlineStatus(mockStatus) {
+    const isOnline = navigator.onLine;
+    const offlineContentOnly = loadSetting('offline-content-only');
+    const downloader = this._root.querySelector('video-downloader');
+    const isDownloaded = downloader.state === 'done';
+    if (((!isOnline || offlineContentOnly) && !isDownloaded)) {
+      this.classList.add('disabled');
+    } else {
+      this.classList.remove('disabled');
+    }
   }
 
   connectedCallback() {
-    const navigate = this.navigate;
     const links = this._root.querySelectorAll('a');
-    links.forEach((link) => link.addEventListener('click', function(e) {
+    links.forEach((link) => link.addEventListener('click', (e) => {
       if (e.ctrlKey || e.metaKey) return;
       e.preventDefault();
-      navigate(this.href);
+      this.navigate(e.target.href);
     }));
+  }
+
+  attachDownloader(downloader) {
+    downloader.onStatusUpdate = this.updateOnlineStatus.bind(this);
+    this._root.querySelector('.downloader').appendChild(downloader);
+    this.updateOnlineStatus();
   }
 
   render(videoData, navigate) {
@@ -79,7 +103,6 @@ export default class extends HTMLElement {
           <div class="title-icon">
             <a href="/${slugify(videoData.title)}" class="title">${videoData.title}</a>
             <div class="downloader"></div>
-<!--            <img class="icon" src="download-circle.svg"  alt=""/>-->
           </div>
           <div class="desc">${videoData.description}</div>
         </div>

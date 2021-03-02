@@ -79,6 +79,9 @@ export default class extends HTMLElement {
 
   set state(state) {
     this.setAttribute('state', state);
+    if (this.onStatusUpdate) {
+      this.onStatusUpdate(state);
+    }
   }
 
   get progress() {

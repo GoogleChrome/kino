@@ -3,6 +3,7 @@
  */
 import Router from './js/modules/Router.module';
 import updateOnlineStatus from './js/utils/updateOnlineStatus';
+import initializeGlobalToggle from './js/utils/initializeGlobalToggle';
 
 /**
  * Web Components implementation.
@@ -56,3 +57,5 @@ if ('serviceWorker' in navigator) {
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
 updateOnlineStatus();
+
+initializeGlobalToggle();

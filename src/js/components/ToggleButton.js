@@ -1,6 +1,9 @@
 const template = document.createElement('template');
 template.innerHTML = `
   <style>
+  :host {
+    display: inline-block;
+  }
   input {
     display: none;
   }
@@ -46,7 +49,7 @@ template.innerHTML = `
   }
   </style>
   <div class="toggle">
-    <input id="toggle" type="checkbox" checked>
+    <input id="toggle" type="checkbox">
     <label for="toggle"></label>
   </div>`;
 
@@ -56,6 +59,11 @@ export default class ToggleButton extends HTMLElement {
     this._root = this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.$checkbox = this._root.querySelector('input');
+    this.$checkbox.addEventListener('change', (e) => {
+      this.dispatchEvent(
+        new CustomEvent('change', { detail: { value: e.target.checked } }),
+      );
+    });
   }
 
   static get observedAttributes() {

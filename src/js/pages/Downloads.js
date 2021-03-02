@@ -6,16 +6,11 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
     <style>
       .grid {
         margin-top: 2rem;
-        /*display: grid;*/
-        /*grid-template-columns: repeat(auto-fill, minmax(min(450px, 100%), 1fr));*/
-        /*grid-gap: 2rem;*/
-      }
-      .grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
         grid-gap: 2rem;
       }
-      .delete-all.clearing {
+      .clearing {
         opacity: 0.3;
       }
     </style>
@@ -39,7 +34,7 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
   const deleteAllBtn = mainContent.querySelector('.delete-all');
   const grid = mainContent.querySelector('.grid');
 
-  // Should partial downloads also be visible here?
+  // Should partial downloads also be visible here? For now - yes.
   // .filter((meta) => meta.done)
   allMeta.forEach((meta) => {
     const videoData = videoDataArray.find((vd) => vd['video-sources'].some((vs) => vs.src === meta.url));
@@ -47,7 +42,7 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
     const downloader = document.createElement('video-downloader');
     downloader.init(videoData, SW_CACHE_NAME);
     card.render(videoData, navigate);
-    card.shadowRoot.querySelector('.downloader').appendChild(downloader);
+    card.attachDownloader(downloader);
     grid.appendChild(card);
   });
 
@@ -59,8 +54,10 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
   deleteAllBtn.addEventListener('click', async (e) => {
     const btn = e.target;
 
+    grid.classList.add('clearing');
     btn.classList.add('clearing');
     await db.clearAll();
+    grid.innerHTML = '';
     btn.classList.remove('clearing');
   });
 };

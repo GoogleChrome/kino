@@ -159,7 +159,11 @@
       color: #FFF;
       text-decoration: none;
     }
-    header .menu a {
+    header .menu {
+      display: flex;
+      align-items: center;
+    }
+    header .menu > * {
       margin-left: 1.5rem;
       font-size: 1rem;
       font-weight: normal;
@@ -353,6 +357,7 @@
       <a href="/">Home</a>
       <a href="/downloads">Manage Downloads</a>
       <a href="/settings">Settings</a>
+      <toggle-button id="offline-content-only"></toggle-button>
     </div>
   </div>
 
