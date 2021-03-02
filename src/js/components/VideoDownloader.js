@@ -53,7 +53,7 @@ const style = `
 
 export default class extends HTMLElement {
   static get observedAttributes() {
-    return ['state', 'progress'];
+    return ['state', 'progress', 'downloading'];
   }
 
   constructor() {
@@ -84,6 +84,14 @@ export default class extends HTMLElement {
     if (this.onStatusUpdate) {
       this.onStatusUpdate(state);
     }
+  }
+
+  get downloading() {
+    return this.getAttribute('downloading') === 'true';
+  }
+
+  set downloading(downloading) {
+    this.setAttribute('downloading', downloading);
   }
 
   get progress() {
@@ -137,8 +145,10 @@ export default class extends HTMLElement {
   clickHandler() {
     if (this.state === 'done') {
       this.removeFromIDB();
-    } else {
+    } else if (this.downloading === false) {
       this.download();
+    } else {
+      this.downloading = false;
     }
   }
 
@@ -206,6 +216,8 @@ export default class extends HTMLElement {
     const videoURL = this.getDownloadableURL();
     const posterURL = this.getPosterURL();
     const subtitlesURLs = this.getSubtitlesUrls();
+
+    this.downloading = true;
 
     this.saveToCache([posterURL, ...subtitlesURLs]);
     this.saveToIDB(videoURL);
@@ -305,6 +317,7 @@ export default class extends HTMLElement {
          * and the `<progress>` element.
          */
         this.progress = chunk.offset / chunk.sizeInBytes;
+        if (done) this.downloading = false;
       });
 
       return chunk;
@@ -331,7 +344,7 @@ export default class extends HTMLElement {
       fileChunk = await reader.read();
       if (!fileChunk.done) fixedBuffer.add(fileChunk.value);
       /* eslint-eanble no-await-in-loop */
-    } while (fileChunk && !fileChunk.done);
+    } while (this.downloading && fileChunk && !fileChunk.done);
 
     fixedBuffer.flush({
       done: true,
@@ -527,6 +540,7 @@ export default class extends HTMLElement {
     } else {
       this.state = 'ready';
     }
+    this.downloading = false;
   }
 
   /**
