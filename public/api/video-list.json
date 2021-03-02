@@ -23,6 +23,15 @@
         "type": "image/jpg",
         "default": true
       }
+    ],
+    "video-subtitles": [
+			{
+				"default": true,
+				"kind": "subtitles",
+				"label": "English",
+				"src": "https://storage.googleapis.com/wdm-assets/subtitles/http-203/http-203-background-fetch.vtt",
+				"srclang": "en"
+			}
     ]
 	},
 	{
