@@ -51,7 +51,7 @@ const style = `
 
 export default class extends HTMLElement {
   static get observedAttributes() {
-    return ['state', 'progress'];
+    return ['state', 'progress', 'downloading'];
   }
 
   constructor() {
@@ -79,6 +79,14 @@ export default class extends HTMLElement {
 
   set state(state) {
     this.setAttribute('state', state);
+  }
+
+  get downloading() {
+    return this.getAttribute('downloading') === 'true';
+  }
+
+  set downloading(downloading) {
+    this.setAttribute('downloading', downloading);
   }
 
   get progress() {
@@ -132,8 +140,10 @@ export default class extends HTMLElement {
   clickHandler() {
     if (this.state === 'done') {
       this.removeFromIDB();
-    } else {
+    } else if (this.downloading === false) {
       this.download();
+    } else {
+      this.downloading = false;
     }
   }
 
@@ -201,6 +211,8 @@ export default class extends HTMLElement {
     const videoURL = this.getDownloadableURL();
     const posterURL = this.getPosterURL();
     const subtitlesURLs = this.getSubtitlesUrls();
+
+    this.downloading = true;
 
     this.saveToCache([posterURL, ...subtitlesURLs]);
     this.saveToIDB(videoURL);
@@ -317,8 +329,9 @@ export default class extends HTMLElement {
       /* eslint-eanble no-await-in-loop */
 
       videoChunk = processChunk(streamChunk);
-    } while (streamChunk && !streamChunk.done);
+    } while (this.downloading && streamChunk && !streamChunk.done);
 
+    this.downloading = false;
     return videoChunk;
   }
 
@@ -479,6 +492,7 @@ export default class extends HTMLElement {
     } else {
       this.state = 'ready';
     }
+    this.downloading = false;
   }
 
   /**
