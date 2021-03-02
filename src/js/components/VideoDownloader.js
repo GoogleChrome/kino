@@ -1,4 +1,6 @@
+import FixedBuffer from '../modules/FixedBuffer.module';
 import getIDBConnection from '../modules/IDBConnection.module';
+import { IDB_CHUNK_INDEX } from '../constants';
 
 const style = `
 <style>
@@ -253,8 +255,6 @@ export default class extends HTMLElement {
    * and invokes `storeVideoChunk` to store individual video chunks in IndexedDB.
    *
    * @param {string} videoURL Video URL to be downloaded and saved to IDB.
-   *
-   * @returns {object} Last chunk object that was generated for IDB.
    */
   async saveToIDB(videoURL) {
     const {
@@ -284,12 +284,12 @@ export default class extends HTMLElement {
     let index = firstIndex;
     let offset = firstOffset;
 
-    const processChunk = ({ done, value }) => {
-      offset += value ? value.length : 0;
+    const processChunk = (data, done) => {
+      offset += data.length;
       index += 1;
 
       const chunk = {
-        data: value,
+        data,
         offset,
         index,
         done,
@@ -297,32 +297,45 @@ export default class extends HTMLElement {
       };
 
       /**
-       * Triggers the `progress` setter, which reflects to the `progress` attribute
-       * and the `<progress>` element.
-       */
-      this.progress = chunk.offset / chunk.sizeInBytes;
-
-      /**
        * Invoke the actual logic that stores received chunk data in IDB.
        */
-      this.storeVideoChunk(chunk);
+      this.storeVideoChunk(chunk).then(() => {
+        /**
+         * Triggers the `progress` setter, which reflects to the `progress` attribute
+         * and the `<progress>` element.
+         */
+        this.progress = chunk.offset / chunk.sizeInBytes;
+      });
 
       return chunk;
     };
 
-    let streamChunk;
-    let videoChunk;
+    /**
+     * IDB put operations have a lot of overhead, so it's impractical for us to store
+     * a data chunk every time our reader has more data, because those chunks
+     * usually are pretty small and generate thousands of IDB data entries.
+     *
+     * Instead we use a fixed 2 MB buffer that we continuously fill with data. Once it
+     * overflows, it automatically flushes and its internal pointer is reset.
+     *
+     * We only write to IDB when such a flush occurs.
+     */
+    const fixedBufferSizeInBytes = 2 * 1000 * 1000; // Store 2 MB chunks.
+    const fixedBuffer = new FixedBuffer(fixedBufferSizeInBytes);
+    fixedBuffer.onflush = (data, opts) => processChunk(data, opts.done || false);
 
+    let fileChunk;
     do {
       /* eslint-disable no-await-in-loop */
       // Await in loop is OK. The processing is sequential and can't be parallelized.
-      streamChunk = await reader.read();
+      fileChunk = await reader.read();
+      if (!fileChunk.done) fixedBuffer.add(fileChunk.value);
       /* eslint-eanble no-await-in-loop */
+    } while (fileChunk && !fileChunk.done);
 
-      videoChunk = processChunk(streamChunk);
-    } while (streamChunk && !streamChunk.done);
-
-    return videoChunk;
+    fixedBuffer.flush({
+      done: true,
+    });
   }
 
   /**
@@ -336,6 +349,8 @@ export default class extends HTMLElement {
    * @param {number}     chunk.sizeInBytes  Filesize in bytes.
    * @param {number}     chunk.index        Chunk positional index in the file. Zero based.
    * @param {string}     chunk.url          File URL.
+   *
+   * @returns {Promise} Promise that resolves when chunk meta and all data is written.
    */
   async storeVideoChunk({
     data, offset, done, mime, sizeInBytes, index, url,
@@ -343,16 +358,31 @@ export default class extends HTMLElement {
     const db = await getIDBConnection();
     const size = data ? data.length : 0;
 
-    db.meta.put({
-      offset, sizeInBytes, done, mime, url,
+    const metaWritePromise = new Promise((resolve, reject) => {
+      const metaPutOperation = db.meta.put({
+        offset, sizeInBytes, done, mime, url,
+      });
+      metaPutOperation.onsuccess = resolve;
+      metaPutOperation.onerror = reject;
     });
 
-    if (data) {
-      db.data.put({
+    const dataWritePromise = new Promise((resolve, reject) => {
+      const dataPutOperation = db.data.put({
         offset, size, data, index, url,
       });
-    }
-    if (done) this.state = 'done';
+
+      dataPutOperation.onsuccess = resolve;
+      dataPutOperation.onerror = reject;
+    });
+
+    return new Promise((resolve, reject) => {
+      Promise.all([metaWritePromise, dataWritePromise])
+        .then(() => {
+          if (done) this.state = 'done';
+          resolve();
+        })
+        .catch(reject);
+    });
   }
 
   /**
@@ -384,19 +414,37 @@ export default class extends HTMLElement {
   }
 
   /**
+   * Returns IDBIndex instance and a key range to iterate over a video URL.
+   *
+   * @param {string} url Video URL.
+   *
+   * @returns {Array} IDBIndex and IDBKeyRange objects.
+   */
+  async accessVideo(url) {
+    const db = await getIDBConnection();
+    const rawDb = db.unwrap();
+    const transaction = rawDb.transaction([db.data.name], 'readonly');
+    const store = transaction.objectStore(db.data.name);
+    const index = store.index(IDB_CHUNK_INDEX);
+    const range = IDBKeyRange.bound(
+      [url, 0, 0],
+      [url, Infinity, Infinity],
+    );
+
+    return [index, range];
+  }
+
+  /**
    * Retrieves the last stored data chunk for the current video.
    *
    * @returns {Promise} Promise that resolves with the last chunk data.
    */
   async getLastChunk() {
-    const db = await getIDBConnection();
-    const rawDb = db.unwrap();
-    const transaction = rawDb.transaction([db.data.name], 'readonly');
-    const store = transaction.objectStore(db.data.name);
-    const index = store.index('index');
+    const url = this.getDownloadableURL();
+    const [index, range] = await this.accessVideo(url);
 
     return new Promise((resolve, reject) => {
-      const request = index.openCursor(null, 'prev');
+      const request = index.openCursor(range, 'prev');
 
       request.onsuccess = (e) => resolve(e.target.result.value);
       request.onerror = (e) => reject(e);
@@ -409,14 +457,11 @@ export default class extends HTMLElement {
    * @returns {Promise} Promise that resolves with the total video size in bytes.
    */
   async getTotalSize() {
-    const db = await getIDBConnection();
-    const rawDb = db.unwrap();
-    const transaction = rawDb.transaction([db.data.name], 'readonly');
-    const store = transaction.objectStore(db.data.name);
-    const index = store.index('index');
+    const url = this.getDownloadableURL();
+    const [index, range] = this.accessVideo(url);
 
     return new Promise((resolve, reject) => {
-      const request = index.openCursor();
+      const request = index.openCursor(range);
 
       let totalSize = 0;
 

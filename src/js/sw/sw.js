@@ -1,4 +1,10 @@
-import { SW_CACHE_NAME, STORAGE_SCHEMA } from '../constants';
+import {
+  SW_CACHE_NAME,
+  STORAGE_SCHEMA,
+  IDB_CHUNK_INDEX,
+  MEDIA_SESSION_DEFAULT_ARTWORK,
+} from '../constants';
+
 import getIDBConnection from '../modules/IDBConnection.module';
 import assetsToCache from '../../../assetsToCache';
 
@@ -24,8 +30,12 @@ const getResponseStream = (request, db, metaEntry) => {
       const rawIDB = db.unwrap();
       const transaction = rawIDB.transaction(STORAGE_SCHEMA.data.name, 'readonly');
       const store = transaction.objectStore(STORAGE_SCHEMA.data.name);
-      const index = store.index('offset');
-      const cursor = index.openCursor();
+      const allEntriesForUrlRange = IDBKeyRange.bound(
+        [request.url, 0, 0],
+        [request.url, Infinity, Infinity],
+      );
+      const index = store.index(IDB_CHUNK_INDEX);
+      const cursor = index.openCursor(allEntriesForUrlRange);
 
       cursor.onsuccess = (e) => {
         const newCursor = e.target.result;
@@ -42,11 +52,11 @@ const getResponseStream = (request, db, metaEntry) => {
               const sliceBufferTo = overlapTo - previousDataLength + 1;
 
               const bufferSlice = new Uint8Array(
-                newCursor.value.data.slice(sliceBufferFrom, sliceBufferTo),
+                dataObject.data.slice(sliceBufferFrom, sliceBufferTo),
               );
               controller.enqueue(bufferSlice);
             } else {
-              controller.enqueue(newCursor.value.data);
+              controller.enqueue(dataObject.data);
             }
           }
           newCursor.continue();
@@ -54,7 +64,7 @@ const getResponseStream = (request, db, metaEntry) => {
           controller.close();
         }
       };
-      cursor.onerror = () => controller.close();
+      cursor.onerror = controller.close;
     },
   });
 
@@ -79,13 +89,16 @@ const getResponseStream = (request, db, metaEntry) => {
  *
  * @param {Event} event The `fetch` event.
  *
- * @returns {Response|null} Response stream or null.
+ * @returns {Promise|Response} Promise that resolves with a `Response` object.
  */
 const maybeGetVideoResponse = async (event) => {
   const db = await getIDBConnection();
   const metaEntry = await db.meta.get(event.request.url);
 
-  return metaEntry.done ? getResponseStream(event.request, db, metaEntry) : null;
+  if (metaEntry.done) {
+    return getResponseStream(event.request, db, metaEntry);
+  }
+  return null;
 };
 
 /**
@@ -94,6 +107,13 @@ const maybeGetVideoResponse = async (event) => {
  * @param {Event} event Install event.
  */
 const precacheAssets = (event) => {
+  /**
+   * Default artwork for Media Session API.
+   */
+  MEDIA_SESSION_DEFAULT_ARTWORK.forEach(
+    (artworkObject) => assetsToCache.push(artworkObject.src),
+  );
+
   event.waitUntil(
     caches.open(SW_CACHE_NAME).then((cache) => cache.addAll(assetsToCache)),
   );
@@ -104,18 +124,19 @@ const precacheAssets = (event) => {
  *
  * @param {Event} event Featch event.
  */
-const fetchHandler = (event) => {
-  event.respondWith(
-    caches.open(SW_CACHE_NAME)
-      .then(async (cache) => cache.match(event.request).then(async (response) => {
-        if (response) return response;
+const fetchHandler = async (event) => {
+  const getResponse = async () => {
+    const openedCache = await caches.open(SW_CACHE_NAME);
 
-        const videoResponse = await maybeGetVideoResponse(event);
-        if (videoResponse) return videoResponse;
+    const cacheResponse = await openedCache.match(event.request);
+    if (cacheResponse) return cacheResponse;
 
-        return fetch(event.request);
-      })),
-  );
+    const videoResponse = await maybeGetVideoResponse(event);
+    if (videoResponse) return videoResponse;
+
+    return fetch(event.request);
+  };
+  event.respondWith(getResponse());
 };
 
 /* eslint-disable no-restricted-globals */
