@@ -62,13 +62,13 @@ export default class extends HTMLElement {
     this._root = this.attachShadow({ mode: 'open' });
 
     window.addEventListener('online', this.updateOnlineStatus.bind(this));
-    window.addEventListener('online-mock', this.updateOnlineStatus.bind(this));
+    window.addEventListener('online-mock', this.updateOnlineStatus.bind(this, true));
     window.addEventListener('offline', this.updateOnlineStatus.bind(this));
-    window.addEventListener('offline-mock', this.updateOnlineStatus.bind(this));
+    window.addEventListener('offline-mock', this.updateOnlineStatus.bind(this, false));
   }
 
-  updateOnlineStatus() {
-    const isOnline = navigator.onLine;
+  updateOnlineStatus(mock) {
+    const isOnline = mock !== undefined ? mock : navigator.onLine;
     const offlineContentOnly = loadSetting('offline-content-only');
     const downloader = this._root.querySelector('video-downloader');
     const isDownloaded = downloader.state === 'done';

@@ -76,6 +76,7 @@ export default class ToggleButton extends HTMLElement {
 
   set checked(value) {
     this.setAttribute('checked', value);
+    this.$checkbox.checked = value;
   }
 
   attributeChangedCallback() {
