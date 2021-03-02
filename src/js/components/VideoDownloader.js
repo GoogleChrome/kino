@@ -19,10 +19,26 @@ const style = `
         position: relative;
         /*transform: translate(-1px, -1px);*/
     }
-    :host( [state="partial"] ) .partial .resume {
+    :host( [state="partial"][downloading="false"] ) .resume {
+        display: block;
+    }
+    :host( [state="partial"][downloading="false"] ) .pause {
+        display: none;
+    }
+    :host( [state="partial"][downloading="true"] ) .resume {
+        display: none;
+    }
+    :host( [state="partial"][downloading="true"] ) .pause {
+        display: block;
+    }
+    :host( [state="partial"] ) .partial .resume,
+    :host( [state="partial"] ) .partial .pause {
         position: absolute;
         left: 50%;
         top: 50%;
+        transform: translate(-50%, -50%);
+    }
+    :host( [state="partial"] ) .partial .resume {
         transform: translate(-40%, -50%);
     }
     :host( [state="done"] ) .done {
@@ -346,9 +362,8 @@ export default class extends HTMLElement {
       /* eslint-eanble no-await-in-loop */
     } while (this.downloading && fileChunk && !fileChunk.done);
 
-    fixedBuffer.flush({
-      done: true,
-    });
+    const opts = fileChunk.done ? { done: true } : {};
+    fixedBuffer.flush(opts);
   }
 
   /**
@@ -372,10 +387,14 @@ export default class extends HTMLElement {
     const size = data ? data.length : 0;
 
     const metaWritePromise = new Promise((resolve, reject) => {
-      const metaPutOperation = db.meta.put({
+      const metaEntry = {
         offset, sizeInBytes, done, mime, url,
-      });
-      metaPutOperation.onsuccess = resolve;
+      };
+      const metaPutOperation = db.meta.put(metaEntry);
+      metaPutOperation.onsuccess = () => {
+        this._videoData.meta = metaEntry;
+        resolve();
+      };
       metaPutOperation.onerror = reject;
     });
 
@@ -506,6 +525,7 @@ export default class extends HTMLElement {
             <button class="partial">
               <progress-ring stroke="2" radius="14" progress="0"></progress-ring>
               <img class="resume" src="/download-resume.svg" alt="Resume" />
+              <img class="pause" src="/download-pause.svg" alt="Pause" />
             </button>
             <button class="done">
               <img class="ok" src="/download-done.svg" alt="Done" />
