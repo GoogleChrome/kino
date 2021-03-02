@@ -121,8 +121,12 @@ export default () => {
       const metaStore = transaction.objectStore(abstractedIDB.meta.name);
       const dataStore = transaction.objectStore(abstractedIDB.data.name);
 
-      const dataUrlIndex = dataStore.index('url');
-      const dataAllChunksCursor = dataUrlIndex.openKeyCursor(IDBKeyRange.only(url));
+      const dataUrlIndex = dataStore.index(IDB_CHUNK_INDEX);
+      const range = IDBKeyRange.bound(
+        [url, 0, 0],
+        [url, Infinity, Infinity],
+      );
+      const dataAllChunksCursor = dataUrlIndex.openKeyCursor(range);
 
       dataAllChunksCursor.onsuccess = (e) => {
         const cursor = e.target.result;
