@@ -1,5 +1,40 @@
 [
 	{
+		"title": "Background Fetch",
+		"description": "HTTP203: Background Fetch – Description Text",
+		"categories": [ "http203" ],
+		"video-sources": [
+			{
+				"src": "https://storage.googleapis.com/wdm-assets/videos/http-203/background-fetch/manifest.mpd",
+				"type": "application/dash+xml"
+			}
+		],
+    "thumbnail": [
+      {
+        "src": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-background-fetch.avif",
+        "type": "image/avif"
+      },
+      {
+        "src": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-background-fetch.webp",
+        "type": "image/webp"
+      },
+      {
+        "src": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-background-fetch.jpg",
+        "type": "image/jpg",
+        "default": true
+      }
+    ],
+    "video-subtitles": [
+			{
+				"default": true,
+				"kind": "subtitles",
+				"label": "English",
+				"src": "https://storage.googleapis.com/wdm-assets/subtitles/http-203/http-203-background-fetch.vtt",
+				"srclang": "en"
+			}
+    ]
+	},
+	{
 		"title": "JavaScript for-loops are… complicated",
 		"description": "In this episode, Jake and Surma dissect how for-loops actually work and how they’ve evolved. Turns out, it got complicated.",
 		"categories": [ "HTTP203" ],
@@ -9,7 +44,7 @@
 				"type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
 			}
 		],
-		"video-subtitles": [
+    "video-subtitles": [
 			{
 				"default": true,
 				"kind": "subtitles",

@@ -12,6 +12,7 @@ const style = `
         display: block;
     }
     :host( [state="ready"] ) button,
+    :host( [state="unable"] ) button,
     :host( [state="partial"] ) button {
         display: block;
     }
@@ -128,7 +129,7 @@ export default class extends HTMLElement {
     }
     /* eslint-enable no-restricted-syntax */
 
-    return candidate || this._videoData['video-sources'][0].src;
+    return candidate;
   }
 
   /**
@@ -471,9 +472,16 @@ export default class extends HTMLElement {
   async _setDownloadState() {
     const db = await getIDBConnection();
     const url = this.getDownloadableURL();
-    const videoMeta = await db.meta.get(url);
 
+    if (!url) {
+      this.state = 'unable';
+      this._buttonEl.disabled = true;
+      return;
+    }
+
+    const videoMeta = await db.meta.get(url);
     this._videoData.meta = videoMeta;
+    this._buttonEl.disabled = false;
 
     if (videoMeta.done) {
       this.state = 'done';
