@@ -4,6 +4,7 @@
   <link rel="icon" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     /* http://meyerweb.com/eric/tools/css/reset/
      v2.0 | 20110126
@@ -51,6 +52,10 @@
     table {
       border-collapse: collapse;
       border-spacing: 0;
+    }
+
+    *, *:before, *:after {
+      box-sizing: border-box;
     }
 
     /* App Styles */
@@ -187,9 +192,47 @@
       justify-content: space-between;
       align-items: center;
     }
-    @media screen and (max-width: 700px) {
+    header .hamburger, header .close {
+      display: none;
+      cursor: pointer;
+    }
+    @media screen and (max-width: 800px) {
+      body.mobile {
+        overflow: hidden;
+      }
+      body.mobile header .container {
+        background: var(--background-dark);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+      body.mobile header .container .menu {
+        flex-basis: 100%;
+        margin-top: -300px;
+      }
+      header .hamburger {
+        display: block;
+      }
+      body.mobile header .hamburger {
+        display: none;
+      }
+      body.mobile header .close {
+        display: block;
+      }
       header .menu {
         display: none;
+      }
+      body.mobile header .menu {
+        display: flex;
+        flex-direction: column;
+
+      }
+      body.mobile .menu > * {
+        margin: 0 0 2rem 0;
       }
     }
 
@@ -283,20 +326,30 @@
       padding: 2rem;
       font-size: 1rem;
     }
-    footer span {
-      white-space: pre;
+    footer p span {
+      margin: 0 0.5rem;
     }
     footer .container {
       display: flex;
       justify-content: space-between;
     }
+    /*footer p span {*/
+    /*  display: none;*/
+    /*}*/
     @media screen and (max-width: 770px) {
       footer .container {
         flex-direction: column-reverse;
         align-items: center;
       }
-      footer span:first-child {
-        margin-top: 1rem;
+      footer p:first-child {
+        margin-top: 2rem;
+      }
+      footer p {
+        text-align: center;
+      }
+      footer p span {
+        display: block;
+        visibility: hidden;
       }
     }
 
@@ -364,6 +417,10 @@
 <header class="_with-video">
   <div class="container">
     <h1><a href="/">KINO</a></h1>
+    <a class="mobile-button">
+      <img class="hamburger" src="menu.svg" alt="Menu" />
+      <img class="close" src="close.svg" alt="Close menu" />
+    </a>
     <div class="menu">
       <a href="/">Home</a>
       <a href="/downloads">Manage Downloads</a>
@@ -385,8 +442,8 @@
 
 <footer>
   <div class="container">
-    <span>© Google 2021</span>
-    <span>Google Privacy Policy and Terms of Service    |    See the source code</span>
+    <p>© Google 2021</p>
+    <p>Google Privacy Policy and Terms of Service<span> | </span>See the source code</p>
   </div>
 </footer>
 

@@ -4,6 +4,10 @@ export default class Router {
 
     window.addEventListener('popstate', () => this.run());
 
+    document.querySelector('.mobile-button').addEventListener('click', () => {
+      document.querySelector('body').classList.toggle('mobile');
+    });
+
     // Upgrade static links
     const navigate = this.navigate.bind(this);
     // eslint-disable-next-line func-names
@@ -59,6 +63,7 @@ export default class Router {
 
   navigate(path) {
     window.history.pushState(null, null, path);
+    document.querySelector('body').classList.remove('mobile');
     this.run();
   }
 }
