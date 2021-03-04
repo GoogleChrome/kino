@@ -17,4 +17,16 @@ export default ({ mainContent, videoDataArray, navigate }) => {
   Object.keys(videosByCategories).forEach((category, index) => {
     appendVideoToGallery(videosByCategories[category], navigate, category, mainContent, index);
   });
+
+  // Mobile view header switch
+  const info = document.querySelector('.poster-wrapper .info');
+  const posterWrapper = document.querySelector('.poster-wrapper');
+  const posterBg = document.querySelector('.poster-bg');
+  window.matchMedia('(max-width: 700px)').addListener((e) => {
+    if (e.matches) {
+      posterWrapper.appendChild(info);
+    } else {
+      posterBg.appendChild(info);
+    }
+  });
 };

@@ -10,7 +10,7 @@ export default ({
   navigate,
 }) => {
   const videoData = videoDataArray.find((vd) => `/${slugify(vd.title)}` === path);
-  const posterWrapper = getPoster(videoData);
+  const posterWrapper = getPoster(videoData, true);
 
   mainContent.innerHTML = `
   <article>

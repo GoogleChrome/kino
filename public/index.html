@@ -103,10 +103,6 @@
     }
 
     header {
-      /*background: linear-gradient(180deg, #223D55 0%, rgba(34, 61, 85, 0.729176) 10%, rgba(34, 61, 85, 0) 30%), linear-gradient(0deg, #223D55 0%, rgba(34, 61, 85, 0.729176) 10%, rgba(34, 61, 85, 0) 30%), url('https://storage.googleapis.com/biograf-video-files/videos/nic-ep-56/poster.jpg');*/
-      /*background-size: cover;*/
-      /*background-position: center center;*/
-      /*height: 700px;*/
       color: #FFF;
       position: absolute;
       top: 0;
@@ -115,8 +111,7 @@
       width: 100%;
     }
     .poster-bg {
-      background: linear-gradient(180deg, #223D55 0%, rgba(34, 61, 85, 0.729176) 10%, rgba(34, 61, 85, 0) 30%), linear-gradient(0deg, #223D55 0%, rgba(34, 61, 85, 0.729176) 10%, rgba(34, 61, 85, 0) 30%), url('https://storage.googleapis.com/biograf-video-files/videos/nic-ep-56/poster.jpg');
-      background-position: center center;
+      background: linear-gradient(180deg, #223D55 0%, rgba(34, 61, 85, 0.729176) 10%, rgba(34, 61, 85, 0) 30%), linear-gradient(0deg, #223D55 0%, rgba(34, 61, 85, 0.729176) 10%, rgba(34, 61, 85, 0) 30%), url('https://storage.googleapis.com/biograf-video-files/videos/nic-ep-56/poster.jpg') center center;
       background-size: cover !important;
       height: 50vw;
       position: relative;
@@ -130,6 +125,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
       color: #000;
+      z-index: 2;
     }
     .poster-bg .play {
       background: transparent;
@@ -156,6 +152,43 @@
     .poster-bg.has-player .main-player {
       display: block;
       height: auto;
+    }
+    .poster-wrapper .info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 0 2rem;
+      /*background: rgba(6,25,43,.8);*/
+    }
+    .poster-wrapper .has-player .info {
+      display: none;
+    }
+    .poster-wrapper .info .limiter {
+      padding: 1rem 0 0 0;
+      width: 65%;
+    }
+    .poster-wrapper .info h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #FFF;
+      line-height: 1.5;
+    }
+    .poster-wrapper .info p {
+      color: #d1d1d1;
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-bottom: 2rem;
+    }
+    @media screen and (max-width: 700px) {
+      .poster-wrapper .info {
+        padding: 0 1.5rem;
+
+        position: initial;
+      }
+      .poster-wrapper .info h1 {
+        font-size: 2rem;
+      }
     }
     header h1 {
       font-size: 2rem;
@@ -357,7 +390,7 @@
     }
 
     .menu-spacer {
-      height: 96px;
+      height: 118px;
       background: var(--background-dark);
     }
 
@@ -367,7 +400,7 @@
       font-weight: bold;
       color: #FFF;
       text-align: center;
-      padding: calc(96px + 80px) 0 30px 0;
+      padding: calc(118px + 80px) 0 30px 0;
     }
     .page-title img {
       margin-top: 30px;
@@ -430,12 +463,6 @@
       </span>
     </div>
   </div>
-
-<!--  <button class="play" onclick="document.querySelector('header').classList.add('with-video')">PLAY</button>-->
-
-<!--  <div class="video">-->
-<!--    test-->
-<!--  </div>-->
 </header>
 
 <main></main>
