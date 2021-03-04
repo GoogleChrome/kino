@@ -8,6 +8,9 @@ const style = `
     :host > * {
         display: none;
     }
+    :host {
+      min-width: 26px;
+    }
     .expanded {
       display: none;
     }

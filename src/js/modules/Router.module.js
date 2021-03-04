@@ -1,3 +1,12 @@
+const globalClickHandler = (navigate) => (e) => {
+  const target = e.path[0];
+  if (e.ctrlKey || e.metaKey) return;
+  if (target.href) {
+    e.preventDefault();
+    navigate(target.href);
+  }
+};
+
 export default class Router {
   constructor() {
     this.routes = [];
@@ -8,14 +17,9 @@ export default class Router {
       document.querySelector('body').classList.toggle('mobile');
     });
 
-    // Upgrade static links
+    // Global click listener setup
     const navigate = this.navigate.bind(this);
-    // eslint-disable-next-line func-names
-    document.querySelectorAll('a[href]').forEach((link) => link.addEventListener('click', function (e) {
-      if (e.ctrlKey || e.metaKey) return;
-      e.preventDefault();
-      navigate(this.href);
-    }));
+    document.addEventListener('click', globalClickHandler(navigate));
 
     this.init();
   }

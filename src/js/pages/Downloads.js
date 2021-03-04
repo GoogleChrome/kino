@@ -46,6 +46,13 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
     grid.appendChild(card);
   });
 
+  if (allMeta.length === 0) {
+    const tipDownload = document.createElement('div');
+    tipDownload.className = 'center-text tip';
+    tipDownload.innerHTML = 'No videos. To download a video press the <img class="vertical-bottom" src="/download-circle.svg" /> button.';
+    mainContent.querySelector('.downloads').appendChild(tipDownload);
+  }
+
   /**
    * Removes all entries from the database on a click event.
    *

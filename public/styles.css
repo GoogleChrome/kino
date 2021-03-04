@@ -54,10 +54,20 @@ table {
 html, body {
   margin: 0;
   background: #f4f4f4;
+  color: #fff;
   background: var(--background-dark);
 }
 body {
   font-family: 'Poppins', sans-serif;
+}
+.vertical-bottom {
+  vertical-align: text-bottom;
+}
+.center-text {
+  text-align: center;
+}
+.tip {
+  padding: 2rem;
 }
 #connection-status {
   position: fixed;
@@ -99,7 +109,7 @@ header {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1;
+  z-index: 3;
   width: 100%;
 }
 .poster-bg {
@@ -136,7 +146,7 @@ header.with-video {
 .poster-bg.has-player {
   background: #223D55 !important;
   height: auto;
-  padding-top: 96px;
+  padding-top: 118px;
 }
 .poster-bg.has-player .play {
   display: none;
@@ -237,7 +247,7 @@ header .hamburger, header .close {
   }
   body.mobile header .container .menu {
     flex-basis: 100%;
-    margin-top: -300px;
+    margin-top: -50%;
   }
   header .hamburger {
     display: block;
@@ -350,6 +360,13 @@ footer {
   color: var(--text-footer);
   padding: 2rem;
   font-size: 1rem;
+}
+footer a {
+  color: var(--text-footer);
+  text-decoration: none;
+}
+footer a:hover {
+  text-decoration: underline;
 }
 footer p span {
   margin: 0 0.5rem;

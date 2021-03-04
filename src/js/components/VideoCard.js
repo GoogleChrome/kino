@@ -79,15 +79,6 @@ export default class extends HTMLElement {
     }
   }
 
-  connectedCallback() {
-    const links = this._root.querySelectorAll('a');
-    links.forEach((link) => link.addEventListener('click', (e) => {
-      if (e.ctrlKey || e.metaKey) return;
-      e.preventDefault();
-      this.navigate(e.target.href);
-    }));
-  }
-
   attachDownloader(downloader) {
     downloader.onStatusUpdate = this.updateOnlineStatus.bind(this);
     this._root.querySelector('.downloader').appendChild(downloader);
