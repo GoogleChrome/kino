@@ -2,6 +2,10 @@ import slugify from '../utils/slugify';
 import appendVideoToGallery from '../utils/appendVideoToGallery';
 
 /**
+ * Finds category name by slug (reverse lookup).
+ *
+ * @todo Later on if we introduce Categories endpoint that will be changed.
+ *
  * @param {string} slug Slug.
  * @param {object[]} videoDataArray Array of video metadata objects.
  *
