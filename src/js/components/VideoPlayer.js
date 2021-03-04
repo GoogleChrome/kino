@@ -195,7 +195,7 @@ export default class extends HTMLElement {
   }
 
   play() {
-    const videoEl = this._root.querySelector('video');
+    const videoEl = this.internal.root.querySelector('video');
     if (videoEl) videoEl.play();
   }
 }
