@@ -21,7 +21,7 @@ export default ({
         <span class="length">7mins 43secs</span>
       </div>
       <p>${videoData.description}</p>
-      <button class="primary icon-download">Make available offline</button>
+      <span class="downloader"></span>
     </div>
   </article>
   <div class="category"></div>
@@ -29,8 +29,9 @@ export default ({
   mainContent.prepend(posterWrapper);
 
   const downloader = document.createElement('video-downloader');
+  downloader.setAttribute('expanded', 'true');
   downloader.init(videoData, SW_CACHE_NAME);
-  mainContent.querySelector('.icon-download').appendChild(downloader);
+  mainContent.querySelector('.downloader').appendChild(downloader);
 
   const content = mainContent.querySelector('.category');
   appendVideoToGallery(videoDataArray, navigate, '', content);

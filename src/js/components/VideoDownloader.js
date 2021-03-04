@@ -8,15 +8,52 @@ const style = `
     :host > * {
         display: none;
     }
+    .expanded {
+      display: none;
+    }
+    span.expanded {
+      margin-left: 1rem;
+    }
+    button.cancel {
+        border-color: #FF8383 !important;
+    }
+    :host( [expanded="true"] ) .expanded {
+        display: inline-block;
+    }
+    :host( [expanded="true"] ) {
+      display: inline-block;
+    }
+    :host( not( [expanded="true"] ) ) .expanded {
+      display: none;
+    }
+    :host( [expanded="true"] ) button {
+      justify-content: center;
+      align-items: center;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: bold;
+      letter-spacing: 0.085em;
+      border-radius: 5px;
+      padding: 0.5rem 1rem 0.5rem 1rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: transparent;
+    }
     :host( :not( [state="not-initialized"] ) ) {
-        display: block;
+        display: inline-block;
     }
     :host( [state="ready"] ) .ready {
-        display: block;
+        display: flex;
+        align-items: center;
     }
     :host( [state="partial"] ) .partial {
-        display: block;
+        display: flex;
         position: relative;
+    }
+    .progress {
+        position: relative;
+        display: inline-block;
     }
     :host( [state="partial"][downloading="true"] ) .cancel {
         display: none;
@@ -37,38 +74,55 @@ const style = `
         cursor: pointer;
         text-transform: uppercase;
     }
-    :host( [state="partial"][downloading="false"] ) .resume {
+    :host( [expanded="true"][state="partial"][downloading="false"] ) .cancel {
+        right: 0;
+        left: initial;
+        bottom: initial;
+        transform: translate(110%, 0);
+    }
+    :host( [state="partial"][downloading="false"] ) .resume:not(.expanded) {
         display: block;
     }
     :host( [state="partial"][downloading="false"] ) .pause {
         display: none;
     }
-    :host( [state="partial"][downloading="true"] ) .resume {
+    :host( [state="partial"][downloading="true"] ) .resume:not(.expanded) {
         display: none;
     }
-    :host( [state="partial"][downloading="true"] ) .pause {
+    :host( [state="partial"][downloading="true"] ) .pause:not(.expanded) {
         display: block;
     }
-    :host( [state="partial"] ) .partial .resume,
-    :host( [state="partial"] ) .partial .pause {
+    :host( [state="partial"][downloading="true"][expanded="true"] ) .resume {
+        display: none;
+    }
+    :host( [state="partial"] ) .partial img.resume,
+    :host( [state="partial"] ) .partial img.pause {
         position: absolute;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
     }
-    :host( [state="partial"] ) .partial .resume {
+    :host( [state="partial"] ) .partial img.resume {
         transform: translate(-40%, -50%);
     }
     :host( [state="done"] ) .done {
-        display: block;
+        display: flex;
     }
     :host( [state="done"] ) button .delete {
         display: none;
         cursor: pointer;
+        color: #FF8383;
     }
-    :host( [state="done"] ) button:hover .delete {
+    :host( [state="done"] ) button:hover {
+        border-color: #FF8383;
+    }
+    :host( [state="done"]:not( [expanded="true"] ) ) button:hover .delete:not(.expanded) {
         display: block;
     }
+    :host( [state="done"][expanded="true"] ) button:hover .delete {
+        display: block;
+    }
+
     :host( [state="done"] ) button:hover .ok {
         display: none;
     }
@@ -541,18 +595,25 @@ export default class extends HTMLElement {
     templateElement.innerHTML = `${style}
             <button class="ready">
               <img src="/download-circle.svg" alt="Download" />
+              <span class="expanded">Make available offline</span>
             </button>
             <span class="partial">
               <button class="cancel" title="Cancel and remove">Cancel</button>
             </span>
             <button class="partial">
-              <progress-ring stroke="2" radius="13" progress="0"></progress-ring>
-              <img class="resume" src="/download-resume.svg" alt="Resume" />
-              <img class="pause" src="/download-pause.svg" alt="Pause" />
+              <div class="progress">
+                <progress-ring stroke="2" radius="13" progress="0"></progress-ring>
+                <img class="resume" src="/download-resume.svg" alt="Resume" />
+                <img class="pause" src="/download-pause.svg" alt="Pause" />
+              </div>
+              <span class="expanded pause">Pause download</span>
+              <span class="expanded resume">Resume download</span>
             </button>
             <button class="done">
               <img class="ok" src="/download-done.svg" alt="Done" />
               <img class="delete" src="/download-delete.svg" alt="Delete" title="Delete the video from cache." />
+              <span class="expanded ok">Downloaded</span>
+              <span class="expanded delete">Remove video</span>
             </button>`;
 
     while (this._root.firstChild) {

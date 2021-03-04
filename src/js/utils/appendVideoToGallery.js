@@ -7,7 +7,7 @@ import { SW_CACHE_NAME } from '../constants';
  * @param {HTMLElement} mainContent Main content DOM node.
  * @param {number} index Index of the gallery/section, for background purposes.
  */
-function appendVideoToGallery(videoDataArray, navigate, category, mainContent, index) {
+function appendVideoToGallery(videoDataArray, navigate, category, mainContent, index = 0) {
   const videoGrid = document.createElement('video-grid');
   videoGrid.category = category;
   videoGrid.background = getComputedStyle(document.documentElement)
