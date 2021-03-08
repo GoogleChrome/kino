@@ -9,7 +9,7 @@ export const SW_CACHE_NAME = 'v1';
 export const STORAGE_SCHEMA = {
   meta: {
     name: 'videoMeta',
-    key: 'url',
+    key: 'id',
   },
   data: {
     name: 'videoData',
@@ -37,3 +37,45 @@ export const MEDIA_SESSION_DEFAULT_ARTWORK = [
  * Media Server URL.
  */
 export const MEDIA_SERVER_URL = 'https://storage.googleapis.com/wdm-assets';
+
+/**
+ * MIME types associated with video streaming sources.
+ */
+export const STREAMING_MIME_TYPES = [
+  'application/dash+xml',
+  'application/vnd.apple.mpegurl', // <-- HLS (m3u8)
+];
+
+/**
+ * Streams that the application is able to play through MSE.
+ */
+export const SUPPORTED_STREAMING_MIME_TYPES = [
+  'application/dash+xml',
+];
+
+/**
+ * Some video types and codecs leads to smaller file sizes
+ * for comparable video qualities.
+ *
+ * If the client supports those, we want to prioritize those sources
+ * over the others available in the MPD manifest.
+ */
+export const DEFAULT_VIDEO_PRIORITIES = [
+  '[mimeType="video/webm"][codecs^="vp09"]',
+  '[mimeType="video/webm"]',
+  '[mimeType="video/mp4"]',
+];
+
+/**
+ * Same for audio, but right now we have no real preference here.
+ */
+export const DEFAULT_AUDIO_PRIORITIES = [
+  '[mimeType="audio/mp4"]',
+];
+
+/**
+ * A stream can be composed from multiple media, e.g. video, audio, subtitles etc.
+ *
+ * These are all the types the Streamer has support for.
+ */
+export const ALL_STREAM_TYPES = ['audio', 'video'];

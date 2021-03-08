@@ -7,19 +7,19 @@ const metaAccessorFactory = (abstractedIDB) => ({
   name: STORAGE_SCHEMA.meta.name,
   key: STORAGE_SCHEMA.meta.key,
 
-  async get(url) {
+  async get(id) {
     const defaultValue = {
+      id,
+      files: [],
       done: false,
-      offset: 0,
-      url,
     };
     const transaction = abstractedIDB.db.transaction([this.name], 'readonly');
     const store = transaction.objectStore(this.name);
     const data = await new Promise((resolve, reject) => {
-      const request = store.get(url);
+      const request = store.get(id);
 
       request.onsuccess = (e) => resolve(e.target.result || defaultValue);
-      request.onerror = () => reject(`Unable to fetch meta information for video: ${url}`);
+      request.onerror = () => reject(`Unable to fetch meta information for video: ${id}`);
     });
 
     return data;
@@ -144,7 +144,7 @@ export default () => {
        *
        * @see https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB#structuring_the_database
        */
-      dataOS.createIndex(IDB_CHUNK_INDEX, ['url', 'index', 'offset'], { unique: true });
+      dataOS.createIndex(IDB_CHUNK_INDEX, ['id', 'url', 'rangeStart', 'rangeEnd'], { unique: true });
     };
   });
 

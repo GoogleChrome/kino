@@ -1,29 +1,6 @@
-/**
- * Some video types and codecs leads to smaller file sizes
- * for comparable video qualities.
- *
- * If the client supports those, we want to prioritize those sources
- * over the others available in the MPD manifest.
- */
-const DEFAULT_VIDEO_PRIORITIES = [
-  '[mimeType="video/webm"][codecs^="vp09"]',
-  '[mimeType="video/webm"]',
-  '[mimeType="video/mp4"]',
-];
-
-/**
- * Same for audio, but right now we have no real preference here.
- */
-const DEFAULT_AUDIO_PRIORITIES = [
-  '[mimeType="audio/mp4"]',
-];
-
-/**
- * A stream can be composed from multiple media, e.g. video, audio, subtitles etc.
- *
- * These are all the types the Streamer has support for.
- */
-const ALL_STREAM_TYPES = ['audio', 'video'];
+import '../typedefs';
+import selectRepresentations from '../utils/selectRepresentations';
+import getRepresentationMimeString from '../utils/getRepresentationMimeString';
 
 /**
  * Streams raw media data to the <video> element.
@@ -38,7 +15,7 @@ export default class {
       media: {
         baseURL: '/',
         streamTypes: [],
-        representations: this.initRepresentations(),
+        representations: selectRepresentations(parser, opts),
         lastRepresentationsIds: {},
         duration: this.parser.duration,
       },
@@ -60,17 +37,7 @@ export default class {
 
     // Iterate which stream types we have separate representations for.
     this.stream.media.streamTypes = Object.keys(this.stream.media.representations);
-
-    /**
-     * Define a base URL for the files referenced in the manifest file.
-     */
-    const manifestSrc = this.getOpt('manifestSrc');
-    if (manifestSrc) {
-      const manifestURL = new URL(manifestSrc);
-      const manifestPathDir = manifestURL.pathname.replace(/[^/]+$/, ''); // Strip trailing filename.
-
-      this.stream.media.baseURL = `${manifestURL.origin}${manifestPathDir}`;
-    }
+    this.stream.media.baseURL = parser.baseURL;
 
     /**
      * Measure real downlink speeds.
@@ -147,7 +114,7 @@ export default class {
     const { streamTypes, representations } = this.stream.media;
 
     streamTypes.forEach((streamType) => {
-      const mimeString = this.getRepresentationMimeString(representations[streamType][0]);
+      const mimeString = getRepresentationMimeString(representations[streamType][0]);
       this.stream.buffer.sourceBuffers[streamType] = this.initializeSourceBuffer(mimeString);
     });
 
@@ -181,19 +148,6 @@ export default class {
     return this.stream.downlink.value
       || navigatorDownlink
       || 10; // Assume broadband if we really don't know.
-  }
-
-  /**
-   * Returns the MIME type for a representation.
-   *
-   * @param {object} representation Information about the representation.
-   *
-   * @returns {string} MIME type, optionally with codecs string, too.
-   */
-  getRepresentationMimeString(representation) {
-    return representation.mimeType && representation.codecs
-      ? `${representation.mimeType}; codecs="${representation.codecs}"`
-      : `${representation.mimeType}`;
   }
 
   /**
@@ -240,57 +194,6 @@ export default class {
       },
       this.stream.media.representations.video[0],
     );
-    return representations;
-  }
-
-  /**
-   * Fetch all representations present in the MPD file and filter
-   * those that the current client can't play out.
-   *
-   * @returns {object[]} All representations that the current client is able to play.
-   */
-  initRepresentations() {
-    /**
-     * Returns whether the provided representation is playable by the current client.
-     *
-     * @param {object} representation Representation object returned by parser.queryRepresentations.
-     *
-     * @returns {boolean} Is this representation playable by the current client.
-     */
-    const canPlayFilter = (representation) => {
-      const testMime = this.getRepresentationMimeString(representation);
-      return this.videoEl.canPlayType(testMime) === 'probably';
-    };
-
-    const representations = {};
-    const priorities = {
-      video: this.getOpt('videoPriorities') || DEFAULT_VIDEO_PRIORITIES,
-      audio: this.getOpt('audioPriorities') || DEFAULT_AUDIO_PRIORITIES,
-    };
-
-    /**
-     * Select sets of video and audio representations that are playable
-     * in the client with respect to indicated priorities.
-     */
-    ALL_STREAM_TYPES.forEach(
-      (contentType) => {
-        let query;
-        do {
-          query = priorities[contentType].shift() || '';
-
-          /**
-           * @todo Support languages other than the hardcoded English.
-           */
-          representations[contentType] = this.parser.queryRepresentations(query, contentType, 'eng');
-          representations[contentType] = representations[contentType].filter(canPlayFilter);
-        } while (!representations[contentType]);
-      },
-    );
-
-    if (representations.video.length === 0) {
-      throw new Error('[Streamer] No playable video representation found.');
-    }
-
     return representations;
   }
 
@@ -489,12 +392,6 @@ export default class {
 
     return sourceBuffer;
   }
-
-  /**
-   * @typedef {object} healthResult
-   * @property {boolean} isHealthy      Whether the `heathyDuration` of the buffer is loaded ahead.
-   * @property {number}  bufferEndTime  The end time of the current buffer range ahead.
-   */
 
   /**
    * Returns health information about the provided buffer.

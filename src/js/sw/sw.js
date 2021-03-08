@@ -30,8 +30,8 @@ const getResponseStream = (request, db, metaEntry) => {
       const transaction = rawIDB.transaction(STORAGE_SCHEMA.data.name, 'readonly');
       const store = transaction.objectStore(STORAGE_SCHEMA.data.name);
       const allEntriesForUrlRange = IDBKeyRange.bound(
-        [request.url, 0, 0],
-        [request.url, Infinity, Infinity],
+        [metaEntry.videoId, request.url, 0, rangeFrom],
+        [metaEntry.videoId, request.url, rangeTo, Infinity],
       );
       const index = store.index(IDB_CHUNK_INDEX);
       const cursor = index.openCursor(allEntriesForUrlRange);
@@ -40,23 +40,20 @@ const getResponseStream = (request, db, metaEntry) => {
         const newCursor = e.target.result;
         if (newCursor) {
           const dataObject = newCursor.value;
-          const previousDataLength = dataObject.offset - dataObject.size;
+          const needsSlice = dataObject.rangeStart < rangeFrom || dataObject.rangeEnd > rangeTo;
 
-          if (rangeFrom < dataObject.offset && rangeTo > previousDataLength) {
-            const overlapFrom = Math.max(rangeFrom, previousDataLength);
-            const overlapTo = Math.min(rangeTo, dataObject.offset - 1);
-
-            if (overlapTo - overlapFrom !== dataObject.size - 1) {
-              const sliceBufferFrom = overlapFrom - previousDataLength;
-              const sliceBufferTo = overlapTo - previousDataLength + 1;
-
-              const bufferSlice = new Uint8Array(
-                dataObject.data.slice(sliceBufferFrom, sliceBufferTo),
-              );
-              controller.enqueue(bufferSlice);
-            } else {
-              controller.enqueue(dataObject.data);
-            }
+          if (needsSlice) {
+            const sliceBufferFrom = Math.max(0, rangeFrom - dataObject.rangeStart);
+            const sliceBufferTo = Math.min(
+              dataObject.rangeEnd - dataObject.rangeStart,
+              rangeTo - dataObject.rangeStart,
+            );
+            const bufferSlice = new Uint8Array(
+              dataObject.data.slice(sliceBufferFrom, sliceBufferTo),
+            );
+            controller.enqueue(bufferSlice);
+          } else {
+            controller.enqueue(dataObject.data);
           }
           newCursor.continue();
         } else {
