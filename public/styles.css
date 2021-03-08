@@ -156,25 +156,17 @@ header.with-video {
   height: auto;
 }
 .poster-wrapper .info {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: 0 2rem;
-  /*background: rgba(6,25,43,.8);*/
+  padding: 2rem 2rem 0 2rem;
 }
 .poster-wrapper .has-player .info {
   display: none;
-}
-.poster-wrapper .info .limiter {
-  padding: 1rem 0 0 0;
-  width: 65%;
 }
 .poster-wrapper .info h1 {
   font-size: 3rem;
   font-weight: bold;
   color: #FFF;
   line-height: 1.5;
+  margin-bottom: 2rem;
 }
 .poster-wrapper .info p {
   color: #d1d1d1;
@@ -184,12 +176,11 @@ header.with-video {
 }
 @media screen and (max-width: 700px) {
   .poster-wrapper .info {
-    padding: 0 1.5rem;
-
-    position: initial;
+    padding: 1.5rem 1.5rem 0 1.5rem;
   }
   .poster-wrapper .info h1 {
     font-size: 2rem;
+    margin-bottom: 1rem;
   }
 }
 header h1 {
