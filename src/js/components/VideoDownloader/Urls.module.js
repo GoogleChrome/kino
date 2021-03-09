@@ -31,11 +31,26 @@ export const getURLsForDownload = async (videoId, sources) => {
     if (offlineGenerated) {
       /**
        * The manifest data has been changed in memory. We need to persist the changes.
-       * Generating a data URI gives us a faux-URL that can reliably be used in
+       * Generating a data URI gives us a stable faux-URL that can reliably be used in
        * place of a real URL and even stored in the database for later usage.
+       *
+       * Note: the offline manifest file is pretty small in size (several kBs max),
+       *       making it a good candidate for a data URI.
        */
       const offlineManifestDataURI = parser.toDataURI();
+
+      /**
+       * For most files, the `url` and `downloadUrl` are the same thing – see
+       * `listAllChunkURLs` source code.
+       *
+       * The only exception are the manifest files, where the `downloadUrl` is a separate data URI,
+       * whereas the `url` is the original URL of the manifest.
+       *
+       * This allows us to intercept requests for the original manifest file, but serve our
+       * updated version of the manifest.
+       */
       const manifestTuple = [selectedSource.src, offlineManifestDataURI];
+
       URLTuples = parser.listAllChunkURLs([manifestTuple]);
     } else {
       return [];

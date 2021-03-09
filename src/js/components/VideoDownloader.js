@@ -113,6 +113,11 @@ export default class extends HTMLElement {
       const dbFiles = await db.file.getByVideoId(videoId);
       const dbFilesUrlTuples = dbFiles.map((fileMeta) => [fileMeta.url, fileMeta]);
       const dbFilesByUrl = Object.fromEntries(dbFilesUrlTuples);
+
+      /**
+       * If we have an entry for this file in the database, use it. Otherwise
+       * fall back to the freshly generated FileMeta object.
+       */
       const filesWithStateUpdatedFromDb = files.map(
         (fileMeta) => (dbFilesByUrl[fileMeta.url] ? dbFilesByUrl[fileMeta.url] : fileMeta),
       );
@@ -216,6 +221,13 @@ export default class extends HTMLElement {
       this.state = 'done';
     };
 
+    /**
+     * The `DownloadManager` instance will download all remaining files in sequence and will
+     * emit data chunks along the way.
+     *
+     * We subscribe the `StoreManager` instance to the `onflush` event of the `DownloadManager`
+     * to make sure all chunks are sent to the `storeChunk` method of the `StoreManager`.
+     */
     const boundStoreChunkHandler = this.storageManager.storeChunk.bind(this.storageManager);
     this.downloadManager.onflush = boundStoreChunkHandler;
 
@@ -263,6 +275,11 @@ export default class extends HTMLElement {
     this.internal.meta = meta;
   }
 
+  /**
+   * Returns the associated video ID.
+   *
+   * @returns {string} Video ID.
+   */
   getId() {
     return this.internal.apiData?.id || '';
   }

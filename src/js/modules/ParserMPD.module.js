@@ -1,6 +1,6 @@
 import '../typedefs';
 import iso8601TimeDurationToSeconds from './Duration.module';
-import selectRepresentations from '../utils/selectRepresentations';
+import selectRepresentations from '../utils/selectRepresentations.module';
 
 /**
  * Replaces MPD variables in the chunk URL string with proper values.

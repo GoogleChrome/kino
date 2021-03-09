@@ -19,9 +19,18 @@ export default class {
   }
 
   /**
-   * @param {FileMeta}   fileMeta   File meta entry upadte to be stored.
+   * Receives the updated file meta object and a file chunk and updates the
+   * database with new information.
+   *
+   * When the data is committed to the database, recalculates the progress
+   * percentage and invokes the `onprogress` handlers.
+   *
+   * If the `isDone` argument is `true`, the storage manager will invoke the `ondone`
+   * handler once all data pieces are written to IDB.
+   *
+   * @param {FileMeta}   fileMeta   File meta entry update to be stored.
    * @param {FileChunk}  fileChunk  File chunk to be stored.
-   * @param {boolean}    isDone     Is this the last downloaded chunk.
+   * @param {boolean}    isDone     Is this the last downloaded chunk?
    *
    * @returns {Promise} Promise that resolves when the write operations are complete.
    */

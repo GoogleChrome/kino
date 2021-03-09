@@ -40,7 +40,8 @@ export default class {
   }
 
   /**
-   * Sets the `currentFileMeta` and `done` properties.
+   * Sets the `currentFileMeta` to the first incomplete download.
+   * Also sets the `done` property to indicate if all downloads are completed.
    */
   maybePrepareNextFile() {
     const firstIncompleteDownload = this.files.find(
@@ -70,6 +71,8 @@ export default class {
   }
 
   /**
+   * When the fixed buffer is flushed, update the current file meta
+   * information appropriately and run the `onflush` handler.
    *
    * @param {Uint8Array} data Downloaded data.
    * @param {object}     opts Any custom options pushed through the buffer.

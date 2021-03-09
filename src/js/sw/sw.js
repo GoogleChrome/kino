@@ -9,7 +9,7 @@ import {
 import getIDBConnection from '../modules/IDBConnection.module';
 
 /**
- * Respond to a request to fetch offline video and contruct a response stream.
+ * Respond to a request to fetch offline video file and construct a response stream.
  *
  * Includes support for `Range` requests.
  *
@@ -30,6 +30,11 @@ const getResponseStream = (request, db, fileMeta) => {
       const rawIDB = db.unwrap();
       const transaction = rawIDB.transaction(STORAGE_SCHEMA.data.name, 'readonly');
       const store = transaction.objectStore(STORAGE_SCHEMA.data.name);
+
+      /**
+       * Construct the range boundaries so that the returned chunks
+       * cover the whole requested range.
+       */
       const allEntriesForUrlRange = IDBKeyRange.bound(
         [request.url, -Infinity, rangeFrom],
         [request.url, rangeTo, Infinity],
@@ -82,11 +87,12 @@ const getResponseStream = (request, db, fileMeta) => {
 };
 
 /**
- * Respond to a offline video request.
+ * If the request is for a video file that we have downloaded in IDB,
+ * respond with the local file.
  *
  * @param {Event} event The `fetch` event.
  *
- * @returns {Promise|Response} Promise that resolves with a `Response` object.
+ * @returns {Promise<Response>|null} Promise that resolves with a `Response` object.
  */
 const maybeGetVideoResponse = async (event) => {
   const db = await getIDBConnection();
