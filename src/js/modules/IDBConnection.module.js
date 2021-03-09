@@ -1,4 +1,7 @@
-import { STORAGE_SCHEMA, IDB_CHUNK_INDEX } from '../constants';
+import {
+  STORAGE_SCHEMA,
+  IDB_CHUNK_INDEX,
+} from '../constants';
 
 const dbName = 'webdev-offline-storage';
 const schemaVersion = 1;
@@ -7,19 +10,18 @@ const metaAccessorFactory = (abstractedIDB) => ({
   name: STORAGE_SCHEMA.meta.name,
   key: STORAGE_SCHEMA.meta.key,
 
-  async get(id) {
+  async get(videoId) {
     const defaultValue = {
-      id,
-      files: [],
-      done: false,
+      videoId,
+      progress: 0,
     };
     const transaction = abstractedIDB.db.transaction([this.name], 'readonly');
     const store = transaction.objectStore(this.name);
     const data = await new Promise((resolve, reject) => {
-      const request = store.get(id);
+      const request = store.get(videoId);
 
       request.onsuccess = (e) => resolve(e.target.result || defaultValue);
-      request.onerror = () => reject(`Unable to fetch meta information for video: ${id}`);
+      request.onerror = () => reject(`Unable to fetch meta information for video: ${videoId}`);
     });
 
     return data;
@@ -38,12 +40,79 @@ const dataAccessorFactory = (abstractedIDB) => ({
   },
 });
 
+const fileAccessorFactory = (abstractedIDB) => ({
+  name: STORAGE_SCHEMA.filemeta.name,
+
+  /**
+   * Returns meta information for a URL.
+   *
+   * @param {string} url URL for the requested file.
+   *
+   * @returns {FileMeta|null} File meta information.
+   */
+  async get(url) {
+    /**
+     * @type {IDBTransaction}
+     */
+    const transaction = abstractedIDB.db.transaction([this.name], 'readonly');
+    const store = transaction.objectStore(this.name);
+    const data = await new Promise((resolve) => {
+      const request = store.get(url);
+
+      request.onsuccess = (e) => resolve(e.target.result);
+      request.onerror = () => resolve();
+    });
+
+    return data;
+  },
+
+  /**
+   * Returns files associated with a particular video ID.
+   *
+   * @param {string} videoId Video ID.
+   *
+   * @returns {FileMeta[]} File meta entries.
+   */
+  async getByVideoId(videoId) {
+    /**
+     * @type {IDBTransaction}
+     */
+    const transaction = abstractedIDB.db.transaction([this.name], 'readonly');
+    const store = transaction.objectStore(this.name);
+    const idIndex = store.index('videoId');
+    const keyRange = IDBKeyRange.only(videoId);
+
+    const data = await new Promise((resolve) => {
+      const request = idIndex.openCursor(keyRange);
+      const fileMeta = [];
+      const cursorReader = (e) => {
+        const cursor = e.target.result;
+        if (cursor) {
+          fileMeta.push(cursor.value);
+          cursor.continue();
+        } else {
+          resolve(fileMeta);
+        }
+      };
+
+      request.onsuccess = cursorReader;
+      request.onerror = () => resolve([]);
+    });
+
+    return data;
+  },
+
+  put(fileMeta) {
+    return abstractedIDB.defaultAccesor.put(fileMeta, this.name);
+  },
+});
+
 let dbConnection = null;
 
 /**
  * Provides access to video data stored in IDB.
  *
- * @returns {null|Promise} Promise that resolved with `IDBDatabase` instance.
+ * @returns {null|Promise<IDBDatabase>} Promise that resolved with `IDBDatabase` instance.
  */
 export default () => {
   if (dbConnection) return dbConnection;
@@ -78,6 +147,7 @@ export default () => {
 
     abstractedIDB.meta = metaAccessorFactory(abstractedIDB);
     abstractedIDB.data = dataAccessorFactory(abstractedIDB);
+    abstractedIDB.file = fileAccessorFactory(abstractedIDB);
 
     return abstractedIDB;
   };
@@ -91,9 +161,12 @@ export default () => {
     /**
      * @see https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB#creating_or_updating_the_version_of_the_database
      *
-     * @param {*} e Event object.
+     * @param {Event} e Event object.
      */
     dbRequest.onupgradeneeded = (e) => {
+      /**
+       * @type {IDBDatabase}
+       */
       const db = e.target.result;
 
       /**
@@ -144,7 +217,16 @@ export default () => {
        *
        * @see https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB#structuring_the_database
        */
-      dataOS.createIndex(IDB_CHUNK_INDEX, ['id', 'url', 'rangeStart', 'rangeEnd'], { unique: true });
+      dataOS.createIndex(IDB_CHUNK_INDEX, ['url', 'rangeStart', 'rangeEnd'], { unique: true });
+
+      /**
+       * File meta storage.
+       */
+      const fileOS = db.createObjectStore(
+        STORAGE_SCHEMA.filemeta.name,
+        { keyPath: STORAGE_SCHEMA.filemeta.key },
+      );
+      fileOS.createIndex('videoId', 'videoId');
     };
   });
 

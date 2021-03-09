@@ -178,11 +178,13 @@ export default class {
   /**
    * Returns the manifest as a Blob.
    *
-   * @returns {Blob} Manifest data as a blob.
+   * @returns {string} Data URI encoding the manifest data.
    */
-  toBlob() {
+  toDataURI() {
     const manifestMarkup = this.internal.manifest.documentElement.outerHTML;
-    return new Blob([manifestMarkup], { type: 'application/dash+xml' });
+    const manifestMarkupBase64 = btoa(manifestMarkup);
+
+    return `data:application/dash+xml;base64,${manifestMarkupBase64}`;
   }
 
   /**
@@ -207,7 +209,7 @@ export default class {
 
     const prependBaseURL = (filename) => this.baseURL + filename;
     const fileTuples = [...initialSegmentFiles, ...dataChunkFiles].map(
-      (file) => [file, prependBaseURL(file)],
+      (file) => [prependBaseURL(file), prependBaseURL(file)],
     );
     return [...fileTuples, ...additionalFileTuples];
   }

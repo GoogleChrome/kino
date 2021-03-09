@@ -19,16 +19,18 @@ export default class {
   }
 
   /**
+   * @param {FileMeta}   fileMeta   File meta entry upadte to be stored.
    * @param {FileChunk}  fileChunk  File chunk to be stored.
    * @param {boolean}    isDone     Is this the last downloaded chunk.
    *
    * @returns {Promise} Promise that resolves when the write operations are complete.
    */
-  async storeChunk(fileChunk, isDone) {
-    const videoMeta = this.internal.videoDownloader.getMeta();
+  async storeChunk(fileMeta, fileChunk, isDone) {
     const db = await getIDBConnection();
-
-    videoMeta.done = isDone;
+    const videoMeta = {
+      done: isDone,
+      videoId: this.internal.videoDownloader.getId(),
+    };
 
     const metaWritePromise = new Promise((resolve, reject) => {
       const metaPutOperation = db.meta.put(videoMeta);
@@ -43,8 +45,15 @@ export default class {
       dataPutOperation.onerror = reject;
     });
 
+    const fileWritePromise = new Promise((resolve, reject) => {
+      const dataPutOperation = db.file.put(fileMeta);
+
+      dataPutOperation.onsuccess = resolve;
+      dataPutOperation.onerror = reject;
+    });
+
     return new Promise((resolve, reject) => {
-      Promise.all([metaWritePromise, dataWritePromise])
+      Promise.all([metaWritePromise, dataWritePromise, fileWritePromise])
         .then(() => {
           const percentage = this.internal.videoDownloader.getProgress();
           this.onprogress(percentage);

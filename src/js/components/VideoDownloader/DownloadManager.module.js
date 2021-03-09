@@ -26,7 +26,7 @@ export default class {
    * @param {VideoDownloader} videoDownloader The associated video downloader object.
    */
   constructor(videoDownloader) {
-    this.files = videoDownloader.getMeta()?.files || [];
+    this.files = videoDownloader.internal.files || [];
     this.paused = false;
 
     this.internal = {
@@ -77,24 +77,26 @@ export default class {
   bufferFlushed(data, opts = {}) {
     const fileMeta = this.currentFileMeta;
     const fileChunk = {
-      id: this.internal.videoDownloader.getId(),
       url: fileMeta.url,
       rangeStart: fileMeta.bytesDownloaded,
-      rangeEnd: fileMeta.bytesDownloaded + data.length,
+      rangeEnd: fileMeta.bytesDownloaded + data.length - 1,
       data,
     };
 
     fileMeta.bytesDownloaded += data.length;
-    if (opts.done) fileMeta.done = true;
+    if (opts.done) {
+      fileMeta.bytesTotal = fileMeta.bytesDownloaded;
+      fileMeta.done = true;
+    }
     this.maybePrepareNextFile();
-    this.onflush(fileChunk, this.done);
+    this.onflush(fileMeta, fileChunk, this.done);
   }
 
   /**
    * Downloads the first file that is not fully downloaded.
    */
   async downloadFile() {
-    const { bytesDownloaded, url } = this.currentFileMeta;
+    const { bytesDownloaded, url, downloadUrl } = this.currentFileMeta;
     const fetchOpts = {};
 
     if (bytesDownloaded) {
@@ -103,7 +105,7 @@ export default class {
       };
     }
 
-    const response = await fetch(url, fetchOpts);
+    const response = await fetch(downloadUrl, fetchOpts);
     const reader = response.body.getReader();
     const mimeType = response.headers.get('Content-Type') || getMimeByURL(url);
     const fileLength = response.headers.has('Content-Range')

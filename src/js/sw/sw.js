@@ -3,6 +3,7 @@ import {
   STORAGE_SCHEMA,
   IDB_CHUNK_INDEX,
   MEDIA_SESSION_DEFAULT_ARTWORK,
+  MEDIA_SERVER_ORIGIN,
 } from '../constants';
 
 import getIDBConnection from '../modules/IDBConnection.module';
@@ -12,17 +13,17 @@ import getIDBConnection from '../modules/IDBConnection.module';
  *
  * Includes support for `Range` requests.
  *
- * @param {Request} request   Request object.
- * @param {IDBDatabase} db    IDBDatabase instance.
- * @param {object} metaEntry  Video metadata from the IDB.
+ * @param {Request}     request    Request object.
+ * @param {IDBDatabase} db         IDBDatabase instance.
+ * @param {FileMeta}    fileMeta   File meta object.
  *
  * @returns {Response} Response object.
  */
-const getResponseStream = (request, db, metaEntry) => {
+const getResponseStream = (request, db, fileMeta) => {
   const rangeRequest = request.headers.get('range') || '';
   const byteRanges = rangeRequest.match(/bytes=(?<from>[0-9]+)?-(?<to>[0-9]+)?/);
-  const rangeFrom = byteRanges.groups?.from || 0;
-  const rangeTo = byteRanges.groups?.to || metaEntry.sizeInBytes - 1;
+  const rangeFrom = byteRanges?.groups?.from || 0;
+  const rangeTo = byteRanges?.groups?.to || fileMeta.bytesTotal - 1;
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -30,8 +31,8 @@ const getResponseStream = (request, db, metaEntry) => {
       const transaction = rawIDB.transaction(STORAGE_SCHEMA.data.name, 'readonly');
       const store = transaction.objectStore(STORAGE_SCHEMA.data.name);
       const allEntriesForUrlRange = IDBKeyRange.bound(
-        [metaEntry.videoId, request.url, 0, rangeFrom],
-        [metaEntry.videoId, request.url, rangeTo, Infinity],
+        [request.url, -Infinity, rangeFrom],
+        [request.url, rangeTo, Infinity],
       );
       const index = store.index(IDB_CHUNK_INDEX);
       const cursor = index.openCursor(allEntriesForUrlRange);
@@ -69,12 +70,12 @@ const getResponseStream = (request, db, metaEntry) => {
     statusText: rangeRequest ? 'Partial Content' : 'OK',
     headers: {
       'Accept-Ranges': 'bytes',
-      'Content-Type': metaEntry.mime || 'application/octet-stream',
+      'Content-Type': fileMeta.mimeType || 'application/octet-stream',
       'Content-Length': rangeTo - rangeFrom + 1,
     },
   };
   if (rangeRequest) {
-    responseOpts.headers['Content-Range'] = `bytes ${rangeFrom}-${rangeTo}/${metaEntry.sizeInBytes}`;
+    responseOpts.headers['Content-Range'] = `bytes ${rangeFrom}-${rangeTo}/${fileMeta.bytesTotal}`;
   }
   const response = new Response(stream, responseOpts);
   return response;
@@ -89,10 +90,13 @@ const getResponseStream = (request, db, metaEntry) => {
  */
 const maybeGetVideoResponse = async (event) => {
   const db = await getIDBConnection();
-  const metaEntry = await db.meta.get(event.request.url);
+  /**
+   * @type {FileMeta}
+   */
+  const fileMeta = await db.file.get(event.request.url);
 
-  if (metaEntry.done) {
-    return getResponseStream(event.request, db, metaEntry);
+  if (fileMeta && fileMeta.done) {
+    return getResponseStream(event.request, db, fileMeta);
   }
   return null;
 };
@@ -127,7 +131,7 @@ const precacheAssets = (event) => {
 /**
  * The main fetch handler.
  *
- * @param {Event} event Featch event.
+ * @param {FetchEvent} event Fetch event.
  */
 const fetchHandler = async (event) => {
   const getResponse = async () => {
@@ -136,8 +140,10 @@ const fetchHandler = async (event) => {
     const cacheResponse = await openedCache.match(event.request);
     if (cacheResponse) return cacheResponse;
 
-    const videoResponse = await maybeGetVideoResponse(event);
-    if (videoResponse) return videoResponse;
+    if (event.request.url.indexOf(MEDIA_SERVER_ORIGIN) === 0) {
+      const videoResponse = await maybeGetVideoResponse(event);
+      if (videoResponse) return videoResponse;
+    }
 
     return fetch(event.request);
   };

@@ -4,15 +4,24 @@
 export const SW_CACHE_NAME = 'v1';
 
 /**
+ * Media Server Hostname
+ */
+export const MEDIA_SERVER_ORIGIN = 'https://storage.googleapis.com/wdm-assets/';
+
+/**
  * IDB Storage Schema.
  */
 export const STORAGE_SCHEMA = {
   meta: {
     name: 'videoMeta',
-    key: 'id',
+    key: 'videoId',
   },
   data: {
     name: 'videoData',
+  },
+  filemeta: {
+    name: 'fileMeta',
+    key: 'url',
   },
 };
 

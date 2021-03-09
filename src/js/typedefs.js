@@ -1,14 +1,14 @@
 /**
  * @typedef  {object}      VideoMeta
  * @property {string}      videoId         Identifier for the video.
- * @property {FileMeta[]}  files           List of metadata for the downloaded files.
  * @property {boolean}     done            If all video files are downloaded.
  */
 
 /**
  * @typedef  {object}      FileMeta
- * @property {string}      id              Identifier for the URL.
- * @property {string}      url             Full URL.
+ * @property {string}      url             The original resource URL.
+ * @property {string}      downloadUrl     Rewritten resource URL.
+ * @property {string}      videoId         Identifier for the video this file is associated with.
  * @property {string}      mimeType        File MIME type.
  * @property {number}      bytesDownloaded Total bytes downloaded of the resources.
  * @property {number|null} bytesTotal      Total size of the resource or `null` if unknown.
@@ -17,7 +17,6 @@
 
 /**
  * @typedef  {object}     FileChunk
- * @property {string}     videoId    ID of video this chunk belongs to.
  * @property {string}     url        URL the file was downloaded from.
  * @property {number}     rangeStart Byte index of the start of the range covered by data.
  * @property {number}     rangeEnd   Byte index of the end of the range covered by data.

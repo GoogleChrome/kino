@@ -99,8 +99,10 @@ export default class {
 
     return new Promise((resolve) => {
       mediaSource.addEventListener('sourceopen', (e) => {
-        this.stream.buffer.mediaSource = e.target;
-        this.stream.buffer.mediaSource.duration = this.stream.media.duration;
+        if (!this.stream.buffer.mediaSource) {
+          this.stream.buffer.mediaSource = e.target;
+          this.stream.buffer.mediaSource.duration = this.stream.media.duration;
+        }
         resolve();
       });
     });

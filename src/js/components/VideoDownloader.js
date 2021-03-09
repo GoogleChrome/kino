@@ -110,16 +110,15 @@ export default class extends HTMLElement {
 
     getURLsForDownload(videoId, sources).then(async (files) => {
       const db = await getIDBConnection();
-      this.internal.meta = await db.meta.get(this.getId());
-
-      const dbFiles = (this.internal.meta.files || []);
+      const dbFiles = await db.file.getByVideoId(videoId);
       const dbFilesUrlTuples = dbFiles.map((fileMeta) => [fileMeta.url, fileMeta]);
       const dbFilesByUrl = Object.fromEntries(dbFilesUrlTuples);
       const filesWithStateUpdatedFromDb = files.map(
         (fileMeta) => (dbFilesByUrl[fileMeta.url] ? dbFilesByUrl[fileMeta.url] : fileMeta),
       );
 
-      this.internal.meta.files = filesWithStateUpdatedFromDb;
+      this.setMeta(await db.meta.get(videoId));
+      this.internal.files = filesWithStateUpdatedFromDb;
 
       this.render();
     });
@@ -181,10 +180,8 @@ export default class extends HTMLElement {
    * @returns {number} Percentage progress for the video in the range 0–100.
    */
   getProgress() {
-    const videoMeta = this.getMeta();
-    const { files } = videoMeta;
-    const pieceValue = 1 / files.length;
-    const percentageProgress = files.reduce(
+    const pieceValue = 1 / this.internal.files.length;
+    const percentageProgress = this.internal.files.reduce(
       (percentage, fileMeta) => {
         if (fileMeta.done) {
           percentage += pieceValue;
@@ -212,7 +209,6 @@ export default class extends HTMLElement {
     this.storageManager = new StorageManager(this);
 
     this.storageManager.onprogress = (progress) => {
-      console.log(progress);
       this.progress = progress;
     };
     this.storageManager.ondone = () => {
@@ -220,8 +216,8 @@ export default class extends HTMLElement {
       this.state = 'done';
     };
 
-    const boundStoreChunk = this.storageManager.storeChunk.bind(this.storageManager);
-    this.downloadManager.onflush = boundStoreChunk;
+    const boundStoreChunkHandler = this.storageManager.storeChunk.bind(this.storageManager);
+    this.downloadManager.onflush = boundStoreChunkHandler;
 
     this.state = 'partial';
     this.downloadManager.run();

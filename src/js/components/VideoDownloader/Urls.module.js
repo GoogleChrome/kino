@@ -9,7 +9,7 @@ import selectSource from '../../utils/selectSource.module';
  * @param {string}   videoId Video ID.
  * @param {object[]} sources Video sources.
  *
- * @returns {Promise<FileMeta[]>} Promise resolving to File Meta objects to be downloaded.
+ * @returns {Promise<FileMeta[]>} Promise resolving to file meta objects.
  */
 export const getURLsForDownload = async (videoId, sources) => {
   let URLTuples = [];
@@ -30,29 +30,32 @@ export const getURLsForDownload = async (videoId, sources) => {
     const offlineGenerated = parser.prepareForOffline();
     if (offlineGenerated) {
       /**
-       * We need to download the altered manifest without the extraneous representations.
-       *
-       * Converting the manifest document to Blob and creating URL for it does the job.
+       * The manifest data has been changed in memory. We need to persist the changes.
+       * Generating a data URI gives us a faux-URL that can reliably be used in
+       * place of a real URL and even stored in the database for later usage.
        */
-      const offlineManifestURL = URL.createObjectURL(parser.toBlob());
-      const manifestTuple = ['manifest', offlineManifestURL];
+      const offlineManifestDataURI = parser.toDataURI();
+      const manifestTuple = [selectedSource.src, offlineManifestDataURI];
       URLTuples = parser.listAllChunkURLs([manifestTuple]);
     } else {
       return [];
     }
   } else {
-    URLTuples = [[videoId, selectedSource.src]];
+    URLTuples = [[selectedSource.src, selectedSource.src]];
   }
 
-  return URLTuples.map(
-    ([id, url]) => ({
-      id,
+  const fileMeta = URLTuples.map(
+    ([url, downloadUrl]) => ({
       url,
+      downloadUrl,
+      videoId,
       bytesDownloaded: 0,
       bytesTotal: null,
       done: false,
     }),
   );
+
+  return fileMeta;
 };
 
 export const a = 1;
