@@ -336,9 +336,4 @@ export default class extends HTMLElement {
       updatePositionState();
     }
   }
-
-  play() {
-    const videoEl = this.internal.root.querySelector('video');
-    if (videoEl) videoEl.play();
-  }
 }
