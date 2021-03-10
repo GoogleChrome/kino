@@ -19,7 +19,7 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
         <img src="/images/arrow-down.svg" alt="" />
     </div>
     <div class="downloads">
-        <div class="header">
+        <div class="header container">
             <span>20 GB available <span>of 220 GB</span></span>
             <div>
                 <button class="primary delete-all">Delete all</button>
