@@ -1,5 +1,5 @@
 import generateAssetsToCache from './src/js/utils/generateAssetsToCache';
-import api from './public/api/video-list.json';
+import api from './public/api.json';
 
 export default [
   {

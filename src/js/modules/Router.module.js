@@ -29,7 +29,7 @@ export default class Router {
   }
 
   async init() {
-    this.videoDataArray = await fetch('/api/video-list.json')
+    this.videoDataArray = await fetch('/api.json')
       .then((response) => response.json());
     this.run();
   }
