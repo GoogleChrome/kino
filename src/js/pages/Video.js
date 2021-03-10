@@ -3,13 +3,17 @@ import appendVideoToGallery from '../utils/appendVideoToGallery';
 import getPoster from './partials/Poster.partial';
 import { SW_CACHE_NAME } from '../constants';
 
-export default ({
-  mainContent,
-  videoDataArray,
-  path,
-  navigate,
-}) => {
-  const videoData = videoDataArray.find((vd) => `/${slugify(vd.title)}` === path);
+/**
+ * @param {RouterContext} routerContext Context object passed by the Router.
+ */
+export default (routerContext) => {
+  const {
+    mainContent,
+    apiData,
+    path,
+    videoDownloaderRegistry,
+  } = routerContext;
+  const videoData = apiData.find((vd) => `/${slugify(vd.title)}` === path);
   const posterWrapper = getPoster(videoData, true);
 
   mainContent.innerHTML = `
@@ -28,11 +32,16 @@ export default ({
 `;
   mainContent.prepend(posterWrapper);
 
-  const downloader = document.createElement('video-downloader');
+  let downloader = videoDownloaderRegistry.get(videoData.id);
+  if (!downloader) {
+    downloader = videoDownloaderRegistry.create(videoData.id);
+    downloader.init(videoData, SW_CACHE_NAME);
+  }
   downloader.setAttribute('expanded', 'true');
-  downloader.init(videoData, SW_CACHE_NAME);
-  mainContent.querySelector('.downloader').appendChild(downloader);
 
-  const content = mainContent.querySelector('.category');
-  appendVideoToGallery(videoDataArray, navigate, '', content);
+  mainContent.querySelector('.downloader').appendChild(downloader);
+  const localContext = {
+    content: mainContent.querySelector('.category'),
+  };
+  appendVideoToGallery(routerContext, localContext);
 };

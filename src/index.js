@@ -4,6 +4,7 @@
 import Router from './js/modules/Router.module';
 import updateOnlineStatus from './js/utils/updateOnlineStatus';
 import initializeGlobalToggle from './js/utils/initializeGlobalToggle';
+import VideoDownloaderRegistry from './js/modules/VideoDownloaderRegistry.module';
 
 /**
  * Web Components implementation.
@@ -35,9 +36,16 @@ customElements.define('toggle-button', ToggleButton);
 customElements.define('progress-ring', ProgressRing);
 
 /**
+ * Initialize a registry holding instances of the `VideoDownload` web components.
+ *
+ * This is to allow us to share these instances between pages.
+ */
+const videoDownloaderRegistry = new VideoDownloaderRegistry();
+
+/**
  * Router setup.
  */
-const router = new Router();
+const router = new Router({ videoDownloaderRegistry });
 router.route('/', HomePage);
 router.route('/settings', SettingsPage);
 router.route('/downloads', DownloadsPage);

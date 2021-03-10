@@ -1,24 +1,36 @@
 import { SW_CACHE_NAME } from '../constants';
 
 /**
- * @param {object[]} videoDataArray Array of video metadata objects.
- * @param {Function} navigate Navigate function.
- * @param {string} category Video category.
- * @param {HTMLElement} mainContent Main content DOM node.
- * @param {number} index Index of the gallery/section, for background purposes.
+ * @param {RouterContext} routerContext Context passed through by Router.
+ * @param {object}        localContext  Additional data needed by this method.
  */
-function appendVideoToGallery(videoDataArray, navigate, category, mainContent, index = 0) {
+function appendVideoToGallery(routerContext, localContext = {
+  category: '',
+  index: 0,
+}) {
+  const {
+    videoDownloaderRegistry,
+    apiData,
+    navigate,
+    mainContent,
+  } = routerContext;
+
   const videoGrid = document.createElement('video-grid');
-  videoGrid.category = category;
+  videoGrid.category = localContext.category;
   videoGrid.background = getComputedStyle(document.documentElement)
-    .getPropertyValue(`--background-${index % 2 === 0 ? 'light' : 'dark'}`);
+    .getPropertyValue(`--background-${localContext.index % 2 === 0 ? 'light' : 'dark'}`);
   const videoGallery = videoGrid.shadowRoot.querySelector('.grid');
 
-  videoDataArray.forEach((videoData) => {
+  apiData.forEach((videoData) => {
     const card = document.createElement('video-card');
-    const downloader = document.createElement('video-downloader');
+
+    let downloader = videoDownloaderRegistry.get(videoData.id);
+    if (!downloader) {
+      downloader = videoDownloaderRegistry.create(videoData.id);
+      downloader.init(videoData, SW_CACHE_NAME);
+    }
+
     const player = document.createElement('video-player');
-    downloader.init(videoData, SW_CACHE_NAME);
     card.render(videoData, navigate);
     card.attachDownloader(downloader);
     player.render(videoData);
