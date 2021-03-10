@@ -73,6 +73,7 @@ export const DEFAULT_VIDEO_PRIORITIES = [
   '[mimeType="video/webm"][codecs^="vp09"]',
   '[mimeType="video/webm"]',
   '[mimeType="video/mp4"]',
+  '',
 ];
 
 /**
@@ -80,6 +81,7 @@ export const DEFAULT_VIDEO_PRIORITIES = [
  */
 export const DEFAULT_AUDIO_PRIORITIES = [
   '[mimeType="audio/mp4"]',
+  '',
 ];
 
 /**

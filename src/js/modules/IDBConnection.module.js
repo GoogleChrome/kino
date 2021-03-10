@@ -168,12 +168,14 @@ export default () => {
      * @returns {Promise} Promise that resolves when the DB is deleted.
      */
     abstractedIDB.clearAll = () => new Promise((resolve, reject) => {
-      const transaction = abstractedIDB.db.transaction([abstractedIDB.meta.name, abstractedIDB.data.name], 'readwrite');
+      const transaction = abstractedIDB.db.transaction([abstractedIDB.meta.name, abstractedIDB.data.name, abstractedIDB.file.name], 'readwrite');
       const metaStore = transaction.objectStore(abstractedIDB.meta.name);
       const dataStore = transaction.objectStore(abstractedIDB.data.name);
+      const fileStore = transaction.objectStore(abstractedIDB.file.name);
 
       metaStore.clear();
       dataStore.clear();
+      fileStore.clear();
 
       transaction.oncomplete = () => resolve();
       transaction.onerror = () => reject();
@@ -182,31 +184,49 @@ export default () => {
     /**
      * Removes the video from IDB by its URL.
      *
-     * @param {string} url URL of the video to be removed.
+     * @param {string}     id    Video ID.
+     * @param {FileMeta[]} files List of files associated with the video.
      *
      * @returns {Promise} Promise that resolves when the video data is removed.
      */
-    abstractedIDB.removeVideoByUrl = (url) => new Promise((resolve, reject) => {
-      const transaction = abstractedIDB.db.transaction([abstractedIDB.meta.name, abstractedIDB.data.name], 'readwrite');
+    abstractedIDB.removeVideo = (id, files) => new Promise((resolve, reject) => {
+      const transaction = abstractedIDB.db.transaction(
+        [abstractedIDB.meta.name, abstractedIDB.data.name, abstractedIDB.file.name],
+        'readwrite',
+      );
       const metaStore = transaction.objectStore(abstractedIDB.meta.name);
       const dataStore = transaction.objectStore(abstractedIDB.data.name);
+      const fileStore = transaction.objectStore(abstractedIDB.file.name);
 
       const dataUrlIndex = dataStore.index(IDB_CHUNK_INDEX);
-      const range = IDBKeyRange.bound(
-        [url, 0, 0],
-        [url, Infinity, Infinity],
-      );
-      const dataAllChunksCursor = dataUrlIndex.openKeyCursor(range);
 
-      dataAllChunksCursor.onsuccess = (e) => {
-        const cursor = e.target.result;
+      /**
+       * @param {FileMeta} file File to remove all chunks for.
+       */
+      const removeFileChunks = (file) => {
+        const range = IDBKeyRange.bound(
+          [file.url, -Infinity, -Infinity],
+          [file.url, Infinity, Infinity],
+        );
+        const dataAllChunksCursor = dataUrlIndex.openKeyCursor(range);
 
-        if (cursor) {
-          dataStore.delete(cursor.primaryKey);
-          cursor.continue();
-        }
+        dataAllChunksCursor.onsuccess = (e) => {
+          const cursor = e.target.result;
+
+          if (cursor) {
+            dataStore.delete(cursor.primaryKey);
+            cursor.continue();
+          }
+        };
       };
-      metaStore.delete(url);
+
+      files.forEach(
+        (file) => {
+          fileStore.delete(file.url);
+          removeFileChunks(file);
+        },
+      );
+      metaStore.delete(id);
 
       transaction.oncomplete = () => resolve();
       transaction.onerror = () => reject();

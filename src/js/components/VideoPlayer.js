@@ -269,4 +269,21 @@ export default class extends HTMLElement {
       updatePositionState();
     }
   }
+
+  /**
+   * Signals the `play` intent to the <video> element.
+   *
+   * Waits for first data to arrive in case its `readyState`
+   * indicates no data has been fetched at all. In those cases
+   * it's possible we're initializing MSE and we can't really
+   * use the `play` method if the source is going to change.
+   */
+  play() {
+    const HAVE_NOTHING = 0;
+    if (this.videoElement.readyState === HAVE_NOTHING) {
+      this.videoElement.addEventListener('loadeddata', this.videoElement.play, { once: true });
+    } else {
+      this.videoElement.play();
+    }
+  }
 }

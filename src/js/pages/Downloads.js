@@ -28,30 +28,36 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
         <div class="grid"></div>
     </div>
   `;
-  const db = await getIDBConnection();
-  const allMeta = await db.meta.getAll();
 
+  const db = await getIDBConnection();
   const deleteAllBtn = mainContent.querySelector('.delete-all');
   const grid = mainContent.querySelector('.grid');
 
-  // Should partial downloads also be visible here? For now - yes.
-  // .filter((meta) => meta.done)
-  allMeta.forEach((meta) => {
-    const videoData = videoDataArray.find((vd) => vd['video-sources'].some((vs) => vs.src === meta.url));
-    const card = document.createElement('video-card');
-    const downloader = document.createElement('video-downloader');
-    downloader.init(videoData, SW_CACHE_NAME);
-    card.render(videoData, navigate);
-    card.attachDownloader(downloader);
-    grid.appendChild(card);
-  });
+  const renderPage = async () => {
+    // Should partial downloads also be visible here? For now - yes.
+    // .filter((meta) => meta.done)
+    const allMeta = await db.meta.getAll();
+    while (grid.firstChild) {
+      grid.removeChild(grid.firstChild);
+    }
 
-  if (allMeta.length === 0) {
-    const tipDownload = document.createElement('div');
-    tipDownload.className = 'center-text tip';
-    tipDownload.innerHTML = 'No videos. To download a video press the <img class="vertical-bottom" src="/images/download-circle.svg" /> button.';
-    mainContent.querySelector('.downloads').appendChild(tipDownload);
-  }
+    allMeta.forEach((meta) => {
+      const videoData = videoDataArray.find((vd) => vd['video-sources'].some((vs) => vs.id === meta.id));
+      const card = document.createElement('video-card');
+      const downloader = document.createElement('video-downloader');
+      downloader.init(videoData, SW_CACHE_NAME);
+      card.render(videoData, navigate);
+      card.attachDownloader(downloader);
+      grid.appendChild(card);
+    });
+
+    if (allMeta.length === 0) {
+      const tipDownload = document.createElement('div');
+      tipDownload.className = 'center-text tip';
+      tipDownload.innerHTML = 'No videos. To download a video press the <img class="vertical-bottom" src="/images/download-circle.svg" /> button.';
+      mainContent.querySelector('.downloads').appendChild(tipDownload);
+    }
+  };
 
   /**
    * Removes all entries from the database on a click event.
@@ -64,7 +70,9 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
     grid.classList.add('clearing');
     btn.classList.add('clearing');
     await db.clearAll();
-    grid.innerHTML = '';
     btn.classList.remove('clearing');
+    renderPage();
   });
+
+  renderPage();
 };

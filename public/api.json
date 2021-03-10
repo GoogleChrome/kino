@@ -2,7 +2,7 @@
   {
     "id": "http-203-background-fetch",
     "title": "Background Fetch",
-    "description": "Background Fetch – Description Text",
+    "description": "Background Fetch. This is a chunked DASH video that should adapt to available bandwidth changes.",
     "categories": [
       "HTTP203"
     ],

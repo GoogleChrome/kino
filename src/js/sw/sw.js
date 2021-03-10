@@ -2,7 +2,6 @@ import {
   SW_CACHE_NAME,
   STORAGE_SCHEMA,
   IDB_CHUNK_INDEX,
-  MEDIA_SESSION_DEFAULT_ARTWORK,
   MEDIA_SERVER_ORIGIN,
 } from '../constants';
 
@@ -114,13 +113,6 @@ const maybeGetVideoResponse = async (event) => {
  * @param {Event} event Install event.
  */
 const precacheAssets = (event) => {
-  /**
-   * Default artwork for Media Session API.
-   */
-  MEDIA_SESSION_DEFAULT_ARTWORK.forEach(
-    (artworkObject) => assetsToCache.push(artworkObject.src),
-  );
-
   event.waitUntil(
     caches.open(SW_CACHE_NAME).then((cache) => cache.addAll(assetsToCache)),
   );
