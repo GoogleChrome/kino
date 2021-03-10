@@ -106,16 +106,10 @@ video-card p {
 
 header {
   color: #FFF;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 3;
-  width: 100%;
 }
 .poster-wrapper {
   background: var(--background-dark);
   height: auto;
-  padding-top: 118px;
   position: relative;
 }
 .poster-bg {
@@ -130,9 +124,6 @@ header {
 .poster-image picture img {
   width: 100%;
   height: auto;
-}
-header.with-video {
-  background: #12283C;
 }
 .poster-bg .play {
   position: absolute;
@@ -220,7 +211,7 @@ header .menu toggle-button {
   padding: 0 1rem;
 }
 header .container {
-  padding: 2rem 0;
+  padding: 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -236,6 +227,7 @@ header .hamburger, header .close {
   body.mobile header .container {
     background: var(--background-dark);
     position: fixed;
+    z-index: 3;
     top: 0;
     left: 0;
     width: 100%;
