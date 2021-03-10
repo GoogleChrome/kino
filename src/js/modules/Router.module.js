@@ -1,3 +1,5 @@
+import { setHeaderToggle } from '../utils/settings';
+
 const globalClickHandler = (navigate) => (e) => {
   const target = e.path[0];
   if (e.ctrlKey || e.metaKey) return;
@@ -63,6 +65,8 @@ export default class Router {
     }
 
     window.scrollTo(0, 0);
+
+    setHeaderToggle();
   }
 
   navigate(path) {

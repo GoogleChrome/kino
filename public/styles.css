@@ -208,13 +208,16 @@ header .menu > * {
   text-decoration: none;
   color: #FFF;
 }
-header .menu span {
-  display: flex;
+header .menu .header-toggle {
+  display: none;
   justify-content: center;
   align-items: center;
   background: #12283C;
   border-radius: 2rem;
   padding: 0.5rem 1rem;
+}
+header .menu .header-toggle.visible {
+  display: flex;
 }
 header .menu toggle-button {
   padding: 0 1rem;
