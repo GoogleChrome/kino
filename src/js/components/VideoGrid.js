@@ -44,12 +44,18 @@ template.innerHTML = `
       grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
       grid-gap: 2rem;
     }
-    .grid > div {
-      color: #000;
-      background: #FFF;
-      /*padding: 1.5rem;*/
-      border-radius: 7px;
-      min-height: 150px;
+    .grid.limit-n > *:nth-of-type(1n+4) {
+      display: none;
+    }
+    @media screen and (max-width: 1042px) {
+      .grid.limit-n > *:nth-of-type(1n+3) {
+        display: none;
+      }
+    }
+    @media screen and (max-width: 693px) {
+      .grid.limit-n > *:nth-of-type(1n+2) {
+        display: none;
+      }
     }
   </style>
   <section>
@@ -72,6 +78,7 @@ export default class VideoGrid extends HTMLElement {
     this.$category = this._root.querySelector('.section-header h2');
     this.$categoryLink = this._root.querySelector('.section-header a');
     this.$background = this._root.querySelector('section');
+    this.$grid = this._root.querySelector('.grid');
     this.render();
   }
 
@@ -106,6 +113,9 @@ export default class VideoGrid extends HTMLElement {
       this.$categoryLink.href = `/category/${slugify(this.category)}`;
     } else {
       this.$sectionHeader.style.display = 'none';
+    }
+    if (this.limitN) {
+      this.$grid.classList.add('limit-n');
     }
     this.$background.style.backgroundColor = this.background;
   }

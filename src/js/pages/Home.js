@@ -23,10 +23,11 @@ export default (routerContext) => {
     const localContext = {
       category,
       index,
+      limitN: true,
     };
     appendVideoToGallery({
       ...routerContext,
-      apiData: videosByCategories[category],
+      apiData: videosByCategories[category].slice(0, 3), // We display max 3 items on the Home page.
     }, localContext);
   });
 };
