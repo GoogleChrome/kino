@@ -44,7 +44,6 @@ const style = `
       font-weight: bold;
       color: #12283C;
       text-decoration: none;
-      /*min-height: calc(2 * 1.3rem * 1.5);*/
     }
     .info .title:hover {
       text-decoration: underline;
