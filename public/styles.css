@@ -298,7 +298,7 @@ button.primary {
 }
 button.icon-download {
   padding: 0.5rem 1rem 0.5rem 3rem;
-  background: url('/download.svg') transparent no-repeat 1rem center;
+  background: url('/images/download.svg') transparent no-repeat 1rem center;
 }
 article p {
   color: var(--text-dark);

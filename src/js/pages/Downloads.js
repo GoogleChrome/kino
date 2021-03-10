@@ -16,7 +16,7 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
     </style>
     <div class="page-title">
         <h2>Manage your downloads</h2>
-        <img src="/arrow-down.svg" alt="" />
+        <img src="/images/arrow-down.svg" alt="" />
     </div>
     <div class="downloads">
         <div class="header">
@@ -49,7 +49,7 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
   if (allMeta.length === 0) {
     const tipDownload = document.createElement('div');
     tipDownload.className = 'center-text tip';
-    tipDownload.innerHTML = 'No videos. To download a video press the <img class="vertical-bottom" src="/download-circle.svg" /> button.';
+    tipDownload.innerHTML = 'No videos. To download a video press the <img class="vertical-bottom" src="/images/download-circle.svg" /> button.';
     mainContent.querySelector('.downloads').appendChild(tipDownload);
   }
 

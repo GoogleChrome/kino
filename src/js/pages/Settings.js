@@ -8,7 +8,7 @@ export default ({ mainContent }) => {
   mainContent.innerHTML = `
     <div class="page-title">
         <h2>Settings</h2>
-        <img src="/arrow-down.svg" alt="" />
+        <img src="/images/arrow-down.svg" alt="" />
     </div>
     <div class="settings">
       <div class="option">

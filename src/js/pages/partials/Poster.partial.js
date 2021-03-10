@@ -5,7 +5,7 @@ export default (videoData, hideInfo = false) => {
 
   posterWrapper.className = 'poster-wrapper';
   posterWrapper.innerHTML = `<div class="poster-bg" style="background: linear-gradient(180deg, #223D55 0%, rgba(34, 61, 85, 0.729176) 10%, rgba(34, 61, 85, 0) 30%), linear-gradient(0deg, #223D55 0%, rgba(34, 61, 85, 0.729176) 10%, rgba(34, 61, 85, 0) 30%), url('${videoData.thumbnail}') center center">
-    <button class="play"><img src="/play.svg" alt="" /></button>
+    <button class="play"><img src="/images/play.svg" alt="" /></button>
     <div class="main-player"></div>
   </div>
   ${hideInfo ? '' : `
