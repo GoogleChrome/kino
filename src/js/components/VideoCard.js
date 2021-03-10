@@ -44,14 +44,21 @@ const style = `
       font-weight: bold;
       color: #12283C;
       text-decoration: none;
+      /*min-height: calc(2 * 1.3rem * 1.5);*/
     }
     .info .title:hover {
       text-decoration: underline;
     }
     .info .desc {
       font-size: 1rem;
-      line-height: 1.5;
       color: #667F96;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      line-height: 1.5;
+      max-height: calc(1.5 * 3); /* Fallback, line-height * N-lines */
     }
 </style>`;
 
