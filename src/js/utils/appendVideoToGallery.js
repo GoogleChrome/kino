@@ -4,10 +4,7 @@ import { SW_CACHE_NAME } from '../constants';
  * @param {RouterContext} routerContext Context passed through by Router.
  * @param {object}        localContext  Additional data needed by this method.
  */
-function appendVideoToGallery(routerContext, localContext = {
-  category: '',
-  index: 0,
-}) {
+function appendVideoToGallery(routerContext, localContext) {
   const {
     videoDownloaderRegistry,
     apiData,
@@ -15,10 +12,13 @@ function appendVideoToGallery(routerContext, localContext = {
     mainContent,
   } = routerContext;
 
+  const category = localContext.category || '';
+  const index = localContext.index || 0;
+
   const videoGrid = document.createElement('video-grid');
-  videoGrid.category = localContext.category;
+  videoGrid.category = category || '';
   videoGrid.background = getComputedStyle(document.documentElement)
-    .getPropertyValue(`--background-${localContext.index % 2 === 0 ? 'light' : 'dark'}`);
+    .getPropertyValue(`--background-${index % 2 === 0 ? 'light' : 'dark'}`);
   const videoGallery = videoGrid.shadowRoot.querySelector('.grid');
 
   apiData.forEach((videoData) => {
@@ -29,6 +29,7 @@ function appendVideoToGallery(routerContext, localContext = {
       downloader = videoDownloaderRegistry.create(videoData.id);
       downloader.init(videoData, SW_CACHE_NAME);
     }
+    downloader.setAttribute('expanded', 'false');
 
     const player = document.createElement('video-player');
     card.render(videoData, navigate);

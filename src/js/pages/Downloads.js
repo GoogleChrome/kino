@@ -58,6 +58,7 @@ export default async (routerContext) => {
         downloader = videoDownloaderRegistry.create(videoData.id);
         downloader.init(videoData, SW_CACHE_NAME);
       }
+      downloader.setAttribute('expanded', 'false');
       card.render(videoData, navigate);
       card.attachDownloader(downloader);
       grid.appendChild(card);

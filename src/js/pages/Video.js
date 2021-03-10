@@ -13,18 +13,34 @@ export default (routerContext) => {
     path,
     videoDownloaderRegistry,
   } = routerContext;
-  const videoData = apiData.find((vd) => `/${slugify(vd.title)}` === path);
-  const posterWrapper = getPoster(videoData, true);
+
+  /**
+   * Pick the current video data out of the `apiData` array
+   * and also return the rest of that data.
+   */
+  const [currentVideoData, restVideoData] = apiData.reduce(
+    (returnValue, videoMeta) => {
+      if (`/${slugify(videoMeta.title)}` === path) {
+        returnValue[0] = videoMeta;
+      } else {
+        returnValue[1].push(videoMeta);
+      }
+      return returnValue;
+    },
+    [null, []],
+  );
+
+  const posterWrapper = getPoster(currentVideoData, true);
 
   mainContent.innerHTML = `
   <article>
     <div class="container">
-      <h2>${videoData.title}</h2>
+      <h2>${currentVideoData.title}</h2>
       <div class="info">
         <span class="date">4th March, 2017</span>
         <span class="length">7mins 43secs</span>
       </div>
-      <p>${videoData.description}</p>
+      <p>${currentVideoData.description}</p>
       <span class="downloader"></span>
     </div>
   </article>
@@ -32,10 +48,10 @@ export default (routerContext) => {
 `;
   mainContent.prepend(posterWrapper);
 
-  let downloader = videoDownloaderRegistry.get(videoData.id);
+  let downloader = videoDownloaderRegistry.get(currentVideoData.id);
   if (!downloader) {
-    downloader = videoDownloaderRegistry.create(videoData.id);
-    downloader.init(videoData, SW_CACHE_NAME);
+    downloader = videoDownloaderRegistry.create(currentVideoData.id);
+    downloader.init(currentVideoData, SW_CACHE_NAME);
   }
   downloader.setAttribute('expanded', 'true');
 
@@ -43,5 +59,12 @@ export default (routerContext) => {
   const localContext = {
     content: mainContent.querySelector('.category'),
   };
-  appendVideoToGallery(routerContext, localContext);
+
+  /**
+   * Passing `restVideoData` to avoid duplication of content on the single page.
+   */
+  appendVideoToGallery({
+    ...routerContext,
+    apiData: restVideoData,
+  }, localContext);
 };
