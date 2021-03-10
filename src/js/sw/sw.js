@@ -3,36 +3,42 @@ import {
   STORAGE_SCHEMA,
   IDB_CHUNK_INDEX,
   MEDIA_SESSION_DEFAULT_ARTWORK,
+  MEDIA_SERVER_ORIGIN,
 } from '../constants';
 
 import getIDBConnection from '../modules/IDBConnection.module';
 import assetsToCache from './cache';
 
 /**
- * Respond to a request to fetch offline video and contruct a response stream.
+ * Respond to a request to fetch offline video file and construct a response stream.
  *
  * Includes support for `Range` requests.
  *
- * @param {Request} request   Request object.
- * @param {IDBDatabase} db    IDBDatabase instance.
- * @param {object} metaEntry  Video metadata from the IDB.
+ * @param {Request}     request    Request object.
+ * @param {IDBDatabase} db         IDBDatabase instance.
+ * @param {FileMeta}    fileMeta   File meta object.
  *
  * @returns {Response} Response object.
  */
-const getResponseStream = (request, db, metaEntry) => {
+const getResponseStream = (request, db, fileMeta) => {
   const rangeRequest = request.headers.get('range') || '';
   const byteRanges = rangeRequest.match(/bytes=(?<from>[0-9]+)?-(?<to>[0-9]+)?/);
-  const rangeFrom = byteRanges.groups?.from || 0;
-  const rangeTo = byteRanges.groups?.to || metaEntry.sizeInBytes - 1;
+  const rangeFrom = byteRanges?.groups?.from || 0;
+  const rangeTo = byteRanges?.groups?.to || fileMeta.bytesTotal - 1;
 
   const stream = new ReadableStream({
     async start(controller) {
       const rawIDB = db.unwrap();
       const transaction = rawIDB.transaction(STORAGE_SCHEMA.data.name, 'readonly');
       const store = transaction.objectStore(STORAGE_SCHEMA.data.name);
+
+      /**
+       * Construct the range boundaries so that the returned chunks
+       * cover the whole requested range.
+       */
       const allEntriesForUrlRange = IDBKeyRange.bound(
-        [request.url, 0, 0],
-        [request.url, Infinity, Infinity],
+        [request.url, -Infinity, rangeFrom],
+        [request.url, rangeTo, Infinity],
       );
       const index = store.index(IDB_CHUNK_INDEX);
       const cursor = index.openCursor(allEntriesForUrlRange);
@@ -41,23 +47,20 @@ const getResponseStream = (request, db, metaEntry) => {
         const newCursor = e.target.result;
         if (newCursor) {
           const dataObject = newCursor.value;
-          const previousDataLength = dataObject.offset - dataObject.size;
+          const needsSlice = dataObject.rangeStart < rangeFrom || dataObject.rangeEnd > rangeTo;
 
-          if (rangeFrom < dataObject.offset && rangeTo > previousDataLength) {
-            const overlapFrom = Math.max(rangeFrom, previousDataLength);
-            const overlapTo = Math.min(rangeTo, dataObject.offset - 1);
-
-            if (overlapTo - overlapFrom !== dataObject.size - 1) {
-              const sliceBufferFrom = overlapFrom - previousDataLength;
-              const sliceBufferTo = overlapTo - previousDataLength + 1;
-
-              const bufferSlice = new Uint8Array(
-                dataObject.data.slice(sliceBufferFrom, sliceBufferTo),
-              );
-              controller.enqueue(bufferSlice);
-            } else {
-              controller.enqueue(dataObject.data);
-            }
+          if (needsSlice) {
+            const sliceBufferFrom = Math.max(0, rangeFrom - dataObject.rangeStart);
+            const sliceBufferTo = Math.min(
+              dataObject.rangeEnd - dataObject.rangeStart,
+              rangeTo - dataObject.rangeStart,
+            );
+            const bufferSlice = new Uint8Array(
+              dataObject.data.slice(sliceBufferFrom, sliceBufferTo),
+            );
+            controller.enqueue(bufferSlice);
+          } else {
+            controller.enqueue(dataObject.data);
           }
           newCursor.continue();
         } else {
@@ -73,30 +76,34 @@ const getResponseStream = (request, db, metaEntry) => {
     statusText: rangeRequest ? 'Partial Content' : 'OK',
     headers: {
       'Accept-Ranges': 'bytes',
-      'Content-Type': metaEntry.mime || 'application/octet-stream',
+      'Content-Type': fileMeta.mimeType || 'application/octet-stream',
       'Content-Length': rangeTo - rangeFrom + 1,
     },
   };
   if (rangeRequest) {
-    responseOpts.headers['Content-Range'] = `bytes ${rangeFrom}-${rangeTo}/${metaEntry.sizeInBytes}`;
+    responseOpts.headers['Content-Range'] = `bytes ${rangeFrom}-${rangeTo}/${fileMeta.bytesTotal}`;
   }
   const response = new Response(stream, responseOpts);
   return response;
 };
 
 /**
- * Respond to a offline video request.
+ * If the request is for a video file that we have downloaded in IDB,
+ * respond with the local file.
  *
  * @param {Event} event The `fetch` event.
  *
- * @returns {Promise|Response} Promise that resolves with a `Response` object.
+ * @returns {Promise<Response>|null} Promise that resolves with a `Response` object.
  */
 const maybeGetVideoResponse = async (event) => {
   const db = await getIDBConnection();
-  const metaEntry = await db.meta.get(event.request.url);
+  /**
+   * @type {FileMeta}
+   */
+  const fileMeta = await db.file.get(event.request.url);
 
-  if (metaEntry.done) {
-    return getResponseStream(event.request, db, metaEntry);
+  if (fileMeta && fileMeta.done) {
+    return getResponseStream(event.request, db, fileMeta);
   }
   return null;
 };
@@ -122,7 +129,7 @@ const precacheAssets = (event) => {
 /**
  * The main fetch handler.
  *
- * @param {Event} event Featch event.
+ * @param {FetchEvent} event Fetch event.
  */
 const fetchHandler = async (event) => {
   const getResponse = async () => {
@@ -131,8 +138,10 @@ const fetchHandler = async (event) => {
     const cacheResponse = await openedCache.match(event.request);
     if (cacheResponse) return cacheResponse;
 
-    const videoResponse = await maybeGetVideoResponse(event);
-    if (videoResponse) return videoResponse;
+    if (event.request.url.indexOf(MEDIA_SERVER_ORIGIN) === 0) {
+      const videoResponse = await maybeGetVideoResponse(event);
+      if (videoResponse) return videoResponse;
+    }
 
     return fetch(event.request);
   };

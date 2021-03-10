@@ -1,5 +1,7 @@
 import Streamer from '../modules/Streamer.module';
 import ParserMPD from '../modules/ParserMPD.module';
+import selectSource from '../utils/selectSource.module';
+
 import { MEDIA_SESSION_DEFAULT_ARTWORK } from '../constants';
 
 const style = `
@@ -15,10 +17,6 @@ const style = `
 </style>
 `;
 
-const STREAMING_MIME_TYPES = [
-  'application/dash+xml',
-  'application/vnd.apple.mpegurl', // <-- HLS (m3u8)
-];
 export default class extends HTMLElement {
   constructor() {
     super();
@@ -28,52 +26,19 @@ export default class extends HTMLElement {
   }
 
   /**
-   * @returns {boolean} Whether the client supports MSE.
-   */
-  clientSupportsMSE() {
-    return 'MediaSource' in window;
-  }
-
-  /**
-   * Returns an array of source objects appropriate to capabilities
-   * of the current client.
-   *
-   * In case the client supports video streaming (DASH / HLS) and sources
-   * include streaming sources (MPD, M3U8 manifests), return only the
-   * streaming sources.
-   *
-   * In all other cases return all video sources as returned from the API.
-   *
-   * @returns {Array} Appropriate sources.
-   */
-  getAppropriateSources() {
-    const clientSupportsMSE = this.clientSupportsMSE();
-    const sources = this.internal.videoData['video-sources'] || [];
-    const streamingSources = sources.filter(
-      (sourceObject) => STREAMING_MIME_TYPES.includes(sourceObject.type),
-    );
-
-    if (clientSupportsMSE && streamingSources.length) {
-      return streamingSources;
-    }
-    return sources;
-  }
-
-  /**
    * Returns the <source> tags HTML to be included in the
    * <video> element.
    *
    * @returns {string} Sources HTML.
    */
-  getSourcesHTML() {
-    const sources = this.getAppropriateSources();
-    return sources.reduce(
-      (markup, sourceObject) => {
-        markup += `<source src="${sourceObject.src}" type="${sourceObject.type}">`;
-        return markup;
-      },
-      '',
-    );
+  getSourceHTML() {
+    const sources = this.internal.videoData['video-sources'] || [];
+    this.internal.selectedSource = selectSource(sources);
+
+    if (this.internal.selectedSource) {
+      return `<source src="${this.internal.selectedSource.src}" type="${this.internal.selectedSource.type}">`;
+    }
+    return '';
   }
 
   /**
@@ -93,21 +58,6 @@ export default class extends HTMLElement {
   }
 
   /**
-   * Returns a boolean indicating whether any of the video sources
-   * point to streaming resources (DASH/HLS).
-   *
-   * @returns {boolean} Does any video source point to a streaming resource?
-   */
-  hasStreamingSource() {
-    const sources = this.internal.videoData['video-sources'] || [];
-    const streamingSources = sources.filter(
-      (sourceObject) => STREAMING_MIME_TYPES.includes(sourceObject.type),
-    );
-
-    return streamingSources.length > 0;
-  }
-
-  /**
    * Renders the component.
    *
    * @param {object} videoData Video data.
@@ -124,7 +74,7 @@ export default class extends HTMLElement {
 
     const markup = `${style}
     <video ${videoData.thumbnail ? `poster="${thumbnailUrl}"` : ''} controls crossorigin="anonymous">
-      ${this.getSourcesHTML()}
+      ${this.getSourceHTML()}
       ${this.getTracksHTML()}
     </video>
     `;
@@ -157,20 +107,11 @@ export default class extends HTMLElement {
 
     if (!isSourceTag) return;
 
-    const allSources = [...this.videoElement.querySelectorAll('source')];
-    const lastSource = allSources.pop();
-    const isSourceTagLast = lastSource === el;
+    const isMSEStream = this.internal.selectedSource?.isStream // This is a stream that...
+      && this.internal.selectedSource?.canPlayTypeNatively === '' // ... we can't play natively, but...
+      && this.internal.selectedSource?.canPlayTypeMSE === 'probably'; // we can play using MSE.
 
-    /**
-     * If an error is invoked on the last source element, it is a signal that
-     * the client is not able to natively play one of the provided <source>s.
-     *
-     * In that case we can take over manually and attempt to pick a streaming
-     * source (`.mpd`, `.m3u8`) and play it back through MSE.
-     *
-     * @see https://html.spec.whatwg.org/multipage/embedded-content.html#the-source-element
-     */
-    if (isSourceTagLast && this.hasStreamingSource()) {
+    if (isMSEStream) {
       this.initializeStream();
     }
   }
@@ -181,13 +122,7 @@ export default class extends HTMLElement {
    * @see https://developer.mozilla.org/en-US/docs/Web/API/Media_Source_Extensions_API
    */
   async initializeStream() {
-    const sourceEls = [...this.videoElement.querySelectorAll('source')];
-    const streamingSource = sourceEls.find(
-      (sourceEl) => STREAMING_MIME_TYPES.includes(sourceEl.type),
-    );
-
-    if (!streamingSource) return;
-
+    const streamingSource = this.videoElement.querySelector('source');
     const mimeType = streamingSource.type;
     const manifestResponse = await fetch(streamingSource.src);
     const manifestDocument = await manifestResponse.text();
@@ -195,14 +130,12 @@ export default class extends HTMLElement {
     let parser = null;
 
     if (mimeType === 'application/dash+xml') {
-      parser = new ParserMPD(manifestDocument);
+      parser = new ParserMPD(manifestDocument, streamingSource.src);
     }
 
     if (!parser) return;
 
-    this.internal.streamer = new Streamer(this.videoElement, parser, {
-      manifestSrc: streamingSource.src,
-    });
+    this.internal.streamer = new Streamer(this.videoElement, parser, {});
   }
 
   /**

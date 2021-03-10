@@ -1,6 +1,7 @@
-import FixedBuffer from '../modules/FixedBuffer.module';
 import getIDBConnection from '../modules/IDBConnection.module';
-import { IDB_CHUNK_INDEX } from '../constants';
+import DownloadManager from './VideoDownloader/DownloadManager.module';
+import StorageManager from './VideoDownloader/StorageManager.module';
+import { getURLsForDownload } from './VideoDownloader/Urls.module';
 
 const style = `
 <style>
@@ -151,7 +152,8 @@ export default class extends HTMLElement {
     super();
 
     // Attach Shadow DOM.
-    this._root = this.attachShadow({ mode: 'open' });
+    this.internal = {};
+    this.internal.root = this.attachShadow({ mode: 'open' });
   }
 
   /**
@@ -208,74 +210,61 @@ export default class extends HTMLElement {
    */
   attributeChangedCallback(name, old, value) {
     if (name === 'progress') {
-      this._progressEl.setAttribute('progress', value);
+      this.internal.elements.progress.value = value;
     }
   }
 
   /**
    * Component logic.
    *
-   * @param {object} videoData Video metadata object.
+   * @param {object} apiData   Video data coming from the API.
    * @param {string} cacheName Cache name.
    */
-  init(videoData, cacheName = 'v1') {
-    this._videoData = videoData;
-    this._cacheName = cacheName;
+  init(apiData, cacheName = 'v1') {
+    this.internal = {
+      ...this.internal,
+      apiData,
+      cacheName,
+      elements: {},
+    };
 
-    this._setDownloadState();
-    this._renderUI();
+    const videoId = this.getId();
+    const sources = this.internal.apiData['video-sources'] || [];
 
-    this._progressEl = this._root.querySelector('progress-ring');
-    this._buttonEls = this._root.querySelectorAll('button');
+    getURLsForDownload(videoId, sources).then(async (files) => {
+      const db = await getIDBConnection();
+      const dbFiles = await db.file.getByVideoId(videoId);
+      const dbFilesUrlTuples = dbFiles.map((fileMeta) => [fileMeta.url, fileMeta]);
+      const dbFilesByUrl = Object.fromEntries(dbFilesUrlTuples);
 
-    this._buttonEls.forEach((button) => {
-      button.addEventListener('click', this.clickHandler.bind(this));
+      /**
+       * If we have an entry for this file in the database, use it. Otherwise
+       * fall back to the freshly generated FileMeta object.
+       */
+      const filesWithStateUpdatedFromDb = files.map(
+        (fileMeta) => (dbFilesByUrl[fileMeta.url] ? dbFilesByUrl[fileMeta.url] : fileMeta),
+      );
+
+      this.setMeta(await db.meta.get(videoId));
+      this.internal.files = filesWithStateUpdatedFromDb;
+
+      this.render();
     });
   }
 
-  clickHandler(e) {
-    if (this.state === 'done') {
-      this.removeFromIDB();
-    } else if (e.target.className === 'cancel') {
-      this.removeFromIDB();
-    } else if (this.downloading === false) {
-      this.download();
+  /**
+   * Returns the thumbnail image URLs.
+   *
+   * @returns {string[]} URLs.
+   */
+  getPosterURLs() {
+    const urls = [];
+    if (Array.isArray(this.internal.apiData.thumbnail)) {
+      this.internal.apiData.thumbnail.forEach((thumbnail) => urls.push(thumbnail.src));
     } else {
-      this.downloading = false;
+      urls.push(this.internal.apiData.thumbnail);
     }
-  }
-
-  /**
-   * Selects an appropriate video source for a video download.
-   *
-   * Fall back to the first source if none of the sources are identified
-   * as potentially supported for playback.
-   *
-   * @returns {string} Video URL appropriate for download on this device.
-   */
-  getDownloadableURL() {
-    const videoEl = document.createElement('video');
-    let candidate = null;
-
-    /* eslint-disable no-restricted-syntax, default-case */
-    for (const source of this._videoData['video-sources']) {
-      switch (videoEl.canPlayType(source.type)) {
-        case 'probably': return source.src;
-        case 'maybe': candidate = candidate || source.src;
-      }
-    }
-    /* eslint-enable no-restricted-syntax */
-
-    return candidate || this._videoData['video-sources'][0].src;
-  }
-
-  /**
-   * Returns the thumbnail image URL.
-   *
-   * @returns {string} URL.
-   */
-  getPosterURL() {
-    return this._videoData.thumbnail;
+    return urls;
   }
 
   /**
@@ -284,7 +273,7 @@ export default class extends HTMLElement {
    * @returns {string[]} URLs.
    */
   getSubtitlesUrls() {
-    const subtitlesObjects = this._videoData['video-subtitles'] || [];
+    const subtitlesObjects = this.internal.apiData['video-subtitles'] || [];
     const subtitlesUrls = subtitlesObjects.map((subObject) => subObject.src);
 
     return subtitlesUrls;
@@ -298,7 +287,7 @@ export default class extends HTMLElement {
    * @returns {Promise} Resolves when the assets are stored in the cache.
    */
   async saveToCache(urls) {
-    const cache = await caches.open(this._cacheName);
+    const cache = await caches.open(this.internal.cacheName);
     return cache.addAll(urls);
   }
 
@@ -306,286 +295,68 @@ export default class extends HTMLElement {
    * Downloads the current video and its assets to the cache and IDB.
    */
   async download() {
-    const videoURL = this.getDownloadableURL();
-    const posterURL = this.getPosterURL();
+    const posterURLs = this.getPosterURLs();
     const subtitlesURLs = this.getSubtitlesUrls();
 
     this.downloading = true;
-
-    this.saveToCache([posterURL, ...subtitlesURLs]);
-    this.saveToIDB(videoURL);
+    this.saveToCache([...posterURLs, ...subtitlesURLs]);
+    this.runIDBDownloads();
   }
 
   /**
-   * Returns data used to download the video to IDB.
+   * Returns the total download progress for the video.
    *
-   * @returns {object} Init data.
+   * @returns {number} Percentage progress for the video in the range 0–100.
    */
-  async initDownload() {
-    const fetchOpts = {
-      headers: {},
-    };
-    let firstIndex = 0;
-    let firstOffset = 0;
-    let videoSizeInBytes = null;
-
-    /**
-     * Support incomplete downloads.
-     */
-    if (this.state === 'partial' && this._videoData.meta) {
-      const lastChunk = await this.getLastChunk();
-
-      if (!lastChunk || !lastChunk.index) {
-        this.state = 'ready';
-        delete this._videoData.meta;
-      } else {
-        firstIndex = lastChunk.index + 1;
-        firstOffset = this._videoData.meta.offset + 1;
-        videoSizeInBytes = this._videoData.meta.sizeInBytes;
-
-        fetchOpts.headers.Range = `bytes=${this._videoData.meta.offset}-`;
-      }
-    }
-
-    return {
-      firstIndex,
-      firstOffset,
-      videoSizeInBytes,
-      fetchOpts,
-    };
-  }
-
-  /**
-   * Takes a video URL, downloads the video using a stream reader
-   * and invokes `storeVideoChunk` to store individual video chunks in IndexedDB.
-   *
-   * @param {string} videoURL Video URL to be downloaded and saved to IDB.
-   */
-  async saveToIDB(videoURL) {
-    const {
-      firstIndex, firstOffset, videoSizeInBytes, fetchOpts,
-    } = await this.initDownload();
-
-    /**
-     * Set the component state to `partial` to indicate that we've started the process.
-     */
-    this.state = 'partial';
-
-    /**
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream
-     */
-    const response = await fetch(videoURL, fetchOpts);
-    const reader = response.body.getReader();
-
-    /**
-     * Some common metadata to be passed together with every chunk of data.
-     */
-    const commonChunkData = {
-      url: videoURL,
-      mime: response.headers.get('Content-Type') || this.getVideoMimeByURL(videoURL),
-      sizeInBytes: videoSizeInBytes || parseInt(response.headers.get('Content-Length'), 10) || 1,
-    };
-
-    let index = firstIndex;
-    let offset = firstOffset;
-
-    const processChunk = (data, done) => {
-      offset += data.length;
-      index += 1;
-
-      const chunk = {
-        data,
-        offset,
-        index,
-        done,
-        ...commonChunkData,
-      };
-
-      /**
-       * Invoke the actual logic that stores received chunk data in IDB.
-       */
-      this.storeVideoChunk(chunk).then(() => {
-        /**
-         * Triggers the `progress` setter, which reflects to the `progress` attribute
-         * and the `<progress>` element.
-         */
-        this.progress = chunk.offset / chunk.sizeInBytes;
-        if (done) this.downloading = false;
-      });
-
-      return chunk;
-    };
-
-    /**
-     * IDB put operations have a lot of overhead, so it's impractical for us to store
-     * a data chunk every time our reader has more data, because those chunks
-     * usually are pretty small and generate thousands of IDB data entries.
-     *
-     * Instead we use a fixed 2 MB buffer that we continuously fill with data. Once it
-     * overflows, it automatically flushes and its internal pointer is reset.
-     *
-     * We only write to IDB when such a flush occurs.
-     */
-    const fixedBufferSizeInBytes = 2 * 1000 * 1000; // Store 2 MB chunks.
-    const fixedBuffer = new FixedBuffer(fixedBufferSizeInBytes);
-    fixedBuffer.onflush = (data, opts) => processChunk(data, opts.done || false);
-
-    let fileChunk;
-    do {
-      /* eslint-disable no-await-in-loop */
-      // Await in loop is OK. The processing is sequential and can't be parallelized.
-      fileChunk = await reader.read();
-      if (!fileChunk.done) fixedBuffer.add(fileChunk.value);
-      /* eslint-eanble no-await-in-loop */
-    } while (this.downloading && fileChunk && !fileChunk.done);
-
-    const opts = fileChunk.done ? { done: true } : {};
-    fixedBuffer.flush(opts);
-  }
-
-  /**
-   * Generates the meta and data objects and stores them in the database.
-   *
-   * @param {object} chunk Chunk data.
-   * @param {Uint8Array} chunk.data         Stored video bytes.
-   * @param {number}     chunk.offset       Data offset from the beginning of the file.
-   * @param {boolean}    chunk.done         Download done flag.
-   * @param {string}     chunk.mime         File MIME type.
-   * @param {number}     chunk.sizeInBytes  Filesize in bytes.
-   * @param {number}     chunk.index        Chunk positional index in the file. Zero based.
-   * @param {string}     chunk.url          File URL.
-   *
-   * @returns {Promise} Promise that resolves when chunk meta and all data is written.
-   */
-  async storeVideoChunk({
-    data, offset, done, mime, sizeInBytes, index, url,
-  }) {
-    const db = await getIDBConnection();
-    const size = data ? data.length : 0;
-
-    const metaWritePromise = new Promise((resolve, reject) => {
-      const metaEntry = {
-        offset, sizeInBytes, done, mime, url,
-      };
-      const metaPutOperation = db.meta.put(metaEntry);
-      metaPutOperation.onsuccess = () => {
-        this._videoData.meta = metaEntry;
-        resolve();
-      };
-      metaPutOperation.onerror = reject;
-    });
-
-    const dataWritePromise = new Promise((resolve, reject) => {
-      const dataPutOperation = db.data.put({
-        offset, size, data, index, url,
-      });
-
-      dataPutOperation.onsuccess = resolve;
-      dataPutOperation.onerror = reject;
-    });
-
-    return new Promise((resolve, reject) => {
-      Promise.all([metaWritePromise, dataWritePromise])
-        .then(() => {
-          if (done) this.state = 'done';
-          resolve();
-        })
-        .catch(reject);
-    });
-  }
-
-  /**
-   * Heuristic method to get video MIME type.
-   *
-   * @param {string} videoURL Video URL.
-   *
-   * @returns {string} Video MIME type string.
-   */
-  getVideoMimeByURL(videoURL) {
-    const URLObject = new URL(videoURL);
-    const extensionMatch = URLObject.pathname.match(/\.([a-z0-9]{3,4})$/);
-    const extension = extensionMatch.length === 2 ? extensionMatch[1] : 'mp4';
-
-    switch (extension) {
-      case 'mp4': return 'video/mp4';
-      case 'webm': return 'video/webm';
-      case 'ogv': return 'video/ogg';
-      case 'mpeg': return 'video/mpeg';
-      case 'mov': return 'video/quicktime';
-      case 'avi': return 'video/x-msvideo';
-      case 'ts': return 'video/mp2t';
-      case '3gp': return 'video/3gpp';
-      case '3g2': return 'video/3gpp2';
-      case 'wmv': return 'video/x-ms-wmv';
-      case 'flv': return 'video/x-flv';
-      default: return `video/${extension}`;
-    }
-  }
-
-  /**
-   * Returns IDBIndex instance and a key range to iterate over a video URL.
-   *
-   * @param {string} url Video URL.
-   *
-   * @returns {Array} IDBIndex and IDBKeyRange objects.
-   */
-  async accessVideo(url) {
-    const db = await getIDBConnection();
-    const rawDb = db.unwrap();
-    const transaction = rawDb.transaction([db.data.name], 'readonly');
-    const store = transaction.objectStore(db.data.name);
-    const index = store.index(IDB_CHUNK_INDEX);
-    const range = IDBKeyRange.bound(
-      [url, 0, 0],
-      [url, Infinity, Infinity],
-    );
-
-    return [index, range];
-  }
-
-  /**
-   * Retrieves the last stored data chunk for the current video.
-   *
-   * @returns {Promise} Promise that resolves with the last chunk data.
-   */
-  async getLastChunk() {
-    const url = this.getDownloadableURL();
-    const [index, range] = await this.accessVideo(url);
-
-    return new Promise((resolve, reject) => {
-      const request = index.openCursor(range, 'prev');
-
-      request.onsuccess = (e) => resolve(e.target.result.value);
-      request.onerror = (e) => reject(e);
-    });
-  }
-
-  /**
-   * Iterate over all video chunks and return the total size of the stored video in bytes.
-   *
-   * @returns {Promise} Promise that resolves with the total video size in bytes.
-   */
-  async getTotalSize() {
-    const url = this.getDownloadableURL();
-    const [index, range] = this.accessVideo(url);
-
-    return new Promise((resolve, reject) => {
-      const request = index.openCursor(range);
-
-      let totalSize = 0;
-
-      request.onsuccess = (e) => {
-        const cursor = e.target.result;
-
-        if (cursor) {
-          totalSize += cursor.value.size;
-          cursor.continue();
+  getProgress() {
+    const pieceValue = 1 / this.internal.files.length;
+    const percentageProgress = this.internal.files.reduce(
+      (percentage, fileMeta) => {
+        if (fileMeta.done) {
+          percentage += pieceValue;
+        } else if (fileMeta.bytesDownloaded === 0 || !fileMeta.bytesTotal) {
+          percentage += 0;
         } else {
-          resolve(totalSize);
+          const percentageOfCurrent = fileMeta.bytesDownloaded / fileMeta.bytesTotal;
+          percentage += percentageOfCurrent * pieceValue;
         }
-      };
-      request.onerror = (e) => reject(e);
-    });
+        return percentage;
+      },
+      0,
+    );
+    const clampedPercents = Math.max(0, Math.min(percentageProgress, 100));
+
+    return clampedPercents;
+  }
+
+  /**
+   * Takes a list of video URLs, downloads the video using a stream reader
+   * and invokes `storeVideoChunk` to store individual video chunks in IndexedDB.
+   */
+  async runIDBDownloads() {
+    this.downloadManager = new DownloadManager(this);
+    this.storageManager = new StorageManager(this);
+
+    this.storageManager.onprogress = (progress) => {
+      this.progress = progress;
+    };
+    this.storageManager.ondone = () => {
+      this.progress = 100;
+      this.state = 'done';
+    };
+
+    /**
+     * The `DownloadManager` instance will download all remaining files in sequence and will
+     * emit data chunks along the way.
+     *
+     * We subscribe the `StoreManager` instance to the `onflush` event of the `DownloadManager`
+     * to make sure all chunks are sent to the `storeChunk` method of the `StoreManager`.
+     */
+    const boundStoreChunkHandler = this.storageManager.storeChunk.bind(this.storageManager);
+    this.downloadManager.onflush = boundStoreChunkHandler;
+
+    this.state = 'partial';
+    this.downloadManager.run();
   }
 
   /**
@@ -593,56 +364,84 @@ export default class extends HTMLElement {
    *
    * @returns {void}
    */
-  _renderUI() {
+  render() {
     const templateElement = document.createElement('template');
     templateElement.innerHTML = `${style}
-            <button class="ready">
-              <img src="/images/download-circle.svg" alt="Download" />
-              <span class="expanded">Make available offline</span>
-            </button>
-            <span class="partial">
-              <button class="cancel" title="Cancel and remove">Cancel</button>
-            </span>
-            <button class="partial">
-              <div class="progress">
-                <progress-ring stroke="2" radius="13" progress="0"></progress-ring>
-                <img class="resume" src="/images/download-resume.svg" alt="Resume" />
-                <img class="pause" src="/images/download-pause.svg" alt="Pause" />
-              </div>
-              <span class="expanded pause">Pause download</span>
-              <span class="expanded resume">Resume download</span>
-            </button>
-            <button class="done">
-              <img class="ok" src="/images/download-done.svg" alt="Done" />
-              <img class="delete" src="/images/download-delete.svg" alt="Delete" title="Delete the video from cache." />
-              <span class="expanded ok">Downloaded</span>
-              <span class="expanded delete">Remove video</span>
-            </button>`;
+            <button>Download for Offline playback</button>
+            <span>✔ Ready for offline playback.</span>
+            <progress max="1" value="0"></progress>`;
 
-    while (this._root.firstChild) {
-      this._root.removeChild(this._root.firstChild);
+    while (this.internal.root.firstChild) {
+      this.internal.root.removeChild(this.internal.root.firstChild);
     }
 
     const ui = templateElement.content.cloneNode(true);
-    this._root.appendChild(ui);
+    this.internal.root.appendChild(ui);
+
+    this.internal.elements.progress = this.internal.root.querySelector('progress');
+    this.internal.elements.buttons = this.internal.root.querySelectorAll('button');
+
+    this.setDownloadState();
+
+    this.internal.elements.buttons.forEach((button) => {
+      button.addEventListener('click', this.clickHandler.bind(this));
+    });
+  }
+
+  /**
+   * Responds to a Download / Pause / Cancel click.
+   *
+   * @param {Event} e Click event.
+   */
+  clickHandler(e) {
+    if (this.state === 'done') {
+      this.removeFromIDB();
+    } else if (e.target.className === 'cancel') {
+      this.removeFromIDB();
+    } else if (this.downloading === false) {
+      this.download();
+    } else {
+      this.downloadManager.pause();
+      this.downloading = false;
+    }
+  }
+
+  /**
+   * @returns {VideoMeta} Video meta value.
+   */
+  getMeta() {
+    return this.internal.meta || {};
+  }
+
+  /**
+   * @param {VideoMeta} meta Video meta value.
+   */
+  setMeta(meta) {
+    this.internal.meta = meta;
+  }
+
+  /**
+   * Returns the associated video ID.
+   *
+   * @returns {string} Video ID.
+   */
+  getId() {
+    return this.internal.apiData?.id || '';
   }
 
   /**
    * Retrieve information about video download state and update
    * component's `state` and `progress` attribute values.
    */
-  async _setDownloadState() {
-    const db = await getIDBConnection();
-    const url = this.getDownloadableURL();
-    const videoMeta = await db.meta.get(url);
-
-    this._videoData.meta = videoMeta;
+  async setDownloadState() {
+    const videoMeta = this.getMeta();
+    const downloadProgress = this.getProgress();
 
     if (videoMeta.done) {
       this.state = 'done';
-    } else if (videoMeta.offset > 0) {
+    } else if (downloadProgress) {
       this.state = 'partial';
-      this.progress = videoMeta.offset / videoMeta.sizeInBytes;
+      this.progress = downloadProgress;
     } else {
       this.state = 'ready';
     }

@@ -1,4 +1,6 @@
+import '../typedefs';
 import iso8601TimeDurationToSeconds from './Duration.module';
+import selectRepresentations from '../utils/selectRepresentations.module';
 
 /**
  * Replaces MPD variables in the chunk URL string with proper values.
@@ -107,20 +109,6 @@ const getSegmentIndexByTime = (representationObject, time) => {
 };
 
 /**
- * @typedef  {object}  RepresentationObject
- * @property {string}  id                    Representation ID.
- * @property {string}  mimeType              Representation MIME type.
- * @property {string}  codecs                Representation codec.
- * @property {string}  bandwidth             Bandwidth in bits required to play media.
- * @property {string}  width                 [Video] Width of the video frame.
- * @property {string}  height                [Video] Height of the video frame.
- * @property {string}  frameRate             [Video] Framerate.
- * @property {string}  audioSamplingRate     [Audio] Audio sampling rate.
- * @property {Element} element               The <Representation> element.
- * @property {number}  maxChunkIndex         The last media chunk index.
- */
-
-/**
  * Converts the <Represenetation> element from the MPD to a more
  * structured `representation` object containing information associated
  * with the representation.
@@ -152,7 +140,7 @@ const representationElementToObject = (representationElement) => {
 };
 
 export default class {
-  constructor(manifest) {
+  constructor(manifest, manifestSrc) {
     const domParser = new DOMParser();
 
     this.internal = {};
@@ -170,6 +158,60 @@ export default class {
     // Public properties.
     this.minBufferTime = this.getMinBufferTime();
     this.duration = this.getDuration();
+    this.baseURL = this.getBaseUrl(manifestSrc);
+  }
+
+  /**
+   * Returns the directory URL of the current manifest.
+   *
+   * @param {string} manifestSrc URL of the current manifest.
+   *
+   * @returns {string} Directory URL of the current manifest.
+   */
+  getBaseUrl(manifestSrc) {
+    const manifestURL = new URL(manifestSrc);
+    const manifestPathDir = manifestURL.pathname.replace(/[^/]+$/, ''); // Strip trailing filename.
+
+    return `${manifestURL.origin}${manifestPathDir}`;
+  }
+
+  /**
+   * Returns the manifest as a Blob.
+   *
+   * @returns {string} Data URI encoding the manifest data.
+   */
+  toDataURI() {
+    const manifestMarkup = this.internal.manifest.documentElement.outerHTML;
+    const manifestMarkupBase64 = btoa(manifestMarkup);
+
+    return `data:application/dash+xml;base64,${manifestMarkupBase64}`;
+  }
+
+  /**
+   * Returns a list of all chunk files referenced in the manifest.
+   *
+   * @param {Array[]} additionalFileTuples List of tuples in the format [fileId, URL].
+   *
+   * @returns {string[]} List of all chunk files referenced in the manifest.
+   */
+  listAllChunkURLs(additionalFileTuples = [[]]) {
+    const repObjects = [...this.internal.root.querySelectorAll('Representation')].map(representationElementToObject);
+    const initialSegmentFiles = repObjects.map(getInitialSegment);
+
+    const dataChunkFiles = [];
+    repObjects.forEach(
+      (rep) => {
+        for (let i = 1; i <= rep.maxChunkIndex; i += 1) {
+          dataChunkFiles.push(rep.getSegmentByIndex(i));
+        }
+      },
+    );
+
+    const prependBaseURL = (filename) => this.baseURL + filename;
+    const fileTuples = [...initialSegmentFiles, ...dataChunkFiles].map(
+      (file) => [prependBaseURL(file), prependBaseURL(file)],
+    );
+    return [...fileTuples, ...additionalFileTuples];
   }
 
   /**
@@ -216,5 +258,73 @@ export default class {
     const representationObjects = representationElements.map(representationElementToObject);
 
     return representationObjects;
+  }
+
+  /**
+   * Removes all `Representation` elements other than one for video and optionally
+   * one for audio from the manifest.
+   *
+   * @returns {boolean} Whether the operation succeeded.
+   */
+  prepareForOffline() {
+    const targetResolutionW = 1280;
+
+    /**
+     * This process is potentially destructive. Clone the root <MPD> element first.
+     */
+    const RootElementClone = this.internal.root.cloneNode(true);
+    const videoAdaptationSets = [...RootElementClone.querySelectorAll('AdaptationSet[contentType="video"]')];
+    const audioAdaptationSets = [...RootElementClone.querySelectorAll('AdaptationSet[contentType="audio"]')];
+
+    /**
+     * Remove all video and audio Adaptation sets apart from the first ones.
+     */
+    const videoAS = videoAdaptationSets.shift();
+    const audioAS = audioAdaptationSets.shift();
+    [...videoAdaptationSets, ...audioAdaptationSets].forEach(
+      (as) => as.parentNode.removeChild(as),
+    );
+
+    /**
+     * Remove all but first audio representation from the document.
+     */
+    if (audioAS) {
+      const audioRepresentations = [...audioAS.querySelectorAll('Representation')];
+      audioRepresentations.shift();
+      audioRepresentations.forEach(
+        (rep) => rep.parentNode.removeChild(rep),
+      );
+    }
+
+    /**
+     * Select the video representation closest to the target resolution and remove the rest.
+     */
+    if (videoAS) {
+      const videoRepresentations = selectRepresentations(this).video;
+      if (!videoRepresentations) return false;
+      let candidate;
+
+      videoRepresentations.forEach(
+        (videoRep) => {
+          const satisifiesTarget = Number(videoRep.width) >= targetResolutionW;
+          const lessData = Number(videoRep.bandwidth) < Number(candidate?.bandwidth || Infinity);
+
+          if (satisifiesTarget && lessData) {
+            candidate = videoRep;
+          }
+        },
+      );
+
+      if (!candidate) return false;
+
+      while (videoAS.firstChild) videoAS.removeChild(videoAS.firstChild);
+      videoAS.appendChild(candidate.element);
+    }
+
+    /**
+     * Everything was OK, assign the altered document as root again.
+     */
+    this.internal.root.innerHTML = RootElementClone.innerHTML;
+    return true;
   }
 }
