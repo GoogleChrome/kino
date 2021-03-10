@@ -1,7 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const { resolve } = require('path');
-const { readdir } = require('fs').promises;
 
 /**
  * Iterator to recursively find the all the assets to cache.
@@ -10,15 +8,15 @@ const { readdir } = require('fs').promises;
  * @returns {any} The next directory iterator or the absolute path to the file.
  */
 async function* getFiles(dir) {
-  const paths = await readdir(dir, { withFileTypes: true });
+  const items = await fs.promises.readdir(dir, { withFileTypes: true });
 
   // eslint-disable-next-line
-  for (const p of paths) {
-    const res = resolve(dir, p.name);
-    if (p.isDirectory()) {
-      yield* getFiles(res);
+  for (const item of items) {
+    const resPath = path.resolve(dir, item.name);
+    if (item.isDirectory()) {
+      yield* getFiles(resPath);
     } else {
-      yield res;
+      yield resPath;
     }
   }
 }
@@ -26,14 +24,14 @@ async function* getFiles(dir) {
 /**
  * Generates the cached assets for the service worker.
  *
- * @param {string} folder Folder to browse.
  * @param {Array} api The video files API.
  */
-export default async function generateAssetsToCache(folder, api) {
+export default async function generateAssetsToCache(api) {
   const start = Date.now();
   const filesRegExp = /\.(html|css|js|svg|png|jpeg|jpg|ico)$/i;
   const excludeFiles = ['sw.js', '404.html'];
   const assetsToCache = ['/'];
+  const folder = 'public';
 
   // eslint-disable-next-line
   for await (const file of getFiles(folder)) {
