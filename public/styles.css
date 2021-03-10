@@ -220,7 +220,7 @@ header .menu toggle-button {
   padding: 0 1rem;
 }
 header .container {
-  padding: 2rem;
+  padding: 2rem 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
