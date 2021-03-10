@@ -123,13 +123,13 @@ header {
   margin: 0 auto;
 }
 .poster-image {
-  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%; /* 16:9 */
   position: relative;
 }
-.poster-image picture {
-  width: 1280px;
-  height: 720px;
-  object-fit: cover;
+.poster-image picture img {
+  width: 100%;
+  height: auto;
 }
 header.with-video {
   background: #12283C;
