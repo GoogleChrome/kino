@@ -18,7 +18,6 @@ const style = `
       opacity: 0.5;
     }
     .poster {
-      background-image: url("https://storage.googleapis.com/biograf-video-files/videos/ttt-ep-2/poster.jpg");
       background-size: cover;
       height: 0;
       padding-top: 56.25%;
@@ -88,8 +87,14 @@ export default class extends HTMLElement {
   render(videoData, navigate) {
     this.navigate = navigate;
     const templateElement = document.createElement('template');
+    let posterImage = videoData.thumbnail;
+
+    if (Array.isArray(posterImage)) {
+      posterImage = videoData.thumbnail.find((thumbnail) => thumbnail.default).src;
+    }
+
     templateElement.innerHTML = `${style}
-        <a href="/${slugify(videoData.title)}" class="poster" style="background-image: url('${videoData.thumbnail}')"></a>
+        <a href="/${slugify(videoData.title)}" class="poster" style="background-image: url('${posterImage}')"></a>
         <div class="info">
           <div class="title-icon">
             <a href="/${slugify(videoData.title)}" class="title">${videoData.title}</a>

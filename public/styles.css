@@ -112,11 +112,24 @@ header {
   z-index: 3;
   width: 100%;
 }
-.poster-bg {
-  background: linear-gradient(180deg, #223D55 0%, rgba(34, 61, 85, 0.729176) 10%, rgba(34, 61, 85, 0) 30%), linear-gradient(0deg, #223D55 0%, rgba(34, 61, 85, 0.729176) 10%, rgba(34, 61, 85, 0) 30%), url('https://storage.googleapis.com/biograf-video-files/videos/nic-ep-56/poster.jpg') center center;
-  background-size: cover !important;
-  height: 50vw;
+.poster-wrapper {
+  background: var(--background-dark);
+  height: auto;
+  padding-top: 118px;
   position: relative;
+}
+.poster-bg {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.poster-image {
+  width: 100%;
+  position: relative;
+}
+.poster-image picture {
+  width: 1280px;
+  height: 720px;
+  object-fit: cover;
 }
 header.with-video {
   background: #12283C;
@@ -140,15 +153,9 @@ header.with-video {
 }
 .poster-bg .main-player {
   display: none;
-  background: #000;
-  height: 600px;
+  height: 720px;
 }
-.poster-bg.has-player {
-  background: #223D55 !important;
-  height: auto;
-  padding-top: 118px;
-}
-.poster-bg.has-player .play {
+.poster-bg.has-player .poster-image {
   display: none;
 }
 .poster-bg.has-player .main-player {
