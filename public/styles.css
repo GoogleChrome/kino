@@ -411,7 +411,7 @@ footer .container {
 }
 .settings {
   min-height: 400px;
-  max-width: 80%;
+  max-width: calc(1200px - 20%);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
