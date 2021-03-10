@@ -4,7 +4,7 @@ const { resolve } = require('path');
 const { readdir } = require('fs').promises;
 
 /**
- * Iterator to find the all the assets to cache.
+ * Iterator to recursively find the all the assets to cache.
  *
  * @param {string} dir The directory to iterate over.
  * @returns {any} The next directory iterator or the absolute path to the file.
@@ -24,16 +24,16 @@ async function* getFiles(dir) {
 }
 
 /**
- * Recursively browses and adds files to the cache.
+ * Generates the cached assets for the service worker.
  *
  * @param {string} folder Folder to browse.
- * @param {Array} assets The assets to cache.
- * @returns {Array} The updated assets.
+ * @param {Array} api The video files API.
  */
-const browseAllFilesInDirectory = async (folder, assets) => {
+export default async function generateAssetsToCache(folder, api) {
+  const start = Date.now();
   const filesRegExp = /\.(html|css|js|svg|png|jpeg|jpg|ico)$/i;
   const excludeFiles = ['sw.js', '404.html'];
-  const assetsToCache = [...assets];
+  const assetsToCache = ['/'];
 
   // eslint-disable-next-line
   for await (const file of getFiles(folder)) {
@@ -43,21 +43,6 @@ const browseAllFilesInDirectory = async (folder, assets) => {
       assetsToCache.push(filePath);
     }
   }
-
-  return assetsToCache;
-};
-
-/**
- * Generates the cached assets for the service worker.
- *
- * @param {string} folder Folder to browse.
- * @param {Array} api The video files API.
- */
-export default async function generateAssetsToCache(folder, api) {
-  const start = Date.now();
-
-  // Add files from the public directory.
-  const assetsToCache = await browseAllFilesInDirectory(folder, ['/']);
 
   // Add files from the API.
   api.forEach((video) => {
