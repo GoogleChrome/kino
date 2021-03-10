@@ -1,20 +1,32 @@
 import appendVideoToGallery from '../utils/appendVideoToGallery';
 import getPoster from './partials/Poster.partial';
 
-export default ({ mainContent, videoDataArray, navigate }) => {
-  if (videoDataArray[0]) {
-    const mainVideoData = videoDataArray[0] || {};
+/**
+ * @param {RouterContext} routerContext Context object passed by the Router.
+ */
+export default (routerContext) => {
+  const { mainContent, apiData } = routerContext;
+  if (apiData[0]) {
+    const mainVideoData = apiData[0] || {};
     mainContent.appendChild(getPoster(mainVideoData));
   }
 
-  const videosByCategories = videoDataArray.reduce((acc, videoData) => {
+  const videosByCategories = apiData.reduce((acc, videoData) => {
     videoData.categories.forEach((category) => {
       if (!(category in acc)) acc[category] = [];
       acc[category].push(videoData);
     });
     return acc;
   }, {});
+
   Object.keys(videosByCategories).forEach((category, index) => {
-    appendVideoToGallery(videosByCategories[category], navigate, category, mainContent, index);
+    const localContext = {
+      category,
+      index,
+    };
+    appendVideoToGallery({
+      ...routerContext,
+      apiData: videosByCategories[category],
+    }, localContext);
   });
 };

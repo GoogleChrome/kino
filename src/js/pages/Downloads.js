@@ -1,7 +1,16 @@
 import getIDBConnection from '../modules/IDBConnection.module';
 import { SW_CACHE_NAME } from '../constants';
 
-export default async ({ mainContent, videoDataArray, navigate }) => {
+/**
+ * @param {RouterContext} routerContext Context object passed by the Router.
+ */
+export default async (routerContext) => {
+  const {
+    mainContent,
+    apiData,
+    navigate,
+    videoDownloaderRegistry,
+  } = routerContext;
   mainContent.innerHTML = `
     <style>
       .grid {
@@ -42,10 +51,14 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
     }
 
     allMeta.forEach((meta) => {
-      const videoData = videoDataArray.find((vd) => vd.id === meta.videoId);
+      const videoData = apiData.find((vd) => vd.id === meta.videoId);
       const card = document.createElement('video-card');
-      const downloader = document.createElement('video-downloader');
-      downloader.init(videoData, SW_CACHE_NAME);
+      let downloader = videoDownloaderRegistry.get(videoData.id);
+      if (!downloader) {
+        downloader = videoDownloaderRegistry.create(videoData.id);
+        downloader.init(videoData, SW_CACHE_NAME);
+      }
+      downloader.setAttribute('expanded', 'false');
       card.render(videoData, navigate);
       card.attachDownloader(downloader);
       grid.appendChild(card);

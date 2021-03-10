@@ -4,7 +4,11 @@ const onChange = (key) => ({ detail }) => {
   saveSetting(key, detail.value);
 };
 
-export default ({ mainContent }) => {
+/**
+ * @param {RouterContext} routerContext Context object passed by the Router.
+ */
+export default (routerContext) => {
+  const { mainContent } = routerContext;
   mainContent.innerHTML = `
     <div class="page-title">
         <h2>Settings</h2>

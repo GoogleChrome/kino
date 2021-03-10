@@ -57,3 +57,20 @@
  * @property {string}  canPlayTypeNatively Can the client play the source natively or using MSE?
  * @property {string}  canPlayTypeMSE      Can the client natively play the returned source?
  */
+
+/**
+ * @typedef  {object} VideoDownloaderRegistry
+ * @property {Function} create   Creates a new `VideoDownload` instance.
+ * @property {Function} get      Returns a previously created `VideoDownload` instance or null.
+ * @property {object}   instance Holds `VideoDownload` instances keyed by video IDs.
+ */
+
+/**
+ * @typedef  {object}      RouterContext
+ * @property {Array}       apiData     Array of sets of video metadata information from the API.
+ * @property {HTMLElement} mainContent Elements representing the main content area in the page.
+ * @property {Function}    navigate    Method to navigate between pages.
+ * @property {string}      path        Current URL path.
+ * @property {VideoDownloaderRegistry} VideoDownloaderRegistry Storage for `videoDownload`
+ *                                                             instances reuse.
+ */

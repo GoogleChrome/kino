@@ -8,8 +8,13 @@ const globalClickHandler = (navigate) => (e) => {
 };
 
 export default class Router {
-  constructor() {
+  /**
+   *
+   * @param {object} context Any initial context to be passed to pages.
+   */
+  constructor(context = {}) {
     this.routes = [];
+    this.context = context;
 
     window.addEventListener('popstate', () => this.run());
 
@@ -29,39 +34,37 @@ export default class Router {
   }
 
   async init() {
-    this.videoDataArray = await fetch('/api.json')
-      .then((response) => response.json());
+    const response = await fetch('/api.json');
+    const apiData = await response.json();
+
+    this.context.apiData = apiData;
+    this.context.mainContent = document.querySelector('main');
+    this.context.navigate = this.navigate.bind(this);
+
     this.run();
   }
 
   run() {
-    const mainContent = document.querySelector('main');
-    const { videoDataArray } = this;
-    const path = window.location.pathname;
+    this.context.path = window.location.pathname;
 
-    const navigate = this.navigate.bind(this);
-    const callbackArgs = {
-      mainContent, videoDataArray, path, navigate,
-    };
     const foundRoute = this.routes.find((route) => {
       if (route.path instanceof RegExp) {
-        return route.path.test(path);
+        return route.path.test(this.context.path);
       }
-      return route.path === path;
+      return route.path === this.context.path;
     });
+
+    this.context.mainContent.innerHTML = '';
     if (foundRoute) {
-      mainContent.innerHTML = '';
-      foundRoute.callback(callbackArgs);
+      foundRoute.callback(this.context);
     } else {
       const catchAllRoute = this.routes.find((route) => route.path === '*');
       if (catchAllRoute) {
-        mainContent.innerHTML = '';
-        catchAllRoute.callback(callbackArgs);
+        catchAllRoute.callback(this.context);
       } else {
-        mainContent.innerHTML = '<h1>404</h1>';
+        this.context.mainContent.innerHTML = '<h1>404</h1>';
       }
     }
-
     window.scrollTo(0, 0);
   }
 
