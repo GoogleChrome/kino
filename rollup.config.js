@@ -16,7 +16,7 @@ export default [
       format: 'cjs',
     },
     plugins: [
-      generateAssetsToCache('public', api),
+      generateAssetsToCache(api),
     ],
   },
 ];
