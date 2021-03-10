@@ -10,8 +10,7 @@
     "lint": "eslint src/",
     "lint:fix": "eslint . --fix",
     "start": "firebase serve --only hosting",
-    "generate-assets": "node generateAssetsToCache",
-    "build": "npm run generate-assets && rollup -c",
+    "build": "rollup -c",
     "watch": "rollup -c -w"
   },
   "devDependencies": {
@@ -26,7 +25,8 @@
     "eslint-plugin-jsdoc": "^30.7.13",
     "husky": "^4.3.8",
     "jest": "^26.6.3",
-    "rollup": "^2.38.5"
+    "rollup": "^2.38.5",
+    "rollup-plugin-execute": "^1.1.1"
   },
   "husky": {
     "hooks": {

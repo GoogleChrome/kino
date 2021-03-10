@@ -1,3 +1,6 @@
+import generateAssetsToCache from './src/js/utils/generateAssetsToCache';
+import api from './public/api/video-list.json';
+
 export default [
   {
     input: 'src/index.js',
@@ -12,5 +15,8 @@ export default [
       file: 'public/sw.js',
       format: 'cjs',
     },
+    plugins: [
+      generateAssetsToCache('public', api),
+    ],
   },
 ];

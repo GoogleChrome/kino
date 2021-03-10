@@ -6,7 +6,7 @@ import {
 } from '../constants';
 
 import getIDBConnection from '../modules/IDBConnection.module';
-import assetsToCache from '../../../assetsToCache';
+import assetsToCache from './cache';
 
 /**
  * Respond to a request to fetch offline video and contruct a response stream.
