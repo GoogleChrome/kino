@@ -3,16 +3,19 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - develop
-      - main
+      - '**'
+      - '!main'
+      - '![0-9]+.[0-9]+'
   pull_request:
-    # Run workflow whenever a PR is opened, updated (synchronized), or marked ready for review.
-    types: [ opened, synchronize, ready_for_review ]
+    types: [ closed ]
+    branches:
+      - 'main'
+      - '[0-9]+.[0-9]+'
 
 jobs:
 
-  lint:
-    name: Lint
+  lint-js:
+    name: Lint JS
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -31,17 +34,52 @@ jobs:
             ${{ runner.os }}-npm-
 
       - name: Install Node dependencies
-        run: npm i
-        env:
-          CI: true
+        run: npm ci
 
       - name: Detect coding standard violations
         run: npm run lint
 
-  deploy:
+  release-tag:
+    needs: [lint-js]
+    if: ${{ github.event.pull_request.merged == true }}
+    name: Release Tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set the tag version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@master
+
+      - name: Prepare Release
+        id: prepare-release
+        continue-on-error: true
+        uses: derekherman/prepare-release@1.0
+        with:
+          baseRef: ${{ github.base_ref }}
+          headRef: ${{ github.head_ref }}
+          tagRef: ${{ steps.package-version.outputs.current-version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        if: steps.prepare-release.outcome == 'success' && steps.prepare-release.conclusion == 'success'
+        with:
+          tag_name: ${{ steps.package-version.outputs.current-version }}
+          release_name: ${{ steps.package-version.outputs.current-version }}
+          body: |
+            ${{ steps.prepare-release.outputs.changelog }}
+            ${{ steps.prepare-release.outputs.props }}
+          prerelease: ${{ contains(github.ref, '-rc') || contains(github.ref, '-b') || contains(github.ref, '-a') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-staging:
     if: github.ref == 'refs/heads/develop'
-    needs: [lint]
-    name: Deploy
+    needs: [lint-js]
+    name: Deploy Staging
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -60,14 +98,10 @@ jobs:
             ${{ runner.os }}-npm-
 
       - name: Install Node dependencies
-        run: npm i
-        env:
-          CI: true
+        run: npm ci
 
       - name: Build Assets
         run: npm run build
-        env:
-          CI: true
 
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0

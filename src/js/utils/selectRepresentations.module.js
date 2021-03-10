@@ -50,7 +50,7 @@ export default (parser, opts = {}) => {
          */
         representations[contentType] = parser.queryRepresentations(query, contentType, 'eng');
         representations[contentType] = representations[contentType].filter(canPlayFilter);
-      } while (!representations[contentType]);
+      } while (representations[contentType].length === 0);
     },
   );
 

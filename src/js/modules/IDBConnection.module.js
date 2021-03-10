@@ -13,7 +13,7 @@ const metaAccessorFactory = (abstractedIDB) => ({
   async get(videoId) {
     const defaultValue = {
       videoId,
-      progress: 0,
+      done: false,
     };
     const transaction = abstractedIDB.db.transaction([this.name], 'readonly');
     const store = transaction.objectStore(this.name);
@@ -22,6 +22,19 @@ const metaAccessorFactory = (abstractedIDB) => ({
 
       request.onsuccess = (e) => resolve(e.target.result || defaultValue);
       request.onerror = () => reject(`Unable to fetch meta information for video: ${videoId}`);
+    });
+
+    return data;
+  },
+
+  async getAll() {
+    const transaction = abstractedIDB.db.transaction([this.name], 'readonly');
+    const store = transaction.objectStore(this.name);
+    const data = await new Promise((resolve, reject) => {
+      const request = store.getAll();
+
+      request.onsuccess = (e) => resolve(e.target.result);
+      request.onerror = () => reject('Unable to fetch meta information.');
     });
 
     return data;
@@ -148,6 +161,76 @@ export default () => {
     abstractedIDB.meta = metaAccessorFactory(abstractedIDB);
     abstractedIDB.data = dataAccessorFactory(abstractedIDB);
     abstractedIDB.file = fileAccessorFactory(abstractedIDB);
+
+    /**
+     * Removes all entries from the database used for video storage.
+     *
+     * @returns {Promise} Promise that resolves when the DB is deleted.
+     */
+    abstractedIDB.clearAll = () => new Promise((resolve, reject) => {
+      const transaction = abstractedIDB.db.transaction([abstractedIDB.meta.name, abstractedIDB.data.name, abstractedIDB.file.name], 'readwrite');
+      const metaStore = transaction.objectStore(abstractedIDB.meta.name);
+      const dataStore = transaction.objectStore(abstractedIDB.data.name);
+      const fileStore = transaction.objectStore(abstractedIDB.file.name);
+
+      metaStore.clear();
+      dataStore.clear();
+      fileStore.clear();
+
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject();
+    });
+
+    /**
+     * Removes the video from IDB by its URL.
+     *
+     * @param {string}     id    Video ID.
+     * @param {FileMeta[]} files List of files associated with the video.
+     *
+     * @returns {Promise} Promise that resolves when the video data is removed.
+     */
+    abstractedIDB.removeVideo = (id, files) => new Promise((resolve, reject) => {
+      const transaction = abstractedIDB.db.transaction(
+        [abstractedIDB.meta.name, abstractedIDB.data.name, abstractedIDB.file.name],
+        'readwrite',
+      );
+      const metaStore = transaction.objectStore(abstractedIDB.meta.name);
+      const dataStore = transaction.objectStore(abstractedIDB.data.name);
+      const fileStore = transaction.objectStore(abstractedIDB.file.name);
+
+      const dataUrlIndex = dataStore.index(IDB_CHUNK_INDEX);
+
+      /**
+       * @param {FileMeta} file File to remove all chunks for.
+       */
+      const removeFileChunks = (file) => {
+        const range = IDBKeyRange.bound(
+          [file.url, -Infinity, -Infinity],
+          [file.url, Infinity, Infinity],
+        );
+        const dataAllChunksCursor = dataUrlIndex.openKeyCursor(range);
+
+        dataAllChunksCursor.onsuccess = (e) => {
+          const cursor = e.target.result;
+
+          if (cursor) {
+            dataStore.delete(cursor.primaryKey);
+            cursor.continue();
+          }
+        };
+      };
+
+      files.forEach(
+        (file) => {
+          fileStore.delete(file.url);
+          removeFileChunks(file);
+        },
+      );
+      metaStore.delete(id);
+
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject();
+    });
 
     return abstractedIDB;
   };

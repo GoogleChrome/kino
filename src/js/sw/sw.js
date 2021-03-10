@@ -2,11 +2,11 @@ import {
   SW_CACHE_NAME,
   STORAGE_SCHEMA,
   IDB_CHUNK_INDEX,
-  MEDIA_SESSION_DEFAULT_ARTWORK,
   MEDIA_SERVER_ORIGIN,
 } from '../constants';
 
 import getIDBConnection from '../modules/IDBConnection.module';
+import assetsToCache from './cache';
 
 /**
  * Respond to a request to fetch offline video file and construct a response stream.
@@ -113,22 +113,6 @@ const maybeGetVideoResponse = async (event) => {
  * @param {Event} event Install event.
  */
 const precacheAssets = (event) => {
-  // In the future we can generate this list with a simple script (looking at video-list.json)
-  const assetsToCache = [
-    '/',
-    '/index.html',
-    '/dist/js/index.js',
-    '/api/video-list.json',
-    '/favicon.svg',
-  ];
-
-  /**
-   * Default artwork for Media Session API.
-   */
-  MEDIA_SESSION_DEFAULT_ARTWORK.forEach(
-    (artworkObject) => assetsToCache.push(artworkObject.src),
-  );
-
   event.waitUntil(
     caches.open(SW_CACHE_NAME).then((cache) => cache.addAll(assetsToCache)),
   );

@@ -6,34 +6,147 @@ import { getURLsForDownload } from './VideoDownloader/Urls.module';
 const style = `
 <style>
     :host,
-    :host * {
+    :host > * {
         display: none;
     }
+    :host {
+      min-width: 26px;
+      min-height: 26px;
+    }
+    .expanded {
+      display: none;
+    }
+    span.expanded {
+      margin-left: 1rem;
+    }
+    button.cancel {
+        border-color: #FF8383 !important;
+    }
+    :host( [expanded="true"] ) .expanded {
+        display: inline-block;
+    }
+    :host( [expanded="true"] ) {
+      display: inline-block;
+    }
+    :host( not( [expanded="true"] ) ) .expanded {
+      display: none;
+    }
+    :host( [expanded="true"] ) button {
+      justify-content: center;
+      align-items: center;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: bold;
+      letter-spacing: 0.085em;
+      border-radius: 5px;
+      padding: 0.5rem 1rem 0.5rem 1rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: transparent;
+    }
     :host( :not( [state="not-initialized"] ) ) {
+        display: inline-block;
+    }
+    :host( [state="ready"] ) .ready {
+        display: flex;
+        align-items: center;
+    }
+    :host( [state="partial"] ) .partial {
+        display: flex;
+        position: relative;
+    }
+    .progress {
+        position: relative;
+        display: inline-block;
+    }
+    :host( [state="partial"][downloading="true"] ) .cancel {
+        display: none;
+    }
+    :host( [state="partial"][downloading="false"] ) .cancel {
+        display: block;
+        position: absolute;
+        bottom: 0;
+        background: #FFF;
+        padding: 0.5rem;
+        border-radius: 5px;
+        left: 50%;
+        transform: translate(-50%, 0);
+        color: #FF8383;
+        font-size: 0.7rem;
+        font-weight: bold;
+        line-height: initial;
+        cursor: pointer;
+        text-transform: uppercase;
+    }
+    :host( [expanded="true"][state="partial"][downloading="false"] ) .cancel {
+        right: 0;
+        left: initial;
+        bottom: initial;
+        transform: translate(110%, 0);
+    }
+    :host( [state="partial"][downloading="false"] ) .resume:not(.expanded) {
         display: block;
     }
-    :host( [state="ready"] ) button,
-    :host( [state="unable"] ) button,
-    :host( [state="partial"] ) button {
+    :host( [state="partial"][downloading="false"] ) .pause {
+        display: none;
+    }
+    :host( [state="partial"][downloading="true"] ) .resume:not(.expanded) {
+        display: none;
+    }
+    :host( [state="partial"][downloading="true"] ) .pause:not(.expanded) {
         display: block;
     }
-    :host( [state="partial"] ) progress {
-        display: block;
-        width: 100%;
+    :host( [state="partial"][downloading="true"][expanded="true"] ) .resume {
+        display: none;
     }
-    :host( [state="done"] ) span {
+    :host( [state="partial"] ) .partial img.resume,
+    :host( [state="partial"] ) .partial img.pause {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+    :host( [state="partial"] ) .partial img.resume {
+        transform: translate(-40%, -50%);
+    }
+    :host( [state="done"] ) .done {
+        display: flex;
+    }
+    :host( [state="done"] ) button .delete {
+        display: none;
+        cursor: pointer;
+        color: #FF8383;
+    }
+    :host( [state="done"] ) button:hover {
+        border-color: #FF8383;
+    }
+    :host( [state="done"]:not( [expanded="true"] ) ) button:hover .delete:not(.expanded) {
         display: block;
-        color: green;
+    }
+    :host( [state="done"][expanded="true"] ) button:hover .delete {
+        display: block;
+    }
+
+    :host( [state="done"] ) button:hover .ok {
+        display: none;
     }
     button {
         cursor: pointer;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        line-height: 0;
+    }
+    :host( [state="ready"] ) button:hover {
+        filter: brightness(95%);
     }
 </style>
 `;
 
 export default class extends HTMLElement {
   static get observedAttributes() {
-    return ['state', 'progress'];
+    return ['state', 'progress', 'downloading'];
   }
 
   constructor() {
@@ -62,6 +175,17 @@ export default class extends HTMLElement {
 
   set state(state) {
     this.setAttribute('state', state);
+    if (this.onStatusUpdate) {
+      this.onStatusUpdate(state);
+    }
+  }
+
+  get downloading() {
+    return this.getAttribute('downloading') === 'true';
+  }
+
+  set downloading(downloading) {
+    this.setAttribute('downloading', downloading);
   }
 
   get progress() {
@@ -87,7 +211,7 @@ export default class extends HTMLElement {
    */
   attributeChangedCallback(name, old, value) {
     if (name === 'progress') {
-      this.internal.elements.progress.value = value;
+      this.internal.elements.progress.setAttribute('progress', value);
     }
   }
 
@@ -122,7 +246,8 @@ export default class extends HTMLElement {
         (fileMeta) => (dbFilesByUrl[fileMeta.url] ? dbFilesByUrl[fileMeta.url] : fileMeta),
       );
 
-      this.setMeta(await db.meta.get(videoId));
+      const videoMeta = await db.meta.get(videoId);
+      this.setMeta(videoMeta);
       this.internal.files = filesWithStateUpdatedFromDb;
 
       this.render();
@@ -175,6 +300,7 @@ export default class extends HTMLElement {
     const posterURLs = this.getPosterURLs();
     const subtitlesURLs = this.getSubtitlesUrls();
 
+    this.downloading = true;
     this.saveToCache([...posterURLs, ...subtitlesURLs]);
     this.runIDBDownloads();
   }
@@ -243,9 +369,28 @@ export default class extends HTMLElement {
   render() {
     const templateElement = document.createElement('template');
     templateElement.innerHTML = `${style}
-            <button>Download for Offline playback</button>
-            <span>✔ Ready for offline playback.</span>
-            <progress max="1" value="0"></progress>`;
+      <button class="ready">
+        <img src="/images/download-circle.svg" alt="Download" />
+        <span class="expanded">Make available offline</span>
+      </button>
+      <span class="partial">
+        <button class="cancel" title="Cancel and remove">Cancel</button>
+      </span>
+      <button class="partial">
+        <div class="progress">
+          <progress-ring stroke="2" radius="13" progress="0"></progress-ring>
+          <img class="resume" src="/images/download-resume.svg" alt="Resume" />
+          <img class="pause" src="/images/download-pause.svg" alt="Pause" />
+        </div>
+        <span class="expanded pause">Pause download</span>
+        <span class="expanded resume">Resume download</span>
+      </button>
+      <button class="done">
+        <img class="ok" src="/images/download-done.svg" alt="Done" />
+        <img class="delete" src="/images/download-delete.svg" alt="Delete" title="Delete the video from cache." />
+        <span class="expanded ok">Downloaded</span>
+        <span class="expanded delete">Remove video</span>
+      </button>`;
 
     while (this.internal.root.firstChild) {
       this.internal.root.removeChild(this.internal.root.firstChild);
@@ -254,11 +399,32 @@ export default class extends HTMLElement {
     const ui = templateElement.content.cloneNode(true);
     this.internal.root.appendChild(ui);
 
-    this.internal.elements.progress = this.internal.root.querySelector('progress');
-    this.internal.elements.button = this.internal.root.querySelector('button');
-    this.internal.elements.button.addEventListener('click', this.download.bind(this));
+    this.internal.elements.progress = this.internal.root.querySelector('progress-ring');
+    this.internal.elements.buttons = this.internal.root.querySelectorAll('button');
 
     this.setDownloadState();
+
+    this.internal.elements.buttons.forEach((button) => {
+      button.addEventListener('click', this.clickHandler.bind(this));
+    });
+  }
+
+  /**
+   * Responds to a Download / Pause / Cancel click.
+   *
+   * @param {Event} e Click event.
+   */
+  clickHandler(e) {
+    if (this.state === 'done') {
+      this.removeFromIDB();
+    } else if (e.target.className === 'cancel') {
+      this.removeFromIDB();
+    } else if (this.downloading === false) {
+      this.download();
+    } else {
+      this.downloadManager.pause();
+      this.downloading = false;
+    }
   }
 
   /**
@@ -289,8 +455,6 @@ export default class extends HTMLElement {
    * component's `state` and `progress` attribute values.
    */
   async setDownloadState() {
-    this.internal.elements.button.disabled = false;
-
     const videoMeta = this.getMeta();
     const downloadProgress = this.getProgress();
 
@@ -299,9 +463,20 @@ export default class extends HTMLElement {
     } else if (downloadProgress) {
       this.state = 'partial';
       this.progress = downloadProgress;
-      this.internal.elements.button.innerHTML = 'Resume Download';
     } else {
       this.state = 'ready';
     }
+    this.downloading = false;
+  }
+
+  /**
+   * Removes the current video from IDB.
+   */
+  async removeFromIDB() {
+    const db = await getIDBConnection();
+
+    this.state = 'removing';
+    await db.removeVideo(this.getId(), this.internal.files);
+    this.init(this.internal.apiData, this.internal.cacheName);
   }
 }

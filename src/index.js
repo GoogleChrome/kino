@@ -1,7 +1,9 @@
 /**
- * Shared constants.
+ * Router, Connection utils.
  */
-import { SW_CACHE_NAME } from './js/constants';
+import Router from './js/modules/Router.module';
+import updateOnlineStatus from './js/utils/updateOnlineStatus';
+import initializeGlobalToggle from './js/utils/initializeGlobalToggle';
 
 /**
  * Web Components implementation.
@@ -9,6 +11,18 @@ import { SW_CACHE_NAME } from './js/constants';
 import VideoPlayerComponent from './js/components/VideoPlayer';
 import VideoCardComponent from './js/components/VideoCard';
 import VideoDownloaderComponent from './js/components/VideoDownloader';
+import VideoGrid from './js/components/VideoGrid';
+import ToggleButton from './js/components/ToggleButton';
+import ProgressRing from './js/components/ProgressRing';
+
+/**
+ * Pages.
+ */
+import HomePage from './js/pages/Home';
+import VideoPage from './js/pages/Video';
+import CategoryPage from './js/pages/Category';
+import DownloadsPage from './js/pages/Downloads';
+import SettingsPage from './js/pages/Settings';
 
 /**
  * Custom Elements definition.
@@ -16,33 +30,22 @@ import VideoDownloaderComponent from './js/components/VideoDownloader';
 customElements.define('video-player', VideoPlayerComponent);
 customElements.define('video-card', VideoCardComponent);
 customElements.define('video-downloader', VideoDownloaderComponent);
+customElements.define('video-grid', VideoGrid);
+customElements.define('toggle-button', ToggleButton);
+customElements.define('progress-ring', ProgressRing);
 
 /**
- * Video Application Logic
+ * Router setup.
  */
-const videoGallery = document.querySelector('.gallery');
+const router = new Router();
+router.route('/', HomePage);
+router.route('/settings', SettingsPage);
+router.route('/downloads', DownloadsPage);
+router.route(RegExp('/category/(.*)'), CategoryPage);
+router.route('*', VideoPage);
 
 /**
- * Build out the gallery view.
- */
-fetch('api/video-list.json')
-  .then((response) => response.json())
-  .then((videoDataArray) => videoDataArray.forEach((videoData) => {
-    const card = document.createElement('video-card');
-    const downloader = document.createElement('video-downloader');
-    const player = document.createElement('video-player');
-
-    downloader.init(videoData, SW_CACHE_NAME);
-    card.render(videoData);
-    card.shadowRoot.appendChild(downloader);
-    player.render(videoData);
-
-    videoGallery.appendChild(card);
-    videoGallery.appendChild(player);
-  }));
-
-/**
- * Register Service Worker
+ * Register Service Worker.
  */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -51,15 +54,10 @@ if ('serviceWorker' in navigator) {
 }
 
 /**
- * Connection status
+ * Connection status.
  */
-function updateOnlineStatus() {
-  const status = document.getElementById('connection-status');
-  const condition = navigator.onLine ? 'online' : 'offline';
-  status.className = condition;
-  status.innerHTML = condition;
-}
-
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
 updateOnlineStatus();
+
+initializeGlobalToggle();

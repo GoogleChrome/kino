@@ -1,63 +1,108 @@
+import slugify from '../utils/slugify';
+import { loadSetting } from '../utils/settings';
+
 const style = `
 <style>
     :host {
-        font-family: sans-serif;
-        display: grid;
-        grid-template:
-            "image image" auto
-            "title download" auto
-            "description ." auto / 1fr auto;
+      overflow: hidden;
+      border-radius: 7px;
+      box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.28);
+      transition: all 120ms;
     }
-    :host > *:not(img):not(picture) {
-        margin: 1rem;
+    :host(:hover:not(.disabled)) {
+        box-shadow: 0px 10px 13px rgba(0, 0, 0, 0.30);
+        transform: scale(1.02);
     }
-    :host > img, :host > picture {
-        grid-area: image;
-        max-width: 100%;
-        height: auto;
+    :host(.disabled) {
+      filter: grayscale(100%);
+      opacity: 0.5;
     }
-    picture img {
-      max-width: 100%;
-      height: auto;
+    .poster {
+      background-size: cover;
+      height: 0;
+      padding-top: 56.25%;
+      display: block;
     }
-    h2 {
-        grid-area: title;
+    .info {
+      padding: 1rem;
+      background: #FFF;
+      height: 100%;
     }
-    p {
-        grid-area: description;
-        margin-top: 0;
+    .info .title-icon {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
     }
-    video-downloader {
-        grid-area: download;
+    .info .title-icon .downloader {
+      margin-top: 2px;
+      margin-left: 10px;
+    }
+    .info .title {
+      font-size: 1.3rem;
+      line-height: 1.5;
+      font-weight: bold;
+      color: #12283C;
+      text-decoration: none;
+    }
+    .info .title:hover {
+      text-decoration: underline;
+    }
+    .info .desc {
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #667F96;
     }
 </style>`;
 
 export default class extends HTMLElement {
   constructor() {
     super();
-
     this._root = this.attachShadow({ mode: 'open' });
+
+    window.addEventListener('online', this.updateOnlineStatus.bind(this));
+    window.addEventListener('online-mock', this.updateOnlineStatus.bind(this, true));
+    window.addEventListener('offline', this.updateOnlineStatus.bind(this));
+    window.addEventListener('offline-mock', this.updateOnlineStatus.bind(this, false));
   }
 
-  render(videoData) {
-    const templateElement = document.createElement('template');
-    const { thumbnail } = videoData;
-    let videoImageHTML;
-
-    if (Array.isArray(thumbnail)) {
-      const sources = thumbnail.filter((t) => !t.default).map((t) => `<source srcset="${t.src}" type="${t.type}">`).join('');
-      const defaultSource = thumbnail.find((t) => t.default);
-      const defaultSourceHTML = `<img src="${defaultSource.src}" width="1280" height="720" alt="${videoData.title} - Thumbnail">`;
-
-      videoImageHTML = `<picture>${sources}${defaultSourceHTML}</picture>`;
+  updateOnlineStatus(mock) {
+    const isOnline = mock !== undefined ? mock : navigator.onLine;
+    const offlineContentOnly = loadSetting('offline-content-only');
+    const downloader = this._root.querySelector('video-downloader');
+    const isDownloaded = downloader.state === 'done';
+    if (((!isOnline || offlineContentOnly) && !isDownloaded)) {
+      this.classList.add('disabled');
     } else {
-      videoImageHTML = `<img src="${videoData.thumbnail}" width="1280" height="720" alt="${videoData.title} - Thumbnail">`;
+      this.classList.remove('disabled');
+    }
+  }
+
+  attachDownloader(downloader) {
+    downloader.onStatusUpdate = this.updateOnlineStatus.bind(this);
+    this._root.querySelector('.downloader').appendChild(downloader);
+    this.updateOnlineStatus();
+  }
+
+  render(videoData, navigate) {
+    this.navigate = navigate;
+    const templateElement = document.createElement('template');
+    let posterImage = videoData.thumbnail;
+
+    if (Array.isArray(posterImage)) {
+      posterImage = videoData.thumbnail.find((thumbnail) => thumbnail.default).src;
     }
 
     templateElement.innerHTML = `${style}
-            ${videoImageHTML}
-            <h2>${videoData.title}</h2>
-            <p>${videoData.description}</p>`;
+        <a href="/${slugify(videoData.title)}" class="poster" style="background-image: url('${posterImage}')"></a>
+        <div class="info">
+          <div class="title-icon">
+            <a href="/${slugify(videoData.title)}" class="title">${videoData.title}</a>
+            <div class="downloader"></div>
+          </div>
+          <div class="desc">${videoData.description}</div>
+        </div>
+      `;
 
     while (this._root.firstChild) {
       this._root.removeChild(this._root.firstChild);
