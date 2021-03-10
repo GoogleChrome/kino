@@ -14,8 +14,8 @@ on:
 
 jobs:
 
-  lint:
-    name: Lint
+  lint-js:
+    name: Lint JS
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -40,7 +40,7 @@ jobs:
         run: npm run lint
 
   release-tag:
-    needs: [lint]
+    needs: [lint-js]
     if: ${{ github.event.pull_request.merged == true }}
     name: Release Tag
     runs-on: ubuntu-latest
@@ -78,7 +78,7 @@ jobs:
 
   deploy-staging:
     if: github.ref == 'refs/heads/develop'
-    needs: [lint]
+    needs: [lint-js]
     name: Deploy Staging
     runs-on: ubuntu-latest
     steps:
