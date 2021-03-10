@@ -246,7 +246,8 @@ export default class extends HTMLElement {
         (fileMeta) => (dbFilesByUrl[fileMeta.url] ? dbFilesByUrl[fileMeta.url] : fileMeta),
       );
 
-      this.setMeta(await db.meta.get(videoId));
+      const videoMeta = await db.meta.get(videoId);
+      this.setMeta(videoMeta);
       this.internal.files = filesWithStateUpdatedFromDb;
 
       this.render();

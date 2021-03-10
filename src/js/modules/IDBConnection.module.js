@@ -13,7 +13,7 @@ const metaAccessorFactory = (abstractedIDB) => ({
   async get(videoId) {
     const defaultValue = {
       videoId,
-      progress: 0,
+      done: false,
     };
     const transaction = abstractedIDB.db.transaction([this.name], 'readonly');
     const store = transaction.objectStore(this.name);

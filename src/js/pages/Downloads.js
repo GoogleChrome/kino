@@ -42,7 +42,7 @@ export default async ({ mainContent, videoDataArray, navigate }) => {
     }
 
     allMeta.forEach((meta) => {
-      const videoData = videoDataArray.find((vd) => vd['video-sources'].some((vs) => vs.id === meta.id));
+      const videoData = videoDataArray.find((vd) => vd.id === meta.videoId);
       const card = document.createElement('video-card');
       const downloader = document.createElement('video-downloader');
       downloader.init(videoData, SW_CACHE_NAME);
