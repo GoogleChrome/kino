@@ -199,13 +199,16 @@ header .menu > * {
   text-decoration: none;
   color: #FFF;
 }
-header .menu span {
+header .menu .toggle-button-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   background: #12283C;
   border-radius: 2rem;
   padding: 0.5rem 1rem;
+}
+header .menu > :last-child {
+  padding-right: 0;
 }
 header .menu toggle-button {
   padding: 0 1rem;
