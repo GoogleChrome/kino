@@ -35,4 +35,12 @@ export default class VideoDownloaderRegistry {
   get(videoId) {
     return this.instances[videoId] || null;
   }
+
+  /**
+   * Detaches the `VideoDownload` instances and leaves them to be
+   * garbage collected.
+   */
+  destroyAll() {
+    this.instances = {};
+  }
 }

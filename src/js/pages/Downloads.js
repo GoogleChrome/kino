@@ -84,7 +84,17 @@ export default async (routerContext) => {
 
     grid.classList.add('clearing');
     btn.classList.add('clearing');
+
+    /**
+     * Clears all data from IDB.
+     */
     await db.clearAll();
+
+    /**
+     * Removes the cached `VideoDownload` objects.
+     */
+    videoDownloaderRegistry.destroyAll();
+
     btn.classList.remove('clearing');
     deleteAllBtn.setAttribute('disabled', '');
     renderPage();
