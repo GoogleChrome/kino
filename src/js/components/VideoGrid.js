@@ -44,19 +44,6 @@ template.innerHTML = `
       grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
       grid-gap: 2rem;
     }
-    .grid.limit-n > *:nth-of-type(1n+4) {
-      display: none;
-    }
-    @media screen and (max-width: 1042px) {
-      .grid.limit-n > *:nth-of-type(1n+3) {
-        display: none;
-      }
-    }
-    @media screen and (max-width: 693px) {
-      .grid.limit-n > *:nth-of-type(1n+2) {
-        display: none;
-      }
-    }
   </style>
   <section>
     <div class="container">
@@ -113,9 +100,6 @@ export default class VideoGrid extends HTMLElement {
       this.$categoryLink.href = `/category/${slugify(this.category)}`;
     } else {
       this.$sectionHeader.style.display = 'none';
-    }
-    if (this.limitN) {
-      this.$grid.classList.add('limit-n');
     }
     this.$background.style.backgroundColor = this.background;
   }

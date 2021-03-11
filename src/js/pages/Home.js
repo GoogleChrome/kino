@@ -5,7 +5,7 @@ import getPoster from './partials/Poster.partial';
  * @param {RouterContext} routerContext Context object passed by the Router.
  */
 export default (routerContext) => {
-  const { mainContent, apiData } = routerContext;
+  const { mainContent, apiData, viewport } = routerContext;
   if (apiData[0]) {
     const mainVideoData = apiData[0] || {};
     mainContent.appendChild(getPoster(mainVideoData));
@@ -19,15 +19,17 @@ export default (routerContext) => {
     return acc;
   }, {});
 
+  // eslint-disable-next-line no-nested-ternary
+  const itemsN = viewport === 'mobile' ? 1 : (viewport === 'tablet' ? 2 : 3);
+
   Object.keys(videosByCategories).forEach((category, index) => {
     const localContext = {
       category,
       index,
-      limitN: true,
     };
     appendVideoToGallery({
       ...routerContext,
-      apiData: videosByCategories[category].slice(0, 3), // We display max 3 items on the Home page.
+      apiData: videosByCategories[category].slice(0, itemsN),
     }, localContext);
   });
 };

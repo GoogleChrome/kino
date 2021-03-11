@@ -18,6 +18,14 @@ export default class Router {
 
     window.addEventListener('popstate', () => this.run());
 
+    this.mqls = [
+      window.matchMedia('(max-width: 693px)'),
+      window.matchMedia('(max-width: 1042px)'),
+    ];
+    this.mqls.forEach((mql) => {
+      mql.addEventListener('change', this.run.bind(this));
+    });
+
     document.querySelector('.mobile-button').addEventListener('click', () => {
       document.querySelector('body').classList.toggle('mobile');
     });
@@ -44,7 +52,18 @@ export default class Router {
     this.run();
   }
 
+  get viewport() {
+    let viewport = 'desktop';
+    if (this.mqls[0].matches && this.mqls[1].matches) {
+      viewport = 'mobile';
+    } else if (!this.mqls[0].matches && this.mqls[1].matches) {
+      viewport = 'tablet';
+    }
+    return viewport;
+  }
+
   run() {
+    this.context.viewport = this.viewport;
     this.context.path = window.location.pathname;
 
     const foundRoute = this.routes.find((route) => {

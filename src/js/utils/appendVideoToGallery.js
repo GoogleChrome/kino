@@ -16,7 +16,6 @@ function appendVideoToGallery(routerContext, localContext) {
   const index = localContext.index || 0;
 
   const videoGrid = document.createElement('video-grid');
-  videoGrid.limitN = localContext.limitN;
   videoGrid.category = category || '';
   videoGrid.background = getComputedStyle(document.documentElement)
     .getPropertyValue(`--background-${index % 2 === 0 ? 'light' : 'dark'}`);
