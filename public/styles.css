@@ -106,6 +106,12 @@ video-card p {
 
 header {
   color: #FFF;
+  padding: 2rem;
+}
+@media screen and (max-width: 700px) {
+  header {
+    padding: 1.5rem;
+  }
 }
 .poster-wrapper {
   background: var(--background-dark);
@@ -214,7 +220,6 @@ header .menu toggle-button {
   padding: 0 1rem;
 }
 header .container {
-  padding: 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -228,6 +233,7 @@ header .hamburger, header .close {
     overflow: hidden;
   }
   body.mobile header .container {
+    padding: 2rem;
     background: var(--background-dark);
     position: fixed;
     z-index: 3;
@@ -261,6 +267,11 @@ header .hamburger, header .close {
   }
   body.mobile .menu > * {
     margin: 0 0 2rem 0;
+  }
+}
+@media screen and (max-width: 700px) {
+  body.mobile header .container {
+    padding: 1.5rem;
   }
 }
 
@@ -368,9 +379,6 @@ footer .container {
   display: flex;
   justify-content: space-between;
 }
-/*footer p span {*/
-/*  display: none;*/
-/*}*/
 @media screen and (max-width: 770px) {
   footer .container {
     flex-direction: column-reverse;
