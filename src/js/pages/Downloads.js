@@ -31,7 +31,7 @@ export default async (routerContext) => {
         <div class="header container">
             <span>20 GB available <span>of 220 GB</span></span>
             <div>
-                <button class="primary delete-all">Delete all</button>
+                <button class="primary delete-all" disabled>Delete all</button>
             </div>
         </div>
         <div class="grid"></div>
@@ -69,6 +69,8 @@ export default async (routerContext) => {
       tipDownload.className = 'center-text tip';
       tipDownload.innerHTML = 'No videos. To download a video press the <img class="vertical-bottom" src="/images/download-circle.svg" /> button.';
       mainContent.querySelector('.downloads').appendChild(tipDownload);
+    } else {
+      deleteAllBtn.removeAttribute('disabled');
     }
   };
 
@@ -82,8 +84,19 @@ export default async (routerContext) => {
 
     grid.classList.add('clearing');
     btn.classList.add('clearing');
+
+    /**
+     * Clears all data from IDB.
+     */
     await db.clearAll();
+
+    /**
+     * Removes the cached `VideoDownload` objects.
+     */
+    videoDownloaderRegistry.destroyAll();
+
     btn.classList.remove('clearing');
+    deleteAllBtn.setAttribute('disabled', '');
     renderPage();
   });
 
