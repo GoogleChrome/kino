@@ -24,6 +24,7 @@
     "max-classes-per-file": "off",
     "prefer-promise-reject-errors": "off",
     "class-methods-use-this": "off",
-    "jsdoc/no-undefined-types": "off"
+    "jsdoc/no-undefined-types": "off",
+    "no-restricted-syntax": "off"
   }
 }

@@ -358,6 +358,7 @@ export default class extends HTMLElement {
     };
     this.storageManager.ondone = () => {
       this.progress = 100;
+      this.downloading = false;
       this.state = 'done';
     };
 
@@ -461,6 +462,16 @@ export default class extends HTMLElement {
   }
 
   /**
+   * Cancels any ongoing operation.
+   */
+  cancel() {
+    if (this.downloadManager) this.downloadManager.cancel();
+    if (this.storageManager) this.storageManager.cancel();
+
+    this.downloading = false;
+  }
+
+  /**
    * Page `beforeunload` event handler.
    *
    * @param {Event} unloadEvent Unload event.
@@ -518,7 +529,6 @@ export default class extends HTMLElement {
   async removeFromIDB() {
     const db = await getIDBConnection();
 
-    this.state = 'removing';
     await db.removeVideo(this.getId(), this.internal.files);
     this.init(this.internal.apiData, this.internal.cacheName);
   }

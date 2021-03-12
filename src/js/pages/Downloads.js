@@ -82,6 +82,14 @@ export default async (routerContext) => {
   deleteAllBtn.addEventListener('click', async (e) => {
     const btn = e.target;
 
+    /**
+     * @type {Iterator<string, VideoDownloader>}
+     */
+    const downloaderIterator = videoDownloaderRegistry.getAll();
+    for (const [, downloader] of downloaderIterator) {
+      downloader.cancel();
+    }
+
     grid.classList.add('clearing');
     btn.classList.add('clearing');
 
