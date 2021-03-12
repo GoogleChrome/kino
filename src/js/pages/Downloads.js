@@ -85,10 +85,10 @@ export default async (routerContext) => {
     /**
      * @type {Iterator<string, VideoDownloader>}
      */
-    const downloaderIterator = videoDownloaderRegistry.getAll();
-    for (const [, downloader] of downloaderIterator) {
-      downloader.cancel();
-    }
+    const allDownloaders = Array.from(videoDownloaderRegistry.getAll());
+    allDownloaders.forEach(
+      ([, downloader]) => downloader.cancel(),
+    );
 
     grid.classList.add('clearing');
     btn.classList.add('clearing');
