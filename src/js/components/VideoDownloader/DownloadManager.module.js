@@ -28,6 +28,7 @@ export default class {
   constructor(videoDownloader) {
     this.files = videoDownloader.internal.files || [];
     this.paused = false;
+    this.cancelled = false;
 
     this.internal = {
       videoDownloader,
@@ -139,11 +140,18 @@ export default class {
   }
 
   /**
+   * Cancels the download.
+   */
+  cancel() {
+    this.cancelled = true;
+  }
+
+  /**
    * Starts downloading files.
    */
   async run() {
     this.paused = false;
-    while (!this.done && !this.paused && this.currentFileMeta) {
+    while (!this.done && !this.paused && !this.cancelled && this.currentFileMeta) {
       /* eslint-disable no-await-in-loop */
       // Await in loop is OK. We don't want to download files in parallel.
       await this.downloadFile();
