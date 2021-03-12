@@ -13,6 +13,9 @@ const style = `
       min-width: 26px;
       min-height: 26px;
     }
+    :host [role="button"] {
+      cursor: pointer;
+    }
     .expanded {
       display: none;
     }
@@ -31,7 +34,7 @@ const style = `
     :host( not( [expanded="true"] ) ) .expanded {
       display: none;
     }
-    :host( [expanded="true"] ) button {
+    :host( [expanded="true"] ) [role="button"] {
       justify-content: center;
       align-items: center;
       border: 1px solid var(--accent);
@@ -81,7 +84,8 @@ const style = `
         cursor: pointer;
         text-transform: uppercase;
     }
-    :host( [expanded="true"][state="partial"][downloading="false"] ) .cancel {
+    :host( [expanded="true"][state="partial"][downloading="false"] ) .cancel,
+    :host( [expanded="true"][state="ready"][willremove="true"] ) .willremove button {
         right: 0;
         left: initial;
         bottom: initial;
@@ -115,22 +119,22 @@ const style = `
     :host( [state="done"] ) .done {
         display: flex;
     }
-    :host( [state="done"] ) button .delete {
+    :host( [state="done"] ) [role="button"] .delete {
         display: none;
         cursor: pointer;
         color: #FF8383;
     }
-    :host( [state="done"] ) button:hover {
+    :host( [state="done"] ) [role="button"]:hover {
         border-color: #FF8383;
     }
-    :host( [state="done"]:not( [expanded="true"] ) ) button:hover .delete:not(.expanded) {
+    :host( [state="done"]:not( [expanded="true"] ) ) [role="button"]:hover .delete:not(.expanded) {
         display: block;
     }
-    :host( [state="done"][expanded="true"] ) button:hover .delete {
+    :host( [state="done"][expanded="true"] ) [role="button"]:hover .delete {
         display: block;
     }
 
-    :host( [state="done"] ) button:hover .ok {
+    :host( [state="done"] ) [role="button"]:hover .ok {
         display: none;
     }
     button {
@@ -140,7 +144,7 @@ const style = `
         border: 0;
         line-height: 0;
     }
-    :host( [state="ready"] ) button:hover {
+    :host( [state="ready"] ) [role="button"]:hover {
         filter: brightness(95%);
     }
 </style>
@@ -380,16 +384,16 @@ export default class extends HTMLElement {
     const templateElement = document.createElement('template');
     templateElement.innerHTML = `${style}
       <span class="partial">
-        <button class="cancel" title="Cancel and remove">Cancel</button>
+        <button class="cancel" title="Cancel and remove" role="button">Cancel</button>
       </span>
       <span class="willremove">
-        <button class="undo-remove" title="Undo deletion">Undo</button>
+        <button class="undo-remove" title="Undo deletion" role="button">Undo</button>
       </span>
-      <button class="ready">
+      <span class="ready" tabindex="0" role="button">
         <img src="/images/download-circle.svg" alt="Download" />
         <span class="expanded">Make available offline</span>
-      </button>
-      <button class="partial">
+      </span>
+      <span class="partial" tabindex="0" role="button">
         <div class="progress">
           <progress-ring stroke="2" radius="13" progress="0"></progress-ring>
           <img class="resume" src="/images/download-resume.svg" alt="Resume" />
@@ -397,13 +401,13 @@ export default class extends HTMLElement {
         </div>
         <span class="expanded pause">Pause download</span>
         <span class="expanded resume">Resume download</span>
-      </button>
-      <button class="done">
+      </span>
+      <span class="done" tabindex="0" role="button">
         <img class="ok" src="/images/download-done.svg" alt="Done" />
         <img class="delete" src="/images/download-delete.svg" alt="Delete" title="Delete the video from cache." />
         <span class="expanded ok">Downloaded</span>
         <span class="expanded delete">Remove video</span>
-      </button>`;
+      </span>`;
 
     while (this.internal.root.firstChild) {
       this.internal.root.removeChild(this.internal.root.firstChild);
@@ -413,7 +417,7 @@ export default class extends HTMLElement {
     this.internal.root.appendChild(ui);
 
     this.internal.elements.progress = this.internal.root.querySelector('progress-ring');
-    this.internal.elements.buttons = this.internal.root.querySelectorAll('button');
+    this.internal.elements.buttons = this.internal.root.querySelectorAll('[role="button"]');
 
     this.setDownloadState();
 

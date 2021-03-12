@@ -61,16 +61,15 @@ export default class extends HTMLElement {
     this._root = this.attachShadow({ mode: 'open' });
 
     window.addEventListener('online', this.updateOnlineStatus.bind(this));
-    window.addEventListener('online-mock', this.updateOnlineStatus.bind(this, true));
+    window.addEventListener('online-mock', this.updateOnlineStatus.bind(this, { mock: true }));
     window.addEventListener('offline', this.updateOnlineStatus.bind(this));
-    window.addEventListener('offline-mock', this.updateOnlineStatus.bind(this, false));
+    window.addEventListener('offline-mock', this.updateOnlineStatus.bind(this, { mock: false }));
   }
 
-  updateOnlineStatus(mock) {
-    const isOnline = mock !== undefined ? mock : navigator.onLine;
+  updateOnlineStatus(opts = {}) {
+    const isOnline = opts.mock !== undefined ? opts.mock : navigator.onLine;
     const offlineContentOnly = loadSetting('offline-content-only');
-    const downloader = this._root.querySelector('video-downloader');
-    const isDownloaded = downloader.state === 'done';
+    const isDownloaded = opts.downloader && (opts.downloader.state === 'done');
     if (((!isOnline || offlineContentOnly) && !isDownloaded)) {
       this.classList.add('disabled');
     } else {
@@ -79,7 +78,7 @@ export default class extends HTMLElement {
   }
 
   attachDownloader(downloader) {
-    downloader.onStatusUpdate = this.updateOnlineStatus.bind(this);
+    downloader.onStatusUpdate = this.updateOnlineStatus.bind(this, { downloader });
     this._root.querySelector('.downloader').appendChild(downloader);
     this.updateOnlineStatus();
   }
