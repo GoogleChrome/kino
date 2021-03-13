@@ -13,6 +13,9 @@ const style = `
       min-width: 26px;
       min-height: 26px;
     }
+    :host [role="button"] {
+      cursor: pointer;
+    }
     .expanded {
       display: none;
     }
@@ -31,7 +34,7 @@ const style = `
     :host( not( [expanded="true"] ) ) .expanded {
       display: none;
     }
-    :host( [expanded="true"] ) button {
+    :host( [expanded="true"] ) [role="button"] {
       justify-content: center;
       align-items: center;
       border: 1px solid var(--accent);
@@ -52,7 +55,8 @@ const style = `
         display: flex;
         align-items: center;
     }
-    :host( [state="partial"] ) .partial {
+    :host( [state="partial"] ) .partial,
+    :host( [state="ready"][willremove="true"] ) .willremove {
         display: flex;
         position: relative;
     }
@@ -63,7 +67,8 @@ const style = `
     :host( [state="partial"][downloading="true"] ) .cancel {
         display: none;
     }
-    :host( [state="partial"][downloading="false"] ) .cancel {
+    :host( [state="partial"][downloading="false"] ) .cancel,
+    :host( [state="ready"][willremove="true"] ) .willremove button {
         display: block;
         position: absolute;
         bottom: 0;
@@ -79,7 +84,8 @@ const style = `
         cursor: pointer;
         text-transform: uppercase;
     }
-    :host( [expanded="true"][state="partial"][downloading="false"] ) .cancel {
+    :host( [expanded="true"][state="partial"][downloading="false"] ) .cancel,
+    :host( [expanded="true"][state="ready"][willremove="true"] ) .willremove button {
         right: 0;
         left: initial;
         bottom: initial;
@@ -113,22 +119,22 @@ const style = `
     :host( [state="done"] ) .done {
         display: flex;
     }
-    :host( [state="done"] ) button .delete {
+    :host( [state="done"] ) [role="button"] .delete {
         display: none;
         cursor: pointer;
         color: #FF8383;
     }
-    :host( [state="done"] ) button:hover {
+    :host( [state="done"] ) [role="button"]:hover {
         border-color: #FF8383;
     }
-    :host( [state="done"]:not( [expanded="true"] ) ) button:hover .delete:not(.expanded) {
+    :host( [state="done"]:not( [expanded="true"] ) ) [role="button"]:hover .delete:not(.expanded) {
         display: block;
     }
-    :host( [state="done"][expanded="true"] ) button:hover .delete {
+    :host( [state="done"][expanded="true"] ) [role="button"]:hover .delete {
         display: block;
     }
 
-    :host( [state="done"] ) button:hover .ok {
+    :host( [state="done"] ) [role="button"]:hover .ok {
         display: none;
     }
     button {
@@ -138,7 +144,7 @@ const style = `
         border: 0;
         line-height: 0;
     }
-    :host( [state="ready"] ) button:hover {
+    :host( [state="ready"] ) [role="button"]:hover {
         filter: brightness(95%);
     }
 </style>
@@ -146,7 +152,7 @@ const style = `
 
 export default class extends HTMLElement {
   static get observedAttributes() {
-    return ['state', 'progress', 'downloading'];
+    return ['state', 'progress', 'downloading', 'willremove'];
   }
 
   constructor() {
@@ -200,6 +206,14 @@ export default class extends HTMLElement {
     const clampedProgress = Math.min(Math.max(0, progressFloat), 100);
 
     this.setAttribute('progress', clampedProgress);
+  }
+
+  get willremove() {
+    return this.getAttribute('willremove') === 'true';
+  }
+
+  set willremove(willremove) {
+    this.setAttribute('willremove', willremove);
   }
 
   /**
@@ -370,14 +384,17 @@ export default class extends HTMLElement {
   render() {
     const templateElement = document.createElement('template');
     templateElement.innerHTML = `${style}
-      <button class="ready">
+      <span class="partial">
+        <button class="cancel" title="Cancel and remove" role="button">Cancel</button>
+      </span>
+      <span class="willremove">
+        <button class="undo-remove" title="Undo deletion" role="button">Undo</button>
+      </span>
+      <span class="ready" tabindex="0" role="button">
         <img src="/images/download-circle.svg" alt="Download" />
         <span class="expanded">Make available offline</span>
-      </button>
-      <span class="partial">
-        <button class="cancel" title="Cancel and remove">Cancel</button>
       </span>
-      <button class="partial">
+      <span class="partial" tabindex="0" role="button">
         <div class="progress">
           <progress-ring stroke="2" radius="13" progress="0"></progress-ring>
           <img class="resume" src="/images/download-resume.svg" alt="Resume" />
@@ -385,13 +402,13 @@ export default class extends HTMLElement {
         </div>
         <span class="expanded pause">Pause download</span>
         <span class="expanded resume">Resume download</span>
-      </button>
-      <button class="done">
+      </span>
+      <span class="done" tabindex="0" role="button">
         <img class="ok" src="/images/download-done.svg" alt="Done" />
         <img class="delete" src="/images/download-delete.svg" alt="Delete" title="Delete the video from cache." />
         <span class="expanded ok">Downloaded</span>
         <span class="expanded delete">Remove video</span>
-      </button>`;
+      </span>`;
 
     while (this.internal.root.firstChild) {
       this.internal.root.removeChild(this.internal.root.firstChild);
@@ -401,7 +418,7 @@ export default class extends HTMLElement {
     this.internal.root.appendChild(ui);
 
     this.internal.elements.progress = this.internal.root.querySelector('progress-ring');
-    this.internal.elements.buttons = this.internal.root.querySelectorAll('button');
+    this.internal.elements.buttons = this.internal.root.querySelectorAll('[role="button"]');
 
     this.setDownloadState();
 
@@ -417,7 +434,23 @@ export default class extends HTMLElement {
    */
   clickHandler(e) {
     if (this.state === 'done') {
-      this.removeFromIDB();
+      this.willremove = true;
+      this.state = 'ready';
+
+      window.addEventListener('beforeunload', this.unloadHandler);
+      this.removalTimeout = setTimeout(async () => {
+        this.willremove = false;
+        await this.removeFromIDB();
+        window.removeEventListener('beforeunload', this.unloadHandler);
+      }, 5000);
+    } else if (e.target.className === 'undo-remove') {
+      if (this.willremove === true) {
+        if (this.removalTimeout) {
+          this.state = 'done';
+          clearTimeout(this.removalTimeout);
+          window.removeEventListener('beforeunload', this.unloadHandler);
+        }
+      }
     } else if (e.target.className === 'cancel') {
       this.removeFromIDB();
     } else if (this.downloading === false) {
@@ -436,6 +469,16 @@ export default class extends HTMLElement {
     if (this.storageManager) this.storageManager.cancel();
 
     this.downloading = false;
+  }
+
+  /**
+   * Page `beforeunload` event handler.
+   *
+   * @param {Event} unloadEvent Unload event.
+   */
+  unloadHandler(unloadEvent) {
+    unloadEvent.returnValue = '';
+    unloadEvent.preventDefault();
   }
 
   /**
