@@ -1,5 +1,6 @@
 export default [
   '/',
+  '/api.json',
   '/dist/js/index.js',
   '/images/apple-touch-icon.png',
   '/images/arrow-down.svg',
