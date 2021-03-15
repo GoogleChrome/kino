@@ -1,4 +1,4 @@
-import { loadSetting, saveSetting } from './settings';
+import { loadSetting, saveSetting, setHeaderToggle } from './settings';
 
 const onChange = (key) => ({ detail }) => {
   saveSetting(key, !detail.value);
@@ -17,16 +17,20 @@ function updateOnlineStatus() {
  * Initialize the offline/online toggle from the header.
  */
 export default function initializeGlobalToggle() {
-  const toggleButtonOffline = document.querySelector('header toggle-button#offline-content-only');
-  toggleButtonOffline.addEventListener('change', onChange('offline-content-only'));
+  if (loadSetting('header-toggle')) {
+    setHeaderToggle();
 
-  window.addEventListener('online', updateOnlineStatus);
-  window.addEventListener('offline', updateOnlineStatus);
+    const toggleButtonOffline = document.querySelector('header toggle-button#offline-content-only');
+    toggleButtonOffline.addEventListener('change', onChange('offline-content-only'));
 
-  // Should we enable and gray-out that option while offline?
-  // +auto enable when going offline on this page?
-  const isOnline = navigator.onLine;
-  if (!loadSetting('offline-content-only') || isOnline) {
-    toggleButtonOffline.checked = true;
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    // Should we enable and gray-out that option while offline?
+    // +auto enable when going offline on this page?
+    const isOnline = navigator.onLine;
+    if (!loadSetting('offline-content-only') || isOnline) {
+      toggleButtonOffline.checked = true;
+    }
   }
 }
