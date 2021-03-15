@@ -18,9 +18,14 @@ export default class Router {
 
     window.addEventListener('popstate', () => this.run());
 
+    const scrollbarWidth = window.innerWidth - document.body.clientWidth;
+    const minCardWidth = 300;
+    const gap = 32;
+    const gridBugFix = 2; // To fix 696 width bug (grid displays just 1 card, should display 2).
+
     this.mqls = [
-      window.matchMedia('(max-width: 693px)'),
-      window.matchMedia('(max-width: 1042px)'),
+      window.matchMedia(`(max-width: ${minCardWidth * 2 + gap * 3 - scrollbarWidth - gridBugFix}px)`),
+      window.matchMedia(`(max-width: ${minCardWidth * 3 + gap * 4 - scrollbarWidth - gridBugFix}px)`),
     ];
     this.mqls.forEach((mql) => {
       mql.addEventListener('change', this.run.bind(this));
