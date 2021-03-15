@@ -15,15 +15,15 @@
 <body>
 <header class="_with-video">
   <div class="container">
-    <h1><a href="/">KINO</a></h1>
+    <h1><a data-use-router href="/">KINO</a></h1>
     <a class="mobile-button">
       <img class="hamburger" src="/images/menu.svg" alt="Menu" />
       <img class="close" src="/images/close.svg" alt="Close menu" />
     </a>
     <div class="menu">
-      <a href="/">Home</a>
-      <a href="/downloads">Manage Downloads</a>
-      <a href="/settings">Settings</a>
+      <a data-use-router href="/">Home</a>
+      <a data-use-router href="/downloads">Manage Downloads</a>
+      <a data-use-router href="/settings">Settings</a>
       <span>
         Offline <toggle-button id="offline-content-only"></toggle-button> Online
       </span>
@@ -36,7 +36,7 @@
 <footer>
   <div class="container">
     <p>© Google 2021</p>
-    <p>Google Privacy Policy and Terms of Service<span> | </span><a data-no-router href="https://github.com/xwp/web-dev-media/">See the source code</a></p>
+    <p>Google Privacy Policy and Terms of Service<span> | </span><a target="_blank" href="https://github.com/xwp/web-dev-media/">See the source code</a></p>
   </div>
 </footer>
 

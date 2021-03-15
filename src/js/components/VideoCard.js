@@ -94,10 +94,10 @@ export default class extends HTMLElement {
     }
 
     templateElement.innerHTML = `${style}
-        <a href="/${slugify(videoData.title)}" class="poster" style="background-image: url('${posterImage}')"></a>
+        <a data-use-router href="/${slugify(videoData.title)}" class="poster" style="background-image: url('${posterImage}')"></a>
         <div class="info">
           <div class="title-icon">
-            <a href="/${slugify(videoData.title)}" class="title">${videoData.title}</a>
+            <a data-use-router href="/${slugify(videoData.title)}" class="title">${videoData.title}</a>
             <div class="downloader"></div>
           </div>
           <div class="desc">${videoData.description}</div>

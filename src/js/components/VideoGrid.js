@@ -56,7 +56,7 @@ template.innerHTML = `
     <div class="container">
       <div class="section-header">
         <h2>...</h2>
-        <a href="/" class="view-all">View all</a>
+        <a data-use-router href="/" class="view-all">View all</a>
       </div>
       <div class="grid"></div>
     </div>
