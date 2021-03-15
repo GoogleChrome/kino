@@ -1,3 +1,5 @@
+/* eslint no-restricted-globals: 1 */
+
 import {
   SW_CACHE_NAME,
   SW_CACHE_FORMAT,
@@ -149,9 +151,7 @@ const maybeGetVideoResponse = async (event) => {
 const precacheAssets = (event) => {
   event.waitUntil(
     caches.open(SW_CACHE_NAME).then((cache) => {
-      /* eslint-disable no-restricted-globals */
       cache.addAll(assetsToCache).then(self.skipWaiting);
-      /* eslint-enable no-restricted-globals */
     }),
   );
 };
@@ -199,8 +199,6 @@ const fetchHandler = async (event) => {
   event.respondWith(getResponse());
 };
 
-/* eslint-disable no-restricted-globals */
 self.addEventListener('install', precacheAssets);
 self.addEventListener('activate', clearOldCaches);
 self.addEventListener('fetch', fetchHandler);
-/* eslint-enable no-restricted-globals */
