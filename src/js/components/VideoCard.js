@@ -51,13 +51,7 @@ const style = `
     .info .desc {
       font-size: 1rem;
       color: #667F96;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 3;
       line-height: 1.5;
-      max-height: calc(1.5 * 3); /* Fallback, line-height * N-lines */
     }
 </style>`;
 
