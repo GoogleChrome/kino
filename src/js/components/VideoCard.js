@@ -1,4 +1,3 @@
-import slugify from '../utils/slugify';
 import { loadSetting } from '../utils/settings';
 
 const style = `
@@ -94,10 +93,10 @@ export default class extends HTMLElement {
     }
 
     templateElement.innerHTML = `${style}
-        <a href="/${slugify(videoData.title)}" class="poster" style="background-image: url('${posterImage}')"></a>
+        <a href="/${videoData.id}" class="poster" style="background-image: url('${posterImage}')"></a>
         <div class="info">
           <div class="title-icon">
-            <a href="/${slugify(videoData.title)}" class="title">${videoData.title}</a>
+            <a href="/${videoData.id}" class="title">${videoData.title}</a>
             <div class="downloader"></div>
           </div>
           <div class="desc">${videoData.description}</div>
