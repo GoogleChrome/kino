@@ -7,8 +7,8 @@
  * There may be adjacent caches used for other purposes and we
  * want to let the SW know which caches it should purge on upgrade.
  */
-export const SW_CACHE_NAME = 'v2';
-export const SW_CACHE_FORMAT = /^v[0-9]+$/;
+export const SW_CACHE_NAME = 'static-assets-v1.0.0-alpha';
+export const SW_CACHE_FORMAT = /^static-assets-v[a-z0-9.-]+$/;
 
 /**
  * Media Server Hostname
