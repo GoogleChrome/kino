@@ -303,6 +303,10 @@ button.primary {
   cursor: pointer;
   background: transparent;
 }
+button[disabled] {
+  opacity: 0.3;
+  filter: grayscale(1);
+}
 button.icon-download {
   padding: 0.5rem 1rem 0.5rem 3rem;
   background: url('/images/download.svg') transparent no-repeat 1rem center;

@@ -30,7 +30,7 @@ export default async function generateAssetsToCache(api) {
   const start = Date.now();
   const filesRegExp = /\.(html|css|js|svg|png|jpeg|jpg|ico)$/i;
   const excludeFiles = ['sw.js', '404.html'];
-  const assetsToCache = ['/'];
+  const assetsToCache = ['/', '/api.json'];
   const folder = 'public';
 
   // eslint-disable-next-line

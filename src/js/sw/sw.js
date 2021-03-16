@@ -22,51 +22,84 @@ import assetsToCache from './cache';
 const getResponseStream = (request, db, fileMeta) => {
   const rangeRequest = request.headers.get('range') || '';
   const byteRanges = rangeRequest.match(/bytes=(?<from>[0-9]+)?-(?<to>[0-9]+)?/);
-  const rangeFrom = byteRanges?.groups?.from || 0;
-  const rangeTo = byteRanges?.groups?.to || fileMeta.bytesTotal - 1;
+  const rangeFrom = Number(byteRanges?.groups?.from || 0);
+  const rangeTo = Number(byteRanges?.groups?.to || fileMeta.bytesTotal - 1);
+
+  /**
+   * As the data is pulled from the stream, we need to keep
+   * track of the current pointer in the range of data
+   * requested.
+   */
+  let currentBytePointer = rangeFrom;
 
   const stream = new ReadableStream({
-    async start(controller) {
+    pull(controller) {
       const rawIDB = db.unwrap();
       const transaction = rawIDB.transaction(STORAGE_SCHEMA.data.name, 'readonly');
       const store = transaction.objectStore(STORAGE_SCHEMA.data.name);
 
       /**
-       * Construct the range boundaries so that the returned chunks
-       * cover the whole requested range.
+       * This returns a cursor to all records within the following range:
+       *
+       * record.rangeStart <= currentBytePointer
+       *
+       * Then we iterate this collection in the reverse direction and grab the
+       * first record and enqueue its data partially or in whole depending on
+       * the originally requested byte range (`rangeFrom`, `rangeTo`).
        */
       const allEntriesForUrlRange = IDBKeyRange.bound(
-        [request.url, -Infinity, rangeFrom],
-        [request.url, rangeTo, Infinity],
+        [request.url, -Infinity, -Infinity],
+        [request.url, currentBytePointer, Infinity],
       );
+
       const index = store.index(IDB_CHUNK_INDEX);
-      const cursor = index.openCursor(allEntriesForUrlRange);
+      const cursor = index.openCursor(allEntriesForUrlRange, 'prev');
 
-      cursor.onsuccess = (e) => {
-        const newCursor = e.target.result;
-        if (newCursor) {
-          const dataObject = newCursor.value;
-          const needsSlice = dataObject.rangeStart < rangeFrom || dataObject.rangeEnd > rangeTo;
+      /**
+       * If the result of calling pull() is a promise, pull() will not be called again
+       * until said promise fulfills. If the promise rejects, the stream will become errored.
+       *
+       * @see https://web.dev/streams/
+       */
+      return new Promise((resolve) => {
+        cursor.onerror = controller.close;
+        cursor.onsuccess = (e) => {
+          if (e.target.result) {
+            const dataChunk = e.target.result.value;
+            const needsSlice = dataChunk.rangeStart < rangeFrom || dataChunk.rangeEnd > rangeTo;
+            const outOfBounds = dataChunk.rangeEnd < currentBytePointer;
 
-          if (needsSlice) {
-            const sliceBufferFrom = Math.max(0, rangeFrom - dataObject.rangeStart);
-            const sliceBufferTo = Math.min(
-              dataObject.rangeEnd - dataObject.rangeStart,
-              rangeTo - dataObject.rangeStart,
-            );
-            const bufferSlice = new Uint8Array(
-              dataObject.data.slice(sliceBufferFrom, sliceBufferTo),
-            );
-            controller.enqueue(bufferSlice);
+            if (outOfBounds) {
+              controller.close();
+            } else if (!needsSlice) {
+              /**
+               * No slicing needed, enqueue the whole data object.
+               */
+              controller.enqueue(dataChunk.data);
+              currentBytePointer += dataChunk.data.length;
+            } else {
+              /**
+               * The requested range only partially overlaps the current chunk range.
+               * We need to slice the buffer and return only the requested portion of data.
+               */
+              const sliceBufferFrom = Math.max(0, rangeFrom - dataChunk.rangeStart);
+              const sliceBufferTo = Math.min(
+                dataChunk.rangeEnd - dataChunk.rangeStart + 1,
+                rangeTo - dataChunk.rangeStart + 1,
+              );
+              const bufferSlice = new Uint8Array(
+                dataChunk.data.slice(sliceBufferFrom, sliceBufferTo),
+              );
+              controller.enqueue(bufferSlice);
+              currentBytePointer += bufferSlice.length;
+            }
           } else {
-            controller.enqueue(dataObject.data);
+            controller.close();
           }
-          newCursor.continue();
-        } else {
-          controller.close();
-        }
-      };
-      cursor.onerror = controller.close;
+
+          resolve();
+        };
+      });
     },
   });
 
