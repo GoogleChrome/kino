@@ -8,8 +8,9 @@ import VideoDownloader from '../components/VideoDownloader';
  * This helps maintain the component's state even across page loads.
  */
 export default class VideoDownloaderRegistry {
-  constructor() {
+  constructor({ connectionStatus }) {
     this.instances = {};
+    this.connectionStatus = connectionStatus;
   }
 
   /**
@@ -20,7 +21,7 @@ export default class VideoDownloaderRegistry {
    * @returns {VideoDownloader} Instantiated VideoDownloader.
    */
   create(videoId) {
-    this.instances[videoId] = new VideoDownloader();
+    this.instances[videoId] = new VideoDownloader({ connectionStatus: this.connectionStatus });
 
     return this.instances[videoId];
   }

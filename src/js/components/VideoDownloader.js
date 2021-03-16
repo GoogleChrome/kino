@@ -149,12 +149,14 @@ export default class extends HTMLElement {
     return ['state', 'progress', 'downloading'];
   }
 
-  constructor() {
+  constructor({ connectionStatus }) {
     super();
 
-    // Attach Shadow DOM.
-    this.internal = {};
-    this.internal.root = this.attachShadow({ mode: 'open' });
+    this.internal = {
+      connectionStatus,
+      changeCallbacks: [],
+      root: this.attachShadow({ mode: 'open' }),
+    };
   }
 
   /**
@@ -174,10 +176,21 @@ export default class extends HTMLElement {
   }
 
   set state(state) {
+    const oldState = this.state;
     this.setAttribute('state', state);
-    if (this.onStatusUpdate) {
-      this.onStatusUpdate(state);
-    }
+
+    this.internal.changeCallbacks.forEach(
+      (callback) => callback(oldState, state),
+    );
+  }
+
+  /**
+   * Subscribe to state changes.
+   *
+   * @param {Function} callback Callback function to run when the component's state changes.
+   */
+  subscribe(callback) {
+    this.internal.changeCallbacks.push(callback);
   }
 
   get downloading() {

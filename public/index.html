@@ -13,6 +13,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
+<div id="offline-banner">No internet connection</div>
 <header class="_with-video">
   <div class="container">
     <h1><a data-use-router href="/">KINO</a></h1>
@@ -25,7 +26,7 @@
       <a data-use-router href="/downloads">Manage Downloads</a>
       <a data-use-router href="/settings">Settings</a>
       <span>
-        Offline <toggle-button id="offline-content-only"></toggle-button> Online
+        <offline-toggle-button></offline-toggle-button> Offline Mode
       </span>
     </div>
   </div>
@@ -39,8 +40,6 @@
     <p>Google Privacy Policy and Terms of Service<span> | </span><a target="_blank" href="https://github.com/xwp/web-dev-media/">See the source code</a></p>
   </div>
 </footer>
-
-<div id="connection-status"></div>
 
 <script type="module" src="/dist/js/index.js"></script>
 

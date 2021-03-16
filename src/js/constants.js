@@ -90,3 +90,8 @@ export const DEFAULT_AUDIO_PRIORITIES = [
  * These are all the types the Streamer has support for.
  */
 export const ALL_STREAM_TYPES = ['audio', 'video'];
+
+/**
+ * Settings key names.
+ */
+export const SETTING_KEY_TOGGLE_OFFLINE = 'toggle-offline';
