@@ -55,19 +55,19 @@ table {
  */
 @keyframes shake {
   10%, 90% {
-    transform: translate3d(-1px, 0, 0);
+    transform: translateX(-50.5%);
   }
 
   20%, 80% {
-    transform: translate3d(2px, 0, 0);
+    transform: translateX(-49%);
   }
 
   30%, 50%, 70% {
-    transform: translate3d(-4px, 0, 0);
+    transform: translateX(-48%);
   }
 
   40%, 60% {
-    transform: translate3d(4px, 0, 0);
+    transform: translateX(-52%);
   }
 }
 
@@ -91,25 +91,29 @@ body {
   padding: 2rem;
 }
 #offline-banner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+  position: fixed;
+  opacity: 0;
+  display: none;
+  bottom: 1em;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 100;
   font: normal 0.8em sans-serif;
-  line-height: 2em;
-  height: 0;
+  padding: 0.5em 1em;
+  border-radius: 4px;
   overflow: hidden;
   color: #fff;
   background: #fa4659;
   text-transform: uppercase;
-  text-align: center;
-  transition: height 100ms ease-in-out;
+  transition: opacity 200ms ease-in-out;
+  white-space: pre;
 }
-#offline-banner.active {
-  height: 2em;
-  transform: translate3d(0, 0, 0);
-  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+[data-connection="offline"] #offline-banner {
+  display: inline-block;
+  opacity: 1;
+}
+#offline-banner.alert {
+  animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
 }
 
 h3 {

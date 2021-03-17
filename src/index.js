@@ -61,8 +61,8 @@ connectionStatus.subscribe(
     document.body.dataset.connection = navigatorStatus;
 
     if (alert && navigatorStatus === 'offline') {
-      offlineBanner.classList.add('active');
-      setTimeout(() => offlineBanner.classList.remove('active'), 3000);
+      offlineBanner.classList.add('alert');
+      setTimeout(() => offlineBanner.classList.remove('alert'), 600);
     }
   },
 );
