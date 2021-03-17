@@ -390,11 +390,11 @@ export default class extends HTMLElement {
       <span class="willremove">
         <button class="undo-remove" title="Undo deletion" role="button">Undo</button>
       </span>
-      <span class="ready" tabindex="0" role="button">
+      <button class="ready">
         <img src="/images/download-circle.svg" alt="Download" />
         <span class="expanded">Make available offline</span>
-      </span>
-      <span class="partial" tabindex="0" role="button">
+      </button>
+      <button class="partial">
         <div class="progress">
           <progress-ring stroke="2" radius="13" progress="0"></progress-ring>
           <img class="resume" src="/images/download-resume.svg" alt="Resume" />
@@ -402,13 +402,13 @@ export default class extends HTMLElement {
         </div>
         <span class="expanded pause">Pause download</span>
         <span class="expanded resume">Resume download</span>
-      </span>
-      <span class="done" tabindex="0" role="button">
+      </button>
+      <button class="done">
         <img class="ok" src="/images/download-done.svg" alt="Done" />
         <img class="delete" src="/images/download-delete.svg" alt="Delete" title="Delete the video from cache." />
         <span class="expanded ok">Downloaded</span>
         <span class="expanded delete">Remove video</span>
-      </span>`;
+      </button>`;
 
     while (this.internal.root.firstChild) {
       this.internal.root.removeChild(this.internal.root.firstChild);
