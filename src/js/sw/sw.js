@@ -1,5 +1,8 @@
+/* eslint no-restricted-globals: 1 */
+
 import {
   SW_CACHE_NAME,
+  SW_CACHE_FORMAT,
   STORAGE_SCHEMA,
   IDB_CHUNK_INDEX,
   MEDIA_SERVER_ORIGIN,
@@ -147,7 +150,30 @@ const maybeGetVideoResponse = async (event) => {
  */
 const precacheAssets = (event) => {
   event.waitUntil(
-    caches.open(SW_CACHE_NAME).then((cache) => cache.addAll(assetsToCache)),
+    caches.open(SW_CACHE_NAME).then((cache) => {
+      cache.addAll(assetsToCache).then(self.skipWaiting);
+    }),
+  );
+};
+
+/**
+ * Clears old precached data.
+ *
+ * @param {Event} event Activate event.
+ */
+const clearOldCaches = (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => Promise.all(
+      cacheNames.map((cacheName) => {
+        /**
+         * If the cache name matches the cache format this SW has under its control
+         * and if the cache name is different from the current cache name,
+         * then delete that cache as obsolete.
+         */
+        const shouldDelete = SW_CACHE_FORMAT.test(cacheName) && cacheName !== SW_CACHE_NAME;
+        return shouldDelete ? caches.delete(cacheName) : true;
+      }),
+    )),
   );
 };
 
@@ -173,7 +199,6 @@ const fetchHandler = async (event) => {
   event.respondWith(getResponse());
 };
 
-/* eslint-disable no-restricted-globals */
 self.addEventListener('install', precacheAssets);
+self.addEventListener('activate', clearOldCaches);
 self.addEventListener('fetch', fetchHandler);
-/* eslint-enable no-restricted-globals */

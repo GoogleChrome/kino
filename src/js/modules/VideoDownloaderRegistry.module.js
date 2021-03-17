@@ -9,7 +9,7 @@ import VideoDownloader from '../components/VideoDownloader';
  */
 export default class VideoDownloaderRegistry {
   constructor({ connectionStatus }) {
-    this.instances = {};
+    this.instances = new Map();
     this.connectionStatus = connectionStatus;
   }
 
@@ -21,9 +21,9 @@ export default class VideoDownloaderRegistry {
    * @returns {VideoDownloader} Instantiated VideoDownloader.
    */
   create(videoId) {
-    this.instances[videoId] = new VideoDownloader({ connectionStatus: this.connectionStatus });
+    this.instances.set(videoId, new VideoDownloader({ connectionStatus: this.connectionStatus }));
 
-    return this.instances[videoId];
+    return this.instances.get(videoId);
   }
 
   /**
@@ -34,7 +34,16 @@ export default class VideoDownloaderRegistry {
    * @returns {VideoDownloader|null} `VideoDownloader` instance.
    */
   get(videoId) {
-    return this.instances[videoId] || null;
+    return this.instances.get(videoId) || null;
+  }
+
+  /**
+   * Returns an iterator over all stored instances.
+   *
+   * @returns {Iterator<string, VideoDownloader>} Iterator over all VideoDownloader instance.
+   */
+  getAll() {
+    return this.instances.entries();
   }
 
   /**
@@ -42,6 +51,6 @@ export default class VideoDownloaderRegistry {
    * garbage collected.
    */
   destroyAll() {
-    this.instances = {};
+    this.instances.clear();
   }
 }
