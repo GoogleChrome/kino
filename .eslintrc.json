@@ -1,12 +1,12 @@
 {
-    "parser": "@babel/eslint-parser",
-    "parserOptions": {
-        "babelOptions": {
-            "configFile": "./.babelrc"
-        },
-        "ecmaVersion": 2018
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "babelOptions": {
+      "configFile": "./.babelrc"
     },
-    "plugins": ["@babel"],
+    "ecmaVersion": 2018
+  },
+  "plugins": ["@babel"],
   "extends": [
     "airbnb-base",
     "plugin:jest/recommended",
