@@ -62,6 +62,7 @@
  * @typedef  {object} VideoDownloaderRegistry
  * @property {Function} create      Creates a new `VideoDownload` instance.
  * @property {Function} get         Returns a previously created `VideoDownload` instance or null.
+ * @property {Function} getAll      Returns an iterator over all `VideoDownload` instances.
  * @property {Function} destroyAll  Detaches all `VideoDownload` instances, clears the registry.
  * @property {object}   instances   Holds `VideoDownload` instances keyed by video IDs.
  */

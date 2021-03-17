@@ -19,6 +19,13 @@ export default class {
   }
 
   /**
+   * Cancels all storage operations.
+   */
+  cancel() {
+    this.cancelled = true;
+  }
+
+  /**
    * Receives the updated file meta object and a file chunk and updates the
    * database with new information.
    *
@@ -35,6 +42,8 @@ export default class {
    * @returns {Promise} Promise that resolves when the write operations are complete.
    */
   async storeChunk(fileMeta, fileChunk, isDone) {
+    if (this.cancelled) return true;
+
     const db = await getIDBConnection();
     const videoMeta = {
       done: isDone,
