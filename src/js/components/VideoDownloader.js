@@ -13,7 +13,7 @@ const style = `
       min-width: 26px;
       min-height: 26px;
     }
-    :host [role="button"] {
+    :host button {
       cursor: pointer;
     }
     .expanded {
@@ -34,7 +34,7 @@ const style = `
     :host( not( [expanded="true"] ) ) .expanded {
       display: none;
     }
-    :host( [expanded="true"] ) [role="button"] {
+    :host( [expanded="true"] ) button {
       justify-content: center;
       align-items: center;
       border: 1px solid var(--accent);
@@ -119,22 +119,22 @@ const style = `
     :host( [state="done"] ) .done {
         display: flex;
     }
-    :host( [state="done"] ) [role="button"] .delete {
+    :host( [state="done"] ) button .delete {
         display: none;
         cursor: pointer;
         color: #FF8383;
     }
-    :host( [state="done"] ) [role="button"]:hover {
+    :host( [state="done"] ) button:hover {
         border-color: #FF8383;
     }
-    :host( [state="done"]:not( [expanded="true"] ) ) [role="button"]:hover .delete:not(.expanded) {
+    :host( [state="done"]:not( [expanded="true"] ) ) button:hover .delete:not(.expanded) {
         display: block;
     }
-    :host( [state="done"][expanded="true"] ) [role="button"]:hover .delete {
+    :host( [state="done"][expanded="true"] ) button:hover .delete {
         display: block;
     }
 
-    :host( [state="done"] ) [role="button"]:hover .ok {
+    :host( [state="done"] ) button:hover .ok {
         display: none;
     }
     button {
@@ -144,7 +144,7 @@ const style = `
         border: 0;
         line-height: 0;
     }
-    :host( [state="ready"] ) [role="button"]:hover {
+    :host( [state="ready"] ) button:hover {
         filter: brightness(95%);
     }
 </style>
@@ -385,10 +385,10 @@ export default class extends HTMLElement {
     const templateElement = document.createElement('template');
     templateElement.innerHTML = `${style}
       <span class="partial">
-        <button class="cancel" title="Cancel and remove" role="button">Cancel</button>
+        <button class="cancel" title="Cancel and remove">Cancel</button>
       </span>
       <span class="willremove">
-        <button class="undo-remove" title="Undo deletion" role="button">Undo</button>
+        <button class="undo-remove" title="Undo deletion">Undo</button>
       </span>
       <button class="ready">
         <img src="/images/download-circle.svg" alt="Download" />
@@ -418,7 +418,7 @@ export default class extends HTMLElement {
     this.internal.root.appendChild(ui);
 
     this.internal.elements.progress = this.internal.root.querySelector('progress-ring');
-    this.internal.elements.buttons = this.internal.root.querySelectorAll('[role="button"]');
+    this.internal.elements.buttons = this.internal.root.querySelectorAll('button');
 
     this.setDownloadState();
 
