@@ -460,6 +460,7 @@ export default class extends HTMLElement {
       if (this.willremove === true) {
         if (this.removalTimeout) {
           this.state = 'done';
+          this.willremove = false;
           clearTimeout(this.removalTimeout);
           window.removeEventListener('beforeunload', this.unloadHandler);
         }
