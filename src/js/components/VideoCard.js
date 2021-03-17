@@ -1,5 +1,3 @@
-import { loadSetting } from '../utils/settings';
-
 const style = `
 <style>
     :host {
@@ -54,36 +52,32 @@ const style = `
     }
 </style>`;
 
-export default class extends HTMLElement {
+/**
+ * When the connection status changes, enable or disable the card
+ * with respect to the download state.
+ *
+ * @param {ConnectionStatus} connectionStatus ConnectionStatus instance.
+ * @param {VideoDownloader}  downloader       `VideoDownloader` instance.
+ */
+function connectionStatusChangeHandler(connectionStatus, downloader) {
+  if (connectionStatus.status === 'offline' && downloader.state !== 'done') {
+    this.classList.add('disabled');
+  } else {
+    this.classList.remove('disabled');
+  }
+}
+
+export default class VideoCard extends HTMLElement {
   constructor() {
     super();
     this._root = this.attachShadow({ mode: 'open' });
-
-    window.addEventListener('online', this.updateOnlineStatus.bind(this));
-    window.addEventListener('online-mock', this.updateOnlineStatus.bind(this, { mock: true }));
-    window.addEventListener('offline', this.updateOnlineStatus.bind(this));
-    window.addEventListener('offline-mock', this.updateOnlineStatus.bind(this, { mock: false }));
   }
 
-  updateOnlineStatus(opts = {}) {
-    const isOnline = opts.mock !== undefined ? opts.mock : navigator.onLine;
-    const offlineContentOnly = loadSetting('offline-content-only');
-    const isDownloaded = opts.downloader && (opts.downloader.state === 'done');
-    if (((!isOnline || offlineContentOnly) && !isDownloaded)) {
-      this.classList.add('disabled');
-    } else {
-      this.classList.remove('disabled');
-    }
-  }
-
-  attachDownloader(downloader) {
-    downloader.onStatusUpdate = this.updateOnlineStatus.bind(this, { downloader });
-    this._root.querySelector('.downloader').appendChild(downloader);
-    this.updateOnlineStatus();
-  }
-
-  render(videoData, navigate) {
-    this.navigate = navigate;
+  render({
+    videoData,
+    connectionStatus,
+    downloader,
+  }) {
     const templateElement = document.createElement('template');
     let posterImage = videoData.thumbnail;
 
@@ -108,5 +102,15 @@ export default class extends HTMLElement {
 
     const ui = templateElement.content.cloneNode(true);
     this._root.appendChild(ui);
+    this._root.querySelector('.downloader').appendChild(downloader);
+
+    const boundHandler = connectionStatusChangeHandler.bind(this, connectionStatus, downloader);
+
+    /**
+     * Whenever connection status or downloader state changes,
+     * maybe disable / enable the card.
+     */
+    connectionStatus.subscribe(boundHandler);
+    downloader.subscribe(boundHandler);
   }
 }

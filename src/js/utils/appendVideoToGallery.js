@@ -1,4 +1,4 @@
-import { SW_CACHE_NAME } from '../constants';
+import getDownloaderElement from './getDownloaderElement.module';
 
 /**
  * @param {RouterContext} routerContext Context passed through by Router.
@@ -10,6 +10,7 @@ function appendVideoToGallery(routerContext, localContext) {
     apiData,
     navigate,
     mainContent,
+    connectionStatus,
   } = routerContext;
 
   const category = localContext.category || '';
@@ -23,18 +24,15 @@ function appendVideoToGallery(routerContext, localContext) {
 
   apiData.forEach((videoData) => {
     const card = document.createElement('video-card');
+    const downloader = getDownloaderElement(videoDownloaderRegistry, videoData);
 
-    let downloader = videoDownloaderRegistry.get(videoData.id);
-    if (!downloader) {
-      downloader = videoDownloaderRegistry.create(videoData.id);
-      downloader.init(videoData, SW_CACHE_NAME);
-    }
-    downloader.setAttribute('expanded', 'false');
+    card.render({
+      videoData,
+      navigate,
+      connectionStatus,
+      downloader,
+    });
 
-    const player = document.createElement('video-player');
-    card.render(videoData, navigate);
-    card.attachDownloader(downloader);
-    player.render(videoData);
     videoGallery.appendChild(card);
   });
 
