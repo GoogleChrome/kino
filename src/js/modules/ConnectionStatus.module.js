@@ -7,17 +7,13 @@ export default class ConnectionStatus {
     };
 
     window.addEventListener('online', () => {
-      const oldStatus = this.status;
       this.internal.status = 'online';
-
-      if (this.status !== oldStatus) this.broadcast();
+      this.broadcast();
     });
 
     window.addEventListener('offline', () => {
-      const oldStatus = this.status;
       this.internal.status = 'offline';
-
-      if (this.status !== oldStatus) this.broadcast();
+      this.broadcast();
     });
   }
 
