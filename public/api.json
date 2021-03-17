@@ -1,10 +1,10 @@
 [
   {
-    "id": "http-203-background-fetch",
+    "id": "background-fetch",
     "title": "Background Fetch",
     "description": "Background Fetch. This is a chunked DASH video that should adapt to available bandwidth changes.",
     "categories": [
-      "HTTP203"
+      "HTTP 203"
     ],
     "video-sources": [
       {
@@ -38,11 +38,11 @@
     ]
   },
   {
-    "id": "http-203-for-loops",
+    "id": "javascript-for-loops-are-complicated",
     "title": "JavaScript for-loops are… complicated",
     "description": "In this episode, Jake and Surma dissect how for-loops actually work and how they’ve evolved. Turns out, it got complicated.",
     "categories": [
-      "HTTP203"
+      "HTTP 203"
     ],
     "video-sources": [
       {
@@ -69,11 +69,11 @@
     "thumbnail": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-for-loops.jpg"
   },
   {
-    "id": "http-203-old-new-js",
+    "id": "old-vs-new-javascript",
     "title": "Old vs New JavaScript",
     "description": "Jake and Surma look at the modern JS & web features we take for granted.",
     "categories": [
-      "HTTP203"
+      "HTTP 203"
     ],
     "video-sources": [
       {
@@ -84,11 +84,11 @@
     "thumbnail": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-old-vs-new-js.jpg"
   },
   {
-    "id": "http-203-polyfills",
+    "id": "conditional-polyfills",
     "title": "Polyfills",
     "description": "In this episode, Surma & Jake talks about the conditional loading of polyfills and how to implement it in the world of ES2015 modules. The non-blocking nature of modules makes the old approach of blocking script tags both inefficient and undesirable and with dynamic import landing, the web now offers better ways.",
     "categories": [
-      "HTTP203"
+      "HTTP 203"
     ],
     "video-sources": [
       {
@@ -144,7 +144,7 @@
     "thumbnail": "https://storage.googleapis.com/wdm-assets/images/gui-challenges/tabs.jpg"
   },
   {
-    "id": "pwa-intro",
+    "id": "pwa-intro-and-setup",
     "title": "Intro & Setup",
     "description": "Welcome to the Progressive Web Apps Training course! This video provides a short introduction to the course, giving an overview of what topics and API’s are covered.\nThe format of this course is simple: we show you something, you build stuff, and repeat!",
     "categories": [
@@ -159,9 +159,9 @@
     "thumbnail": "https://storage.googleapis.com/wdm-assets/images/pwa/pwa-intro.jpg"
   },
   {
-    "id": "pwa-when",
+    "id": "pwa-when-to-use-one",
     "title": "When should you use a PWA?",
-    "description": "The hardest problem with software is distribution. App developers often spend more on distribution than they earn back. This problem is solved by the web platform, however web apps have historically been less capable than native apps. With the advent of PWAs, web apps have become just as capable as native, supporting features such as push notifications and Add to Homescreen, without giving up the reach of the web.",
+    "description": "The hardest problem with software is distribution. App developers often spend more on distribution than they earn back. This problem is solved by the web platform, however web apps have historically been less capable than native apps. With the advent of PWAs, web apps have become just as capable as native, supporting features such as push notifications and Add to Home Screen, without giving up the reach of the web.",
     "categories": [
       "Progressive Web Apps"
     ],

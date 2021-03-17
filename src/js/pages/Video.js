@@ -1,4 +1,3 @@
-import slugify from '../utils/slugify';
 import appendVideoToGallery from '../utils/appendVideoToGallery';
 import getPoster from './partials/Poster.partial';
 import { SW_CACHE_NAME } from '../constants';
@@ -20,7 +19,7 @@ export default (routerContext) => {
    */
   const [currentVideoData, restVideoData] = apiData.reduce(
     (returnValue, videoMeta) => {
-      if (`/${slugify(videoMeta.title)}` === path) {
+      if (`/${videoMeta.id}` === path) {
         returnValue[0] = videoMeta;
       } else {
         returnValue[1].push(videoMeta);

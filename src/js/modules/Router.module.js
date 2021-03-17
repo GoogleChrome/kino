@@ -1,7 +1,7 @@
 const globalClickHandler = (navigate) => (e) => {
   const target = e.path[0];
   if (e.ctrlKey || e.metaKey) return;
-  if (target.href) {
+  if ('useRouter' in target.dataset) {
     e.preventDefault();
     navigate(target.href);
   }
