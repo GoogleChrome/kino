@@ -50,6 +50,27 @@ table {
   box-sizing: border-box;
 }
 
+/**
+ * Animations.
+ */
+@keyframes shake {
+  10%, 90% {
+    transform: translateX(-50.5%);
+  }
+
+  20%, 80% {
+    transform: translateX(-49%);
+  }
+
+  30%, 50%, 70% {
+    transform: translateX(-48%);
+  }
+
+  40%, 60% {
+    transform: translateX(-52%);
+  }
+}
+
 /* App Styles */
 html, body {
   margin: 0;
@@ -69,22 +90,30 @@ body {
 .tip {
   padding: 2rem;
 }
-#connection-status {
+#offline-banner {
   position: fixed;
-  bottom: 0;
-  right: 0;
-  width: auto;
+  opacity: 0;
+  display: none;
+  bottom: 1em;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
   font: normal 0.8em sans-serif;
+  padding: 0.5em 1em;
+  border-radius: 4px;
+  overflow: hidden;
   color: #fff;
-  padding: 0.5em;
-  text-transform: uppercase;
-  border-top-left-radius: 5px;
-}
-.online {
-  background: #2eb872;
-}
-.offline {
   background: #fa4659;
+  text-transform: uppercase;
+  transition: opacity 200ms ease-in-out;
+  white-space: pre;
+}
+[data-connection="offline"] #offline-banner {
+  display: inline-block;
+  opacity: 1;
+}
+#offline-banner.alert {
+  animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
 }
 
 h3 {
@@ -127,7 +156,8 @@ header {
   padding-bottom: 56.25%; /* 16:9 */
   position: relative;
 }
-.poster-image picture img {
+.poster-image picture img,
+.poster-image > img {
   width: 100%;
   height: auto;
 }
@@ -163,7 +193,7 @@ header.with-video {
   height: auto;
 }
 .poster-wrapper .info {
-  padding: 2rem 2rem 0 2rem;
+  padding: 2rem 0;
 }
 .poster-wrapper .has-player .info {
   display: none;
@@ -216,11 +246,11 @@ header .menu span {
   border-radius: 2rem;
   padding: 0.5rem 1rem;
 }
-header .menu toggle-button {
-  padding: 0 1rem;
+header .menu offline-toggle-button {
+  padding-right: 1rem;
 }
 header .container {
-  padding: 2rem 0;
+  padding: 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -271,7 +301,7 @@ header .hamburger, header .close {
 
 article {
   background: #FFF;
-  padding: 4rem 2rem;
+  padding: 4rem 0;
 }
 article h2 {
   font-size: 2rem;
@@ -319,8 +349,9 @@ article p {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: calc(1200px + 4rem);
   margin: 0 auto;
+  padding: 0 2rem;
 }
 
 div.card {
@@ -360,7 +391,7 @@ div.card {
 footer {
   background: var(--background-dark);
   color: var(--text-footer);
-  padding: 2rem;
+  padding: 2rem 0;
   font-size: 1rem;
 }
 footer a {

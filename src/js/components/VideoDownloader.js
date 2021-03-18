@@ -13,6 +13,9 @@ const style = `
       min-width: 26px;
       min-height: 26px;
     }
+    :host button {
+      cursor: pointer;
+    }
     .expanded {
       display: none;
     }
@@ -52,7 +55,8 @@ const style = `
         display: flex;
         align-items: center;
     }
-    :host( [state="partial"] ) .partial {
+    :host( [state="partial"] ) .partial,
+    :host( [state="ready"][willremove="true"] ) .willremove {
         display: flex;
         position: relative;
     }
@@ -63,7 +67,8 @@ const style = `
     :host( [state="partial"][downloading="true"] ) .cancel {
         display: none;
     }
-    :host( [state="partial"][downloading="false"] ) .cancel {
+    :host( [state="partial"][downloading="false"] ) .cancel,
+    :host( [state="ready"][willremove="true"] ) .willremove button {
         display: block;
         position: absolute;
         bottom: 0;
@@ -79,7 +84,8 @@ const style = `
         cursor: pointer;
         text-transform: uppercase;
     }
-    :host( [expanded="true"][state="partial"][downloading="false"] ) .cancel {
+    :host( [expanded="true"][state="partial"][downloading="false"] ) .cancel,
+    :host( [expanded="true"][state="ready"][willremove="true"] ) .willremove button {
         right: 0;
         left: initial;
         bottom: initial;
@@ -146,15 +152,17 @@ const style = `
 
 export default class extends HTMLElement {
   static get observedAttributes() {
-    return ['state', 'progress', 'downloading'];
+    return ['state', 'progress', 'downloading', 'willremove'];
   }
 
-  constructor() {
+  constructor({ connectionStatus }) {
     super();
 
-    // Attach Shadow DOM.
-    this.internal = {};
-    this.internal.root = this.attachShadow({ mode: 'open' });
+    this.internal = {
+      connectionStatus,
+      changeCallbacks: [],
+      root: this.attachShadow({ mode: 'open' }),
+    };
   }
 
   /**
@@ -174,10 +182,21 @@ export default class extends HTMLElement {
   }
 
   set state(state) {
+    const oldState = this.state;
     this.setAttribute('state', state);
-    if (this.onStatusUpdate) {
-      this.onStatusUpdate(state);
-    }
+
+    this.internal.changeCallbacks.forEach(
+      (callback) => callback(oldState, state),
+    );
+  }
+
+  /**
+   * Subscribe to state changes.
+   *
+   * @param {Function} callback Callback function to run when the component's state changes.
+   */
+  subscribe(callback) {
+    this.internal.changeCallbacks.push(callback);
   }
 
   get downloading() {
@@ -200,6 +219,14 @@ export default class extends HTMLElement {
     const clampedProgress = Math.min(Math.max(0, progressFloat), 100);
 
     this.setAttribute('progress', clampedProgress);
+  }
+
+  get willremove() {
+    return this.getAttribute('willremove') === 'true';
+  }
+
+  set willremove(willremove) {
+    this.setAttribute('willremove', willremove);
   }
 
   /**
@@ -370,13 +397,16 @@ export default class extends HTMLElement {
   render() {
     const templateElement = document.createElement('template');
     templateElement.innerHTML = `${style}
+      <span class="partial">
+        <button class="cancel" title="Cancel and remove">Cancel</button>
+      </span>
+      <span class="willremove">
+        <button class="undo-remove" title="Undo deletion">Undo</button>
+      </span>
       <button class="ready">
         <img src="/images/download-circle.svg" alt="Download" />
         <span class="expanded">Make available offline</span>
       </button>
-      <span class="partial">
-        <button class="cancel" title="Cancel and remove">Cancel</button>
-      </span>
       <button class="partial">
         <div class="progress">
           <progress-ring stroke="2" radius="13" progress="0"></progress-ring>
@@ -417,7 +447,24 @@ export default class extends HTMLElement {
    */
   clickHandler(e) {
     if (this.state === 'done') {
-      this.removeFromIDB();
+      this.willremove = true;
+      this.state = 'ready';
+
+      window.addEventListener('beforeunload', this.unloadHandler);
+      this.removalTimeout = setTimeout(async () => {
+        this.willremove = false;
+        await this.removeFromIDB();
+        window.removeEventListener('beforeunload', this.unloadHandler);
+      }, 5000);
+    } else if (e.target.className === 'undo-remove') {
+      if (this.willremove === true) {
+        if (this.removalTimeout) {
+          this.state = 'done';
+          this.willremove = false;
+          clearTimeout(this.removalTimeout);
+          window.removeEventListener('beforeunload', this.unloadHandler);
+        }
+      }
     } else if (e.target.className === 'cancel') {
       this.removeFromIDB();
     } else if (this.downloading === false) {
@@ -436,6 +483,16 @@ export default class extends HTMLElement {
     if (this.storageManager) this.storageManager.cancel();
 
     this.downloading = false;
+  }
+
+  /**
+   * Page `beforeunload` event handler.
+   *
+   * @param {Event} unloadEvent Unload event.
+   */
+  unloadHandler(unloadEvent) {
+    unloadEvent.returnValue = '';
+    unloadEvent.preventDefault();
   }
 
   /**

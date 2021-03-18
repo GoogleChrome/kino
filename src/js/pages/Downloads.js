@@ -1,5 +1,5 @@
 import getIDBConnection from '../modules/IDBConnection.module';
-import { SW_CACHE_NAME } from '../constants';
+import getDownloaderElement from '../utils/getDownloaderElement.module';
 
 /**
  * @param {RouterContext} routerContext Context object passed by the Router.
@@ -9,6 +9,7 @@ export default async (routerContext) => {
     mainContent,
     apiData,
     navigate,
+    connectionStatus,
     videoDownloaderRegistry,
   } = routerContext;
   mainContent.innerHTML = `
@@ -18,6 +19,7 @@ export default async (routerContext) => {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
         grid-gap: 2rem;
+        max-width: 1200px;
       }
       .clearing {
         opacity: 0.3;
@@ -27,8 +29,8 @@ export default async (routerContext) => {
         <h2>Manage your downloads</h2>
         <img src="/images/arrow-down.svg" alt="" />
     </div>
-    <div class="downloads">
-        <div class="header container">
+    <div class="downloads container">
+        <div class="header">
             <span>20 GB available <span>of 220 GB</span></span>
             <div>
                 <button class="primary delete-all" disabled>Delete all</button>
@@ -53,14 +55,15 @@ export default async (routerContext) => {
     allMeta.forEach((meta) => {
       const videoData = apiData.find((vd) => vd.id === meta.videoId);
       const card = document.createElement('video-card');
-      let downloader = videoDownloaderRegistry.get(videoData.id);
-      if (!downloader) {
-        downloader = videoDownloaderRegistry.create(videoData.id);
-        downloader.init(videoData, SW_CACHE_NAME);
-      }
-      downloader.setAttribute('expanded', 'false');
-      card.render(videoData, navigate);
-      card.attachDownloader(downloader);
+      const downloader = getDownloaderElement(videoDownloaderRegistry, videoData);
+
+      card.render({
+        videoData,
+        navigate,
+        connectionStatus,
+        downloader,
+      });
+
       grid.appendChild(card);
     });
 

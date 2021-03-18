@@ -13,3 +13,12 @@ export function saveSetting(key, value) {
 export function loadSetting(key) {
   return JSON.parse(localStorage.getItem(key));
 }
+
+/**
+ * Removes a settings entry.
+ *
+ * @param {string} key Setting key.
+ */
+export function removeSetting(key) {
+  localStorage.removeItem(key);
+}
