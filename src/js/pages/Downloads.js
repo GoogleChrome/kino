@@ -19,6 +19,7 @@ export default async (routerContext) => {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
         grid-gap: 2rem;
+        max-width: 1200px;
       }
       .clearing {
         opacity: 0.3;
@@ -28,8 +29,8 @@ export default async (routerContext) => {
         <h2>Manage your downloads</h2>
         <img src="/images/arrow-down.svg" alt="" />
     </div>
-    <div class="downloads">
-        <div class="header container">
+    <div class="downloads container">
+        <div class="header">
             <span>20 GB available <span>of 220 GB</span></span>
             <div>
                 <button class="primary delete-all" disabled>Delete all</button>
