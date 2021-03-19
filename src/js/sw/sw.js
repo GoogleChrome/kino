@@ -185,17 +185,10 @@ const clearOldCaches = (event) => {
  */
 const fetchHandler = async (event) => {
   const getResponse = async () => {
+    const request = event.request.destination === 'document' ? APP_SHELL_URL : event.request;
     const openedCache = await caches.open(SW_CACHE_NAME);
+    const cacheResponse = await openedCache.match(request);
 
-    let cacheResponse;
-    if (event.request.destination === 'document') {
-      /**
-       * Rewrite all document requests to the cached app shell.
-       */
-      cacheResponse = await openedCache.match(APP_SHELL_URL);
-    } else {
-      cacheResponse = await openedCache.match(event.request);
-    }
     if (cacheResponse) return cacheResponse;
 
     if (event.request.url.indexOf(MEDIA_SERVER_ORIGIN) === 0) {
