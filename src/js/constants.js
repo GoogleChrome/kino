@@ -102,3 +102,8 @@ export const ALL_STREAM_TYPES = ['audio', 'video'];
  * Settings key names.
  */
 export const SETTING_KEY_TOGGLE_OFFLINE = 'toggle-offline';
+
+/**
+ * Event name signalling that data in IDB has changes.
+ */
+export const IDB_DATA_CHANGED_EVENT = 'idb-data-changed';

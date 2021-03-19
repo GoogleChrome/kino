@@ -15,8 +15,11 @@ export default class Router {
   constructor(context = {}) {
     this.routes = [];
     this.context = context;
+    this.currentPage = null;
 
-    window.addEventListener('popstate', () => this.run());
+    window.addEventListener('popstate', (e) => {
+      this.renderPage(e.state.href, true);
+    });
 
     document.querySelector('.mobile-button').addEventListener('click', () => {
       document.querySelector('body').classList.toggle('mobile');
@@ -29,6 +32,12 @@ export default class Router {
     this.init();
   }
 
+  /**
+   * Registers a route.
+   *
+   * @param {string}   path     Route path.
+   * @param {Function} callback Callback method.
+   */
   route(path, callback) {
     this.routes.push({ path, callback });
   }
@@ -41,36 +50,44 @@ export default class Router {
     this.context.mainContent = document.querySelector('main');
     this.context.navigate = this.navigate.bind(this);
 
-    this.run();
+    this.renderPage(window.location.href);
   }
 
-  run() {
-    this.context.path = window.location.pathname;
+  /**
+   * Finds appropriate callback and executes it.
+   *
+   * @param {string}  href      Target URL to navigate to.
+   * @param {boolean} skipState Flag indicating whether push state should be skipped.
+   */
+  renderPage(href = '/', skipState = false) {
+    const targetUrl = new URL(href, window.location.origin);
+    const foundRoute = this.routes.find(
+      ({ path }) => new RegExp(path).test(targetUrl.pathname),
+    );
 
-    const foundRoute = this.routes.find((route) => {
-      if (route.path instanceof RegExp) {
-        return route.path.test(this.context.path);
-      }
-      return route.path === this.context.path;
-    });
-
-    this.context.mainContent.innerHTML = '';
-    if (foundRoute) {
-      foundRoute.callback(this.context);
-    } else {
-      const catchAllRoute = this.routes.find((route) => route.path === '*');
-      if (catchAllRoute) {
-        catchAllRoute.callback(this.context);
-      } else {
-        this.context.mainContent.innerHTML = '<h1>404</h1>';
-      }
+    /**
+     * Only push new state when this is a navigation between pages
+     * and `skipState` is not true.
+     */
+    const isNavigationBetweenPages = this.currentPage !== foundRoute.callback;
+    if (!skipState && isNavigationBetweenPages) {
+      window.history.pushState({ href }, null, targetUrl.pathname);
     }
+
     window.scrollTo(0, 0);
+    this.context.path = targetUrl.pathname;
+    this.context.mainContent.innerHTML = '';
+    this.currentPage = foundRoute.callback;
+    foundRoute.callback(this.context);
   }
 
-  navigate(path) {
-    window.history.pushState(null, null, path);
+  /**
+   * Invoked when an internal link is clicked / tapped.
+   *
+   * @param {string} href Target URL to navigate to.
+   */
+  navigate(href) {
     document.querySelector('body').classList.remove('mobile');
-    this.run();
+    this.renderPage(href);
   }
 }

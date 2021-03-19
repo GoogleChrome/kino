@@ -52,21 +52,30 @@ export default class {
 
     const metaWritePromise = new Promise((resolve, reject) => {
       const metaPutOperation = db.meta.put(videoMeta);
-      metaPutOperation.onsuccess = resolve;
+      metaPutOperation.onsuccess = () => {
+        db.dispatchDataChangedEvent();
+        resolve();
+      };
       metaPutOperation.onerror = reject;
     });
 
     const dataWritePromise = new Promise((resolve, reject) => {
       const dataPutOperation = db.data.put(fileChunk);
 
-      dataPutOperation.onsuccess = resolve;
+      dataPutOperation.onsuccess = () => {
+        db.dispatchDataChangedEvent();
+        resolve();
+      };
       dataPutOperation.onerror = reject;
     });
 
     const fileWritePromise = new Promise((resolve, reject) => {
       const dataPutOperation = db.file.put(fileMeta);
 
-      dataPutOperation.onsuccess = resolve;
+      dataPutOperation.onsuccess = () => {
+        db.dispatchDataChangedEvent();
+        resolve();
+      };
       dataPutOperation.onerror = reject;
     });
 
