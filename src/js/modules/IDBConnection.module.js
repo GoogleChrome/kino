@@ -148,7 +148,7 @@ export default () => {
             const transaction = abstractedIDB.db.transaction([storeName], 'readwrite');
             const store = transaction.objectStore(storeName);
 
-            return store.put(data);
+            return [transaction, store.put(data)];
           },
         };
       }

@@ -10,6 +10,7 @@ export default class {
   constructor(videoDownloader) {
     this.done = false;
 
+    this.onerror = () => {};
     this.onprogress = () => {};
     this.ondone = () => {};
 
@@ -49,23 +50,41 @@ export default class {
       done: isDone,
       videoId: this.internal.videoDownloader.getId(),
     };
+    const txAbortHandler = (e) => {
+      const { error } = e.target;
+      if (error.name === 'QuotaExceededError') {
+        this.cancel();
+
+        /**
+         * @todo Display an alert or snackbar warning instead of console.
+         */
+
+        // eslint-disable-next-line no-console
+        console.log(`[StorageManager] Quota exceeded. Unable to store more data in '${e.target.objectStoreNames?.[0]}' store.`);
+      }
+      this.onerror(error);
+    };
 
     const metaWritePromise = new Promise((resolve, reject) => {
-      const metaPutOperation = db.meta.put(videoMeta);
+      const [transaction, metaPutOperation] = db.meta.put(videoMeta);
+
+      transaction.onabort = txAbortHandler;
       metaPutOperation.onsuccess = resolve;
       metaPutOperation.onerror = reject;
     });
 
     const dataWritePromise = new Promise((resolve, reject) => {
-      const dataPutOperation = db.data.put(fileChunk);
+      const [transaction, dataPutOperation] = db.data.put(fileChunk);
 
+      transaction.onabort = txAbortHandler;
       dataPutOperation.onsuccess = resolve;
       dataPutOperation.onerror = reject;
     });
 
     const fileWritePromise = new Promise((resolve, reject) => {
-      const dataPutOperation = db.file.put(fileMeta);
+      const [transaction, dataPutOperation] = db.file.put(fileMeta);
 
+      transaction.onabort = txAbortHandler;
       dataPutOperation.onsuccess = resolve;
       dataPutOperation.onerror = reject;
     });
