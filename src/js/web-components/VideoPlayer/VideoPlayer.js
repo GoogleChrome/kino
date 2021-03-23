@@ -1,6 +1,6 @@
 import styles from './VideoPlayer.css';
-import Streamer from '../../modules/Streamer';
-import ParserMPD from '../../modules/ParserMPD';
+import Streamer from '../../classes/Streamer';
+import ParserMPD from '../../classes/ParserMPD';
 import selectSource from '../../utils/selectSource';
 
 import { MEDIA_SESSION_DEFAULT_ARTWORK } from '../../constants';

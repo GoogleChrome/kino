@@ -1,9 +1,9 @@
 import styles from './VideoDownloader.css';
 
-import getIDBConnection from '../../modules/IDBConnection';
-import DownloadManager from '../../modules/DownloadManager';
-import StorageManager from '../../modules/StorageManager';
-import { getURLsForDownload } from '../../modules/Urls';
+import getIDBConnection from '../../classes/IDBConnection';
+import DownloadManager from '../../classes/DownloadManager';
+import StorageManager from '../../classes/StorageManager';
+import { getURLsForDownload } from '../../classes/Urls';
 
 export default class VideoDownloader extends HTMLElement {
   static get observedAttributes() {

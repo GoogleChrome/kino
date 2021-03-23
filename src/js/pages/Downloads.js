@@ -1,5 +1,5 @@
 import { IDB_DATA_CHANGED_EVENT } from '../constants';
-import getIDBConnection from '../modules/IDBConnection';
+import getIDBConnection from '../classes/IDBConnection';
 import getDownloaderElement from '../utils/getDownloaderElement';
 
 /**
