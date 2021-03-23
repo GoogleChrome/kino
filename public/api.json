@@ -10,6 +10,10 @@
       {
         "src": "https://storage.googleapis.com/wdm-assets/videos/http-203/background-fetch/manifest.mpd",
         "type": "application/dash+xml"
+      },
+      {
+        "src": "https://storage.googleapis.com/wdm-assets/videos/http-203/background-fetch/master.m3u8",
+        "type": "application/x-mpegURL"
       }
     ],
     "thumbnail": [
