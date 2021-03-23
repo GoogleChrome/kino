@@ -88,17 +88,21 @@ const router = new Router({
   videoDownloaderRegistry,
   connectionStatus,
 });
-router.route('/', HomePage);
-router.route('/settings', SettingsPage);
-router.route('/downloads', DownloadsPage);
-router.route(RegExp('/category/(.*)'), CategoryPage);
-router.route('*', VideoPage);
+router.route('^/settings/?', SettingsPage);
+router.route('^/downloads/?', DownloadsPage);
+router.route('^/category/([^/]*)/?', CategoryPage);
+router.route('^/?$', HomePage);
+
+/**
+ * Consider all else a single video page.
+ */
+router.route('.*', VideoPage);
 
 /**
  * Register Service Worker.
  */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js');
+    navigator.serviceWorker.register('/sw.js');
   });
 }

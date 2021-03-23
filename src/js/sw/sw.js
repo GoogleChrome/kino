@@ -3,6 +3,7 @@
 import {
   SW_CACHE_NAME,
   SW_CACHE_FORMAT,
+  APP_SHELL_URL,
   STORAGE_SCHEMA,
   IDB_CHUNK_INDEX,
   MEDIA_SERVER_ORIGIN,
@@ -184,9 +185,10 @@ const clearOldCaches = (event) => {
  */
 const fetchHandler = async (event) => {
   const getResponse = async () => {
+    const request = event.request.destination === 'document' ? APP_SHELL_URL : event.request;
     const openedCache = await caches.open(SW_CACHE_NAME);
+    const cacheResponse = await openedCache.match(request);
 
-    const cacheResponse = await openedCache.match(event.request);
     if (cacheResponse) return cacheResponse;
 
     if (event.request.url.indexOf(MEDIA_SERVER_ORIGIN) === 0) {

@@ -7,8 +7,13 @@
  * There may be adjacent caches used for other purposes and we
  * want to let the SW know which caches it should purge on upgrade.
  */
-export const SW_CACHE_NAME = 'static-assets-v1.0.0-alpha';
+export const SW_CACHE_NAME = 'static-assets-v1.0.0-alpha1';
 export const SW_CACHE_FORMAT = /^static-assets-v[a-z0-9.-]+$/;
+
+/**
+ * App Shell URL
+ */
+export const APP_SHELL_URL = '/';
 
 /**
  * Media Server Hostname
@@ -102,3 +107,8 @@ export const ALL_STREAM_TYPES = ['audio', 'video'];
  * Settings key names.
  */
 export const SETTING_KEY_TOGGLE_OFFLINE = 'toggle-offline';
+
+/**
+ * Event name signalling that data in IDB has changes.
+ */
+export const IDB_DATA_CHANGED_EVENT = 'idb-data-changed';
