@@ -1,6 +1,14 @@
 import '../typedefs';
 import getIDBConnection from './IDBConnection';
 
+/**
+ * Stores video meta, data and file chunks in IndexedDB and invokes
+ * `onprogress` and `ondone` callbacks, allowing for the UI to be able
+ * to reliably reflect the download process progress.
+ *
+ * Please see the `DownloadManager` class, too, which handles the actual
+ * video data download from network.
+ */
 export default class {
   /**
    * Instantiates the storage manager.

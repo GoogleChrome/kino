@@ -3,7 +3,9 @@ import selectRepresentations from '../utils/selectRepresentations';
 import getRepresentationMimeString from '../utils/getRepresentationMimeString';
 
 /**
- * Streams raw media data to the <video> element.
+ * Streams raw media data to the <video> element through a MediaSource container.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Media_Source_Extensions_API
  */
 export default class {
   constructor(videoEl, parser, opts = {}) {

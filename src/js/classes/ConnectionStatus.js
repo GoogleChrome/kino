@@ -1,3 +1,11 @@
+/**
+ * ConnectionStatus class tracks and broadcasts changes in internet connection
+ * status and offline mode status.
+ *
+ * It allows different parts of the application to subscribe to connection
+ * changes and also emits a global event whenever there is a change related
+ * to internet connection or offline mode status.
+ */
 export default class ConnectionStatus {
   constructor(offlineForced = false) {
     this.internal = {

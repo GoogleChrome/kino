@@ -139,6 +139,11 @@ const representationElementToObject = (representationElement) => {
   return representation;
 };
 
+/**
+ * Parses a supplied DASH manifest file (.mpd) and provides
+ * access to media metadata and adaptation sets, representations
+ * and other objects described by the manifest.
+ */
 export default class {
   constructor(manifest, manifestSrc) {
     const domParser = new DOMParser();
