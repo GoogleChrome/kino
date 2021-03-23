@@ -1,6 +1,7 @@
 import {
   STORAGE_SCHEMA,
   IDB_CHUNK_INDEX,
+  IDB_DATA_CHANGED_EVENT,
 } from '../constants';
 
 const dbName = 'webdev-offline-storage';
@@ -153,6 +154,15 @@ export default () => {
         };
       }
 
+      /**
+       * Dispatch an event signalling that data in IDB
+       * has changed.
+       */
+      dispatchDataChangedEvent() {
+        const changeEvent = new Event(IDB_DATA_CHANGED_EVENT);
+        window.dispatchEvent(changeEvent);
+      }
+
       unwrap() {
         return this.db;
       }
@@ -177,7 +187,10 @@ export default () => {
       dataStore.clear();
       fileStore.clear();
 
-      transaction.oncomplete = () => resolve();
+      transaction.oncomplete = () => {
+        abstractedIDB.dispatchDataChangedEvent();
+        resolve();
+      };
       transaction.onerror = () => reject();
     });
 
@@ -228,7 +241,10 @@ export default () => {
       );
       metaStore.delete(id);
 
-      transaction.oncomplete = () => resolve();
+      transaction.oncomplete = () => {
+        abstractedIDB.dispatchDataChangedEvent();
+        resolve();
+      };
       transaction.onerror = () => reject();
     });
 
