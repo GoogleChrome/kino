@@ -1,4 +1,4 @@
-import VideoPlayer from '../../components/VideoPlayer';
+import VideoPlayer from '../../components/VideoPlayer/VideoPlayer';
 
 export default (videoData, hideInfo = false) => {
   const posterWrapper = document.createElement('div');

@@ -1,6 +1,6 @@
 import { IDB_DATA_CHANGED_EVENT } from '../constants';
-import getIDBConnection from '../modules/IDBConnection.module';
-import getDownloaderElement from '../utils/getDownloaderElement.module';
+import getIDBConnection from '../modules/IDBConnection';
+import getDownloaderElement from '../utils/getDownloaderElement';
 
 /**
  * @param {RouterContext} routerContext Context object passed by the Router.

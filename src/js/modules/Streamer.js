@@ -1,6 +1,6 @@
 import '../typedefs';
-import selectRepresentations from '../utils/selectRepresentations.module';
-import getRepresentationMimeString from '../utils/getRepresentationMimeString.module';
+import selectRepresentations from '../utils/selectRepresentations';
+import getRepresentationMimeString from '../utils/getRepresentationMimeString';
 
 /**
  * Streams raw media data to the <video> element.

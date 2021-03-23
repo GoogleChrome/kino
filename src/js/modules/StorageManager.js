@@ -1,5 +1,5 @@
-import '../../typedefs';
-import getIDBConnection from '../../modules/IDBConnection.module';
+import '../typedefs';
+import getIDBConnection from './IDBConnection';
 
 export default class {
   /**

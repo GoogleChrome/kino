@@ -1,17 +1,17 @@
 /**
  * Type definitions.
  */
-import '../../typedefs';
+import '../typedefs';
 
 /**
  * Classes.
  */
-import FixedBuffer from '../../modules/FixedBuffer.module';
+import FixedBuffer from './FixedBuffer';
 
 /**
  * Utils.
  */
-import getMimeByURL from '../../utils/getMimeByURL.module';
+import getMimeByURL from '../utils/getMimeByURL';
 
 /**
  * @class

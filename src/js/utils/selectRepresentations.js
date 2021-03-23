@@ -1,4 +1,4 @@
-import getRepresentationMimeString from './getRepresentationMimeString.module';
+import getRepresentationMimeString from './getRepresentationMimeString';
 
 import {
   DEFAULT_AUDIO_PRIORITIES,

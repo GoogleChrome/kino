@@ -9,7 +9,7 @@ import {
   MEDIA_SERVER_ORIGIN,
 } from '../constants';
 
-import getIDBConnection from '../modules/IDBConnection.module';
+import getIDBConnection from '../modules/IDBConnection';
 import assetsToCache from './cache';
 
 /**

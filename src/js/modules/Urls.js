@@ -1,6 +1,6 @@
-import '../../typedefs';
-import ParserMPD from '../../modules/ParserMPD.module';
-import selectSource from '../../utils/selectSource.module';
+import '../typedefs';
+import ParserMPD from './ParserMPD';
+import selectSource from '../utils/selectSource';
 
 /**
  * Returns a list of URLs that need to be downloaded in order to allow
