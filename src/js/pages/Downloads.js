@@ -1,3 +1,4 @@
+import { IDB_DATA_CHANGED_EVENT } from '../constants';
 import getIDBConnection from '../modules/IDBConnection.module';
 import getDownloaderElement from '../utils/getDownloaderElement.module';
 
@@ -31,7 +32,7 @@ export default async (routerContext) => {
     </div>
     <div class="downloads container">
         <div class="header">
-            <span>20 GB available <span>of 220 GB</span></span>
+            <span class="quota"></span>
             <div>
                 <button class="primary delete-all" disabled>Delete all</button>
             </div>
@@ -43,6 +44,27 @@ export default async (routerContext) => {
   const db = await getIDBConnection();
   const deleteAllBtn = mainContent.querySelector('.delete-all');
   const grid = mainContent.querySelector('.grid');
+
+  /**
+   * Displays the current storage quota.
+   */
+  const displayQuota = () => {
+    if (navigator.storage?.estimate) {
+      navigator.storage.estimate().then(
+        (quota) => {
+          const quotaElement = mainContent.querySelector('.quota');
+
+          if (quotaElement) {
+            const bytesPerGB = 1000 * 1000 * 1000;
+            const availableGB = ((quota.quota - quota.usage) / bytesPerGB).toFixed(2);
+            const totalGB = (quota.quota / bytesPerGB).toFixed(2);
+
+            quotaElement.innerHTML = `${availableGB} GB available <span>of ${totalGB} GB</span>`;
+          }
+        },
+      );
+    }
+  };
 
   const renderPage = async () => {
     // Should partial downloads also be visible here? For now - yes.
@@ -75,6 +97,12 @@ export default async (routerContext) => {
     } else {
       deleteAllBtn.removeAttribute('disabled');
     }
+
+    /**
+     * Display quota information and rerender it whenever IDB data changes.
+     */
+    displayQuota();
+    window.addEventListener(IDB_DATA_CHANGED_EVENT, displayQuota);
   };
 
   /**

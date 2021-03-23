@@ -69,7 +69,10 @@ export default class {
       const [transaction, metaPutOperation] = db.meta.put(videoMeta);
 
       transaction.onabort = txAbortHandler;
-      metaPutOperation.onsuccess = resolve;
+      metaPutOperation.onsuccess = () => {
+        db.dispatchDataChangedEvent();
+        resolve();
+      };
       metaPutOperation.onerror = reject;
     });
 
@@ -77,7 +80,10 @@ export default class {
       const [transaction, dataPutOperation] = db.data.put(fileChunk);
 
       transaction.onabort = txAbortHandler;
-      dataPutOperation.onsuccess = resolve;
+      dataPutOperation.onsuccess = () => {
+        db.dispatchDataChangedEvent();
+        resolve();
+      };
       dataPutOperation.onerror = reject;
     });
 
@@ -85,7 +91,10 @@ export default class {
       const [transaction, dataPutOperation] = db.file.put(fileMeta);
 
       transaction.onabort = txAbortHandler;
-      dataPutOperation.onsuccess = resolve;
+      dataPutOperation.onsuccess = () => {
+        db.dispatchDataChangedEvent();
+        resolve();
+      };
       dataPutOperation.onerror = reject;
     });
 
