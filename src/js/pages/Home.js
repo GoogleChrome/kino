@@ -8,7 +8,7 @@ export default (routerContext) => {
 
   mainContent.innerHTML = `
     <div class="container">
-      <header class="home-header">
+      <header class="page-header">
         <h1>Bye bye buffering, hello video!</h1>
         <p>All our content is available on the web, which means you can get access to it whenever you want it. What's more, if your browser supports the latest technologies, you can save videos to view whenever you're offline!</p>
       </header>
@@ -23,10 +23,9 @@ export default (routerContext) => {
     return acc;
   }, {});
 
-  Object.keys(videosByCategories).forEach((category, index) => {
+  Object.keys(videosByCategories).forEach((category) => {
     const localContext = {
       category,
-      index,
     };
 
     /**

@@ -13,10 +13,9 @@ function appendVideoToGallery(routerContext, localContext) {
     connectionStatus,
   } = routerContext;
 
-  const category = localContext.category || '';
-
   const videoGrid = document.createElement('video-grid');
-  videoGrid.category = category || '';
+  videoGrid.category = localContext.category || '';
+  videoGrid.setAttribute('class', localContext.class || 'flex');
 
   const videoGallery = videoGrid.shadowRoot.querySelector('.video-cards ul');
 

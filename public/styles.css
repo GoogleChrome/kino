@@ -422,7 +422,7 @@ main {
 }
 
 /* Home Header */
-.home-header {
+.page-header {
   font-size: 16px;
   line-height: 29px;
   margin-bottom: 3rem;
@@ -430,7 +430,7 @@ main {
 
 /* Home Header: Breakpoints */
 @media (min-width: 720px) {
-  .home-header {
+  .page-header {
     font-size: 18px;
     line-height: 32px;
     margin-bottom: 3.5rem;
@@ -438,12 +438,12 @@ main {
   }
 }
 @media (min-width: 960px) {
-  .home-header {
+  .page-header {
     margin-bottom: 4rem;
   }
 }
 @media (min-width: 1200px) {
-  .home-header {
+  .page-header {
     width: 57.5%;
   }
 }

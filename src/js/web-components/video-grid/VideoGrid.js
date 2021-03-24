@@ -20,7 +20,6 @@ export default class VideoGrid extends HTMLElement {
     super();
     this._root = this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
-    this.$sectionHeader = this._root.querySelector('.section-header');
     this.$category = this._root.querySelector('.section-header h2');
     this.$categoryLink = this._root.querySelector('.section-header a');
     this.render();

@@ -33,22 +33,26 @@ export default (routerContext) => {
     path,
   } = routerContext;
 
-  const categorySlug = path.replace('/category/', '');
+  const categorySlug = path.replace('/category/', '').replace(/\/$/, '');
   const categoryName = findCategoryNameBySlug(categorySlug, apiData);
   mainContent.innerHTML = `
-    <div class="page-title">
-        <h2>${categoryName}</h2>
-        <img src="/images/arrow-down.svg" alt="" />
+    <div class="container">
+      <header class="page-header">
+        <h1>${categoryName}</h1>
+      </header>
     </div>
-    <div class="category"></div>
   `;
 
   const filteredApiData = apiData.filter(
     (videoData) => videoData.categories.includes(categoryName),
   );
+
   const localContext = {
-    content: mainContent.querySelector('.category'),
+    category: categoryName,
+    class: 'hide-header',
   };
+
+  document.body.classList.add('is-category');
 
   appendVideoToGallery({
     ...routerContext,
