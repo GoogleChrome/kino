@@ -1,3 +1,14 @@
+/**
+ * Remove animations when the user indicates the preference.
+ *
+ * Also on slow updating devices.
+ */
+ @media screen and (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0ms !important;
+  }
+}
+
 /* Container */
 .container {
   display: grid;
@@ -27,6 +38,12 @@
   margin: 0;
 }
 
+:host a {
+  display: inline-block;
+  color: var(--accent-text);
+  text-decoration: none;
+}
+
 .section-header a {
   border-radius: 8px;
   color: var(--accent);
@@ -35,12 +52,6 @@
   line-height: 24px;
   margin-left: auto;
   padding: 10px 0px;
-}
-
-:host a {
-  display: inline-block;
-  color: var(--accent-text);
-  text-decoration: none;
 }
 
 :host a:hover,
@@ -59,6 +70,12 @@
   .section-header a {
     background: var(--accent-background);
     padding: 10px 20px;
+    transition: color 100ms ease-in-out, background-color 100ms ease-in-out;
+  }
+  .section-header a:hover {
+    text-decoration: none;
+    color: var(--accent-background);
+    background: var(--accent);
   }
 }
 

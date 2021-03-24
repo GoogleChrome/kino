@@ -37,6 +37,17 @@
   }
 }
 
+/**
+ * Remove animations when the user indicates the preference.
+ *
+ * Also on slow updating devices.
+ */
+@media screen and (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0ms !important;
+  }
+}
+
 /* General */
 body {
   background-color: var(--background);
@@ -177,11 +188,6 @@ h4,
 }
 .site-header.open .site-header--menu {
   transform: translateX(0);
-}
-@media screen and (prefers-reduced-motion: reduce), (update: slow) {
-  .site-header--menu {
-    transition-duration: 0ms;
-  }
 }
 .site-header--menu-item .site-header--menu-link {
   color: var(--accent-text);
