@@ -28,9 +28,15 @@ export default (routerContext) => {
       category,
       index,
     };
+
+    /**
+     * Limit the number of videos to 3 per category on the homepage.
+     */
+    const firstSetOfVideos = videosByCategories[category].slice(0, 3);
+
     appendVideoToGallery({
       ...routerContext,
-      apiData: videosByCategories[category],
+      apiData: firstSetOfVideos,
     }, localContext);
   });
 };

@@ -67,6 +67,7 @@
   align-content: start;
   grid-gap: var(--gutter) 0;
   grid-template-columns: var(--gutter) 1fr var(--gutter);
+  overflow-x: hidden;
   overflow-y: scroll;
   padding: 0;
 }
@@ -77,7 +78,8 @@
   grid-gap: var(--gutter);
   grid-template-columns: 1fr;
   list-style: none;
-  margin: 0 var(--gutter) 3rem var(--gutter);
+  margin: 0 var(--gutter);
+  padding-inline-start: 0;
 }
 
 .video-cards ul li {
@@ -123,10 +125,11 @@
 @media (min-width: 960px) {
   .video-cards {
     padding: 0 var(--gutter);
+    overflow-y: hidden;
   }
   .video-cards ul {
     grid-auto-flow: initial;
-    grid-template-columns: auto auto auto;
+    grid-template-columns: 1fr 1fr 1fr;
     margin-bottom: 4rem;
   }
   .video-cards ul:before,
