@@ -8,13 +8,13 @@ import ConnectionStatus from './js/classes/ConnectionStatus';
 /**
  * Web Components implementation.
  */
-import VideoPlayer from './js/web-components/VideoPlayer/VideoPlayer';
-import VideoCard from './js/web-components/VideoCard/VideoCard';
-import VideoDownloader from './js/web-components/VideoDownloader/VideoDownloader';
-import VideoGrid from './js/web-components/VideoGrid/VideoGrid';
-import ToggleButton from './js/web-components/ToggleButton/ToggleButton';
-import OfflineToggleButton from './js/web-components/OfflineToggleButton/OfflineToggleButton';
-import ProgressRing from './js/web-components/ProgressRing/ProgressRing';
+import VideoPlayer from './js/web-components/video-player/VideoPlayer';
+import VideoCard from './js/web-components/video-card/VideoCard';
+import VideoDownloader from './js/web-components/video-download/VideoDownloader';
+import VideoGrid from './js/web-components/video-grid/VideoGrid';
+import ToggleButton from './js/web-components/toggle-button/ToggleButton';
+import OfflineToggleButton from './js/web-components/offline-toggle-button/OfflineToggleButton';
+import ProgressRing from './js/web-components/progress-ring/ProgressRing';
 
 /**
  * Pages.

@@ -1,7 +1,7 @@
 import { loadSetting, saveSetting, removeSetting } from '../../utils/settings';
 import { SETTING_KEY_TOGGLE_OFFLINE } from '../../constants';
 
-import ToggleButton from '../ToggleButton/ToggleButton';
+import ToggleButton from '../toggle-button/ToggleButton';
 
 /**
  * Respond to button interaction.
