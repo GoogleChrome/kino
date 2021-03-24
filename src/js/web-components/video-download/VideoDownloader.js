@@ -274,7 +274,6 @@ export default class VideoDownloader extends HTMLElement {
   render() {
     const templateElement = document.createElement('template');
     templateElement.innerHTML = `<style>${styles}</style>
-      <div class="tooltip">
         <span class="partial">
           <button class="cancel" title="Cancel and remove">Cancel</button>
         </span>
@@ -282,12 +281,17 @@ export default class VideoDownloader extends HTMLElement {
           <button class="undo-remove" title="Undo deletion">Undo</button>
         </span>
         <button class="ready">
-          <img src="/images/download-circle.svg" alt="Download" />
-          <span class="expanded">Make available offline</span>
+          <div class="tooltip">
+            <svg class="icon icon--download" viewBox="0 0 27 27" width="27" height="27" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7.304 25.416h11.56c4.026 0 6.552-2.852 6.552-6.888V7.638c0-4.036-2.512-6.888-6.552-6.888H7.304C3.265.75.752 3.602.752 7.638v10.89c0 4.036 2.514 6.888 6.554 6.888z" fill="" stroke="" stroke-width="1.5"/>
+              <path d="M13.084 18.531V7.635M18.08 13.513l-4.996 5.018-4.998-5.018" fill="none" stroke="" stroke-width="1.5"/>
+            </svg>
+            <div class="tooltip--message">Make available offline<span class="tooltip--arrow"></span></div>
+          </div>
         </button>
         <button class="partial">
           <div class="progress">
-            <progress-ring stroke="2" radius="13" progress="0"></progress-ring>
+            <progress-ring stroke="2" radius="14" progress="0"></progress-ring>
             <img class="resume" src="/images/download-resume.svg" alt="Resume" />
             <img class="pause" src="/images/download-pause.svg" alt="Pause" />
           </div>
@@ -295,12 +299,20 @@ export default class VideoDownloader extends HTMLElement {
           <span class="expanded resume">Resume download</span>
         </button>
         <button class="done">
-          <img class="ok" src="/images/download-done.svg" alt="Done" />
-          <img class="delete" src="/images/download-delete.svg" alt="Delete" title="Delete the video from cache." />
-          <span class="expanded ok">Downloaded</span>
-          <span class="expanded delete">Remove video</span>
+          <div class="tooltip">
+            <svg viewBox="0 0 27 27" width="27" height="27" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+              <g class="remove">
+                <path d="M26.308 18.726c0 4.77-2.812 7.582-7.582 7.582H8.344c-4.783 0-7.594-2.812-7.594-7.582V8.332C.75 3.562 2.502.75 7.273.75h2.665c.958 0 1.86.45 2.435 1.217l1.217 1.618a3.051 3.051 0 002.434 1.217h3.773c4.783 0 6.547 2.434 6.547 7.303l-.036 6.621z" fill="#ff375c" stroke="#ff375c" stroke-width="1.5"/>
+                <path d="M16.91 11.842l-6.39 6.39M16.911 18.235l-6.395-6.396" fill="none" stroke="#fff" stroke-width="2"/>
+              </g>
+              <g class="downloaded">
+                <path d="M26.308 18.726c0 4.77-2.812 7.582-7.582 7.582H8.344c-4.783 0-7.594-2.812-7.594-7.582V8.332C.75 3.562 2.502.75 7.273.75h2.665c.958 0 1.86.45 2.435 1.217l1.216 1.618a3.055 3.055 0 002.435 1.217h3.773c4.783 0 6.547 2.434 6.547 7.303l-.036 6.621z" fill="none" stroke="#858287" stroke-width="1.5"/>
+                <path d="M8.968 15.05l3.166 3.163 6.328-6.328" fill="none" stroke="#858287" stroke-width="1.5"/>
+              </g>
+            </svg>
+            <div class="tooltip--message">Remove offline version<span class="tooltip--arrow"></span></div>
+          </div>
         </button>
-        <div class="tooltip--message">Make available offline<span class="tooltip--arrow"></span></div>
       </div>`;
 
     while (this.internal.root.firstChild) {

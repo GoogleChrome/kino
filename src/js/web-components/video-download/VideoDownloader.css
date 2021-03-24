@@ -1,14 +1,75 @@
+@media screen and (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0ms !important;
+  }
+}
+
 :host,
-.tooltip > * {
+:host > * {
     display: none;
 }
 :host {
-  min-width: 26px;
-  min-height: 26px;
+  width: 27px;
+  height: 27px;
 }
+
+/**
+ * Default and hover button styles.
+ */
 :host button {
   cursor: pointer;
+  width: 27px;
+  height: 27px;
+  justify-content: center;
+  align-items: center;
 }
+
+/* Ready button (download icon) */
+:host( [state="ready"] ) button.ready {
+  display: flex;
+}
+:host( [state="ready"] ) button.ready svg path[stroke] {
+  stroke: var(--accent);
+}
+:host( [state="ready"] ) button.ready svg path:not([fill="none"]) {
+  fill: var(--background);
+}
+:host( [state="ready"] ) button.ready:hover svg path[stroke] {
+  stroke: var(--background);
+}
+:host( [state="ready"] ) button.ready:hover svg path:not([fill="none"]) {
+  fill: var(--accent);
+}
+
+/* Ready button (downloaded / remove combo icon) */
+:host( [state="done"] ) button.done {
+  display: flex;
+}
+:host( [state="done"] ) button.done svg g.remove {
+  display: none;
+}
+:host( [state="done"] ) button.done svg g.downloaded {
+  display: inline-block;
+}
+:host( [state="done"] ) button.done svg g.downloaded path[stroke] {
+  stroke: var(--icon);
+}
+:host( [state="done"] ) button.done:hover svg g.downloaded {
+  display: none;
+}
+:host( [state="done"] ) button.done:hover svg g.remove {
+  display: inline-block;
+}
+:host( [state="done"] ) button.done svg path:not([fill="none"]) {
+  fill: var(--background);
+}
+:host( [state="done"] ) button.done:hover svg path[stroke] {
+  stroke: var(--background);
+}
+:host( [state="done"] ) button.done:hover svg path:not([fill="none"]) {
+  fill: var(--alarm);
+}
+
 .expanded {
   display: none;
 }
@@ -30,6 +91,8 @@ button.cancel {
 :host( [expanded="true"] ) button {
   justify-content: center;
   align-items: center;
+  cursor: pointer;
+  /*
   border: 1px solid var(--accent);
   color: var(--accent);
   font-size: 0.8rem;
@@ -38,16 +101,14 @@ button.cancel {
   border-radius: 5px;
   padding: 0.5rem 1rem 0.5rem 1rem;
   text-transform: uppercase;
-  cursor: pointer;
+
   background: transparent;
+  */
 }
 :host( :not( [state="not-initialized"] ) ) {
     display: inline-block;
 }
-:host( [state="ready"] ) .ready {
-    display: flex;
-    align-items: center;
-}
+
 :host( [state="partial"] ) .partial,
 :host( [state="ready"][willremove="true"] ) .willremove {
     display: flex;
@@ -141,6 +202,9 @@ button {
     filter: brightness(95%);
 }
 
+/**
+ * Tooltips styling.
+ */
 .tooltip--message {
   display: none;
 }
@@ -158,22 +222,23 @@ button {
     max-width: 300px;
     display: block;
 
-    top: -20px;
+    top: -16px;
     left: 50%;
     transform: translate(-50%, -100%);
 
-    padding: calc(var(--gutter) / 3) calc(var(--gutter) / 2);
+    padding: calc(var(--gutter) / 2);
     color: var(--tooltip);
     background-color: var(--tooltip-background);
     font-weight: normal;
     font-size: 12px;
+    line-height: 12px;
     border-radius: 8px;
     position: absolute;
     box-sizing: border-box;
     white-space: pre;
     z-index: 999;
     opacity: 0;
-    transition: opacity 200ms ease-in-out 500ms;
+    transition: opacity 200ms ease-in-out 300ms;
     pointer-events: none;
   }
 

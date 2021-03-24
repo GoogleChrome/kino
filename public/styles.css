@@ -17,6 +17,8 @@
   --separator: #E6E4E7;
   --tooltip: #fff;
   --tooltip-background: #1E1E20;
+  --alarm: #FF375C;
+  --alert: #FFA24C;
 }
 
 @media (prefers-color-scheme: dark) {

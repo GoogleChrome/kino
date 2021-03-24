@@ -94,6 +94,17 @@
   font-size: 24px;
   font-weight: 500;
   line-height: 32px;
+  margin-right: 40px;
+}
+
+.video-card--content {
+  position: relative;
+}
+
+.video-card--downloader {
+  position: absolute;
+  top: 4px;
+  right: 0;
 }
 
 /* Video Card: Breakpoints */

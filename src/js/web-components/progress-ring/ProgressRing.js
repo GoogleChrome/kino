@@ -15,7 +15,7 @@ export default class ProgressRing extends HTMLElement {
         width="${radius * 2}"
        >
         <circle
-           stroke="#EFEFEF"
+           stroke="#E6E4E7"
            stroke-width="${stroke}"
            fill="transparent"
            r="${normalizedRadius}"
@@ -23,7 +23,7 @@ export default class ProgressRing extends HTMLElement {
            cy="${radius}"
         />
          <circle
-           stroke="#56C0AD"
+           stroke="#141216"
            stroke-linecap="round"
            stroke-dasharray="${this._circumference} ${this._circumference}"
            style="stroke-dashoffset:${this._circumference}"
