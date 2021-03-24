@@ -167,12 +167,21 @@ export default class VideoDownloader extends HTMLElement {
    * Saves assets to the specified cache using Cache API.
    *
    * @param {string[]} urls Array of URLs to be saved to the cache.
-   *
-   * @returns {Promise} Resolves when the assets are stored in the cache.
    */
   async saveToCache(urls) {
-    const cache = await caches.open(this.internal.cacheName);
-    return cache.addAll(urls);
+    try {
+      const cache = await caches.open(this.internal.cacheName);
+      await cache.addAll(urls);
+    } catch (error) {
+      if (error.name === 'QuotaExceededError') {
+        /**
+         * @todo Display an alert or snackbar warning instead of console.
+         */
+
+        // eslint-disable-next-line no-console
+        console.log('[VideoDownloader] Quota exceeded. Unable to cache video assets.');
+      }
+    }
   }
 
   /**
@@ -223,6 +232,19 @@ export default class VideoDownloader extends HTMLElement {
 
     this.storageManager.onprogress = (progress) => {
       this.progress = progress;
+    };
+    this.storageManager.onerror = (error) => {
+      if (this.downloading && error.name === 'QuotaExceededError') {
+        /**
+         * Allow some time for any remaining pending transactions to error out, too,
+         * before we remove the partially removed video.
+         */
+        setTimeout(() => {
+          this.cancel();
+          this.removeFromIDB();
+          this.state = 'ready';
+        }, 1000);
+      }
     };
     this.storageManager.ondone = () => {
       this.progress = 100;
