@@ -11,6 +11,11 @@ const metaAccessorFactory = (abstractedIDB) => ({
   name: STORAGE_SCHEMA.meta.name,
   key: STORAGE_SCHEMA.meta.key,
 
+  /**
+   * @param {string} videoId Video ID.
+   *
+   * @returns {object} Video meta object.
+   */
   async get(videoId) {
     const defaultValue = {
       videoId,
@@ -28,6 +33,11 @@ const metaAccessorFactory = (abstractedIDB) => ({
     return data;
   },
 
+  /**
+   * Gets all video meta.
+   *
+   * @returns {object[]} Array of video meta objects.
+   */
   async getAll() {
     const transaction = abstractedIDB.db.transaction([this.name], 'readonly');
     const store = transaction.objectStore(this.name);
@@ -41,6 +51,14 @@ const metaAccessorFactory = (abstractedIDB) => ({
     return data;
   },
 
+  /**
+   * Request to add or update video meta in IDB.
+   *
+   * @param {object} videoMetaData Video meta to be stored.
+   *
+   * @returns {Array} Array containing an `IDBTransaction` and `IDBRequest`
+   *                  objects for the put operation.
+   */
   put(videoMetaData) {
     return abstractedIDB.defaultAccesor.put(videoMetaData, this.name);
   },
@@ -49,6 +67,14 @@ const metaAccessorFactory = (abstractedIDB) => ({
 const dataAccessorFactory = (abstractedIDB) => ({
   name: STORAGE_SCHEMA.data.name,
 
+  /**
+   * Request to add or update video data in IDB.
+   *
+   * @param {object} videoData Video data to be stored.
+   *
+   * @returns {Array} Array containing an `IDBTransaction` and `IDBRequest`
+   *                  objects for the put operation.
+   */
   put(videoData) {
     return abstractedIDB.defaultAccesor.put(videoData, this.name);
   },
@@ -116,6 +142,14 @@ const fileAccessorFactory = (abstractedIDB) => ({
     return data;
   },
 
+  /**
+   * Request to add or update video file meta in IDB.
+   *
+   * @param {object} fileMeta Video file meta to be stored.
+   *
+   * @returns {Array} Array containing an `IDBTransaction` and `IDBRequest`
+   *                  objects for the put operation.
+   */
   put(fileMeta) {
     return abstractedIDB.defaultAccesor.put(fileMeta, this.name);
   },
@@ -133,7 +167,7 @@ export default () => {
 
   /**
    * Abstraction on top of raw `IDBDatabase` providing convenience access
-   * to video meta and data stores.
+   * to video meta, data and file stores.
    *
    * @param {IDBDatabase} idbConnection Connection to an IDB.
    *

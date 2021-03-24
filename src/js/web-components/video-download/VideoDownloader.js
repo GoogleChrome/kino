@@ -1,156 +1,11 @@
-import getIDBConnection from '../modules/IDBConnection.module';
-import DownloadManager from './VideoDownloader/DownloadManager.module';
-import StorageManager from './VideoDownloader/StorageManager.module';
-import { getURLsForDownload } from './VideoDownloader/Urls.module';
+import styles from './VideoDownloader.css';
 
-const style = `
-<style>
-    :host,
-    :host > * {
-        display: none;
-    }
-    :host {
-      min-width: 26px;
-      min-height: 26px;
-    }
-    :host button {
-      cursor: pointer;
-    }
-    .expanded {
-      display: none;
-    }
-    span.expanded {
-      margin-left: 1rem;
-    }
-    button.cancel {
-        border-color: #FF8383 !important;
-    }
-    :host( [expanded="true"] ) .expanded {
-        display: inline-block;
-    }
-    :host( [expanded="true"] ) {
-      display: inline-block;
-    }
-    :host( not( [expanded="true"] ) ) .expanded {
-      display: none;
-    }
-    :host( [expanded="true"] ) button {
-      justify-content: center;
-      align-items: center;
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      font-size: 0.8rem;
-      font-weight: bold;
-      letter-spacing: 0.085em;
-      border-radius: 5px;
-      padding: 0.5rem 1rem 0.5rem 1rem;
-      text-transform: uppercase;
-      cursor: pointer;
-      background: transparent;
-    }
-    :host( :not( [state="not-initialized"] ) ) {
-        display: inline-block;
-    }
-    :host( [state="ready"] ) .ready {
-        display: flex;
-        align-items: center;
-    }
-    :host( [state="partial"] ) .partial,
-    :host( [state="ready"][willremove="true"] ) .willremove {
-        display: flex;
-        position: relative;
-    }
-    .progress {
-        position: relative;
-        display: inline-block;
-    }
-    :host( [state="partial"][downloading="true"] ) .cancel {
-        display: none;
-    }
-    :host( [state="partial"][downloading="false"] ) .cancel,
-    :host( [state="ready"][willremove="true"] ) .willremove button {
-        display: block;
-        position: absolute;
-        bottom: 0;
-        background: #FFF;
-        padding: 0.5rem;
-        border-radius: 5px;
-        left: 50%;
-        transform: translate(-50%, 0);
-        color: #FF8383;
-        font-size: 0.7rem;
-        font-weight: bold;
-        line-height: initial;
-        cursor: pointer;
-        text-transform: uppercase;
-    }
-    :host( [expanded="true"][state="partial"][downloading="false"] ) .cancel,
-    :host( [expanded="true"][state="ready"][willremove="true"] ) .willremove button {
-        right: 0;
-        left: initial;
-        bottom: initial;
-        transform: translate(110%, 0);
-    }
-    :host( [state="partial"][downloading="false"] ) .resume:not(.expanded) {
-        display: block;
-    }
-    :host( [state="partial"][downloading="false"] ) .pause {
-        display: none;
-    }
-    :host( [state="partial"][downloading="true"] ) .resume:not(.expanded) {
-        display: none;
-    }
-    :host( [state="partial"][downloading="true"] ) .pause:not(.expanded) {
-        display: block;
-    }
-    :host( [state="partial"][downloading="true"][expanded="true"] ) .resume {
-        display: none;
-    }
-    :host( [state="partial"] ) .partial img.resume,
-    :host( [state="partial"] ) .partial img.pause {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-    }
-    :host( [state="partial"] ) .partial img.resume {
-        transform: translate(-40%, -50%);
-    }
-    :host( [state="done"] ) .done {
-        display: flex;
-    }
-    :host( [state="done"] ) button .delete {
-        display: none;
-        cursor: pointer;
-        color: #FF8383;
-    }
-    :host( [state="done"] ) button:hover {
-        border-color: #FF8383;
-    }
-    :host( [state="done"]:not( [expanded="true"] ) ) button:hover .delete:not(.expanded) {
-        display: block;
-    }
-    :host( [state="done"][expanded="true"] ) button:hover .delete {
-        display: block;
-    }
+import getIDBConnection from '../../classes/IDBConnection';
+import DownloadManager from '../../classes/DownloadManager';
+import StorageManager from '../../classes/StorageManager';
+import getURLsForDownload from '../../utils/getURLsForDownload';
 
-    :host( [state="done"] ) button:hover .ok {
-        display: none;
-    }
-    button {
-        cursor: pointer;
-        padding: 0;
-        background: transparent;
-        border: 0;
-        line-height: 0;
-    }
-    :host( [state="ready"] ) button:hover {
-        filter: brightness(95%);
-    }
-</style>
-`;
-
-export default class extends HTMLElement {
+export default class VideoDownloader extends HTMLElement {
   static get observedAttributes() {
     return ['state', 'progress', 'downloading', 'willremove'];
   }
@@ -418,7 +273,7 @@ export default class extends HTMLElement {
    */
   render() {
     const templateElement = document.createElement('template');
-    templateElement.innerHTML = `${style}
+    templateElement.innerHTML = `<style>${styles}</style>
       <span class="partial">
         <button class="cancel" title="Cancel and remove">Cancel</button>
       </span>

@@ -1,3 +1,5 @@
+import styles from './ProgressRing.css';
+
 export default class ProgressRing extends HTMLElement {
   constructor() {
     super();
@@ -33,13 +35,7 @@ export default class ProgressRing extends HTMLElement {
         />
       </svg>
 
-      <style>
-        circle {
-          transition: stroke-dashoffset 0.35s;
-          transform: rotate(-90deg);
-          transform-origin: 50% 50%;
-        }
-      </style>
+      <style>${styles}</style>
     `;
   }
 

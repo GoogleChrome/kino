@@ -1,4 +1,4 @@
-import VideoDownloader from '../components/VideoDownloader';
+import VideoDownloader from '../web-components/video-download/VideoDownloader';
 
 /**
  * The `VideoDownloader` web component contains a download method that is potentially

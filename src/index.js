@@ -1,20 +1,20 @@
 /**
  * Router, Connection utils.
  */
-import Router from './js/modules/Router.module';
-import VideoDownloaderRegistry from './js/modules/VideoDownloaderRegistry.module';
-import ConnectionStatus from './js/modules/ConnectionStatus.module';
+import Router from './js/classes/Router';
+import VideoDownloaderRegistry from './js/classes/VideoDownloaderRegistry';
+import ConnectionStatus from './js/classes/ConnectionStatus';
 
 /**
  * Web Components implementation.
  */
-import VideoPlayerComponent from './js/components/VideoPlayer';
-import VideoCardComponent from './js/components/VideoCard';
-import VideoDownloaderComponent from './js/components/VideoDownloader';
-import VideoGrid from './js/components/VideoGrid';
-import ToggleButton from './js/components/ToggleButton';
-import OfflineToggleButton from './js/components/OfflineToggleButton';
-import ProgressRing from './js/components/ProgressRing';
+import VideoPlayer from './js/web-components/video-player/VideoPlayer';
+import VideoCard from './js/web-components/video-card/VideoCard';
+import VideoDownloader from './js/web-components/video-download/VideoDownloader';
+import VideoGrid from './js/web-components/video-grid/VideoGrid';
+import ToggleButton from './js/web-components/toggle-button/ToggleButton';
+import OfflineToggleButton from './js/web-components/offline-toggle-button/OfflineToggleButton';
+import ProgressRing from './js/web-components/progress-ring/ProgressRing';
 
 /**
  * Pages.
@@ -34,9 +34,9 @@ import { SETTING_KEY_TOGGLE_OFFLINE } from './js/constants';
 /**
  * Custom Elements definition.
  */
-customElements.define('video-player', VideoPlayerComponent);
-customElements.define('video-card', VideoCardComponent);
-customElements.define('video-downloader', VideoDownloaderComponent);
+customElements.define('video-player', VideoPlayer);
+customElements.define('video-card', VideoCard);
+customElements.define('video-downloader', VideoDownloader);
 customElements.define('video-grid', VideoGrid);
 customElements.define('toggle-button', ToggleButton);
 customElements.define('offline-toggle-button', OfflineToggleButton);

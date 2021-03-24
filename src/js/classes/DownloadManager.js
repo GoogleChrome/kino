@@ -1,25 +1,31 @@
 /**
  * Type definitions.
  */
-import '../../typedefs';
+import '../typedefs';
 
 /**
  * Classes.
  */
-import FixedBuffer from '../../modules/FixedBuffer.module';
+import FixedBuffer from './FixedBuffer';
 
 /**
  * Utils.
  */
-import getMimeByURL from '../../utils/getMimeByURL.module';
+import getMimeByURL from '../utils/getMimeByURL';
 
 /**
- * @class
- * @property {FixedBuffer} buffer          FixedBuffer instance.
- * @property {FileMeta}    currentFileMeta Currently downloaded file meta info.
- * @property {boolean}     done            Are all files fully downloaded?
+ * The DownloadManager is responsible for downloading videos from the network.
+ *
+ * 1) It accepts a `VideoDownloader` instance and retrieve the list of files to be downloaded.
+ * 2) It creates a fixed 2 MB ArrayBuffer.
+ * 3) It downloads the queued files one by one.
+ * 4) When the file is downloaded or when the ArrayBuffer is full, it flushes the buffer data.
+ * 5) This is done by calling `onflush` containing the buffer data.
+ * 6) Outside code can use `onflush` to be notified of the downloaded data. In our case,
+ *    we use a custom `StorageManager` instance to observe the flushes and to store
+ *    the data inside IndexedDB.
  */
-export default class {
+export default class DownloadManager {
   /**
    * Instantiates the download manager.
    *
@@ -121,11 +127,10 @@ export default class {
 
     let dataChunk;
     do {
-      /* eslint-disable no-await-in-loop */
-      // Await in loop is OK. The processing is sequential and can't be parallelized.
+      /* eslint-disable-next-line no-await-in-loop */
       dataChunk = await reader.read();
+
       if (!dataChunk.done) this.buffer.add(dataChunk.value);
-      /* eslint-eanble no-await-in-loop */
     } while (dataChunk && !dataChunk.done && !this.paused);
 
     const flushOpts = dataChunk.done ? { done: true } : {};
@@ -152,10 +157,8 @@ export default class {
   async run() {
     this.paused = false;
     while (!this.done && !this.paused && !this.cancelled && this.currentFileMeta) {
-      /* eslint-disable no-await-in-loop */
-      // Await in loop is OK. We don't want to download files in parallel.
+      /* eslint-disable-next-line no-await-in-loop */
       await this.downloadFile();
-      /* eslint-eanble no-await-in-loop */
     }
   }
 }

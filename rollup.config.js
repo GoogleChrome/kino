@@ -1,4 +1,6 @@
+import css from 'rollup-plugin-import-css';
 import generateAssetsToCache from './src/js/utils/generateAssetsToCache';
+
 import api from './public/api.json';
 
 export default [
@@ -8,6 +10,9 @@ export default [
       file: 'public/dist/js/index.js',
       format: 'cjs',
     },
+    plugins: [
+      css(),
+    ],
   },
   {
     input: 'src/js/sw/sw.js',

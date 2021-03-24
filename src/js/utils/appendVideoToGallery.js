@@ -1,4 +1,4 @@
-import getDownloaderElement from './getDownloaderElement.module';
+import getDownloaderElement from './getDownloaderElement';
 
 /**
  * @param {RouterContext} routerContext Context passed through by Router.

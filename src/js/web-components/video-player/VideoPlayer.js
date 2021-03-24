@@ -1,21 +1,9 @@
-import Streamer from '../modules/Streamer.module';
-import ParserMPD from '../modules/ParserMPD.module';
-import selectSource from '../utils/selectSource.module';
+import styles from './VideoPlayer.css';
+import Streamer from '../../classes/Streamer';
+import ParserMPD from '../../classes/ParserMPD';
+import selectSource from '../../utils/selectSource';
 
-import { MEDIA_SESSION_DEFAULT_ARTWORK } from '../constants';
-
-const style = `
-<style>
-  :host {
-    display: flex;
-    align-items: center;
-  }
-  video {
-    width: 100%;
-    height: auto;
-  }
-</style>
-`;
+import { MEDIA_SESSION_DEFAULT_ARTWORK } from '../../constants';
 
 export default class extends HTMLElement {
   constructor() {
@@ -72,7 +60,7 @@ export default class extends HTMLElement {
       ? (videoData.thumbnail.find((t) => t.default)).src
       : videoData.thumbnail;
 
-    const markup = `${style}
+    const markup = `<style>${styles}</style>
     <video ${videoData.thumbnail ? `poster="${thumbnailUrl}"` : ''} controls crossorigin="anonymous">
       ${this.getSourceHTML()}
       ${this.getTracksHTML()}

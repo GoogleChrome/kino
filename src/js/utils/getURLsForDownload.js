@@ -1,6 +1,6 @@
-import '../../typedefs';
-import ParserMPD from '../../modules/ParserMPD.module';
-import selectSource from '../../utils/selectSource.module';
+import '../typedefs';
+import ParserMPD from '../classes/ParserMPD';
+import selectSource from './selectSource';
 
 /**
  * Returns a list of URLs that need to be downloaded in order to allow
@@ -11,7 +11,7 @@ import selectSource from '../../utils/selectSource.module';
  *
  * @returns {Promise<FileMeta[]>} Promise resolving to file meta objects.
  */
-export const getURLsForDownload = async (videoId, sources) => {
+export default async (videoId, sources) => {
   let URLTuples = [];
   const selectedSource = selectSource(sources);
 
@@ -72,5 +72,3 @@ export const getURLsForDownload = async (videoId, sources) => {
 
   return fileMeta;
 };
-
-export const a = 1;
