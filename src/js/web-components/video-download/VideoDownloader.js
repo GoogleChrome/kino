@@ -288,6 +288,7 @@ export default class VideoDownloader extends HTMLElement {
             <div class="tooltip--message">Make available offline<span class="tooltip--arrow"></span></div>
           </div>
         </button>
+        <button class="button--contextual action--undo">Undo</button>
 
         <button class="downloading">
           <div class="tooltip">
@@ -299,7 +300,6 @@ export default class VideoDownloader extends HTMLElement {
             <div class="tooltip--message">Pause download<span class="tooltip--arrow"></span></div>
           </div>
         </button>
-        <button class="button--contextual action--cancel">Cancel</button>
 
         <button class="paused">
           <div class="tooltip">
@@ -311,6 +311,7 @@ export default class VideoDownloader extends HTMLElement {
             <div class="tooltip--message">Continue download<span class="tooltip--arrow"></span></div>
           </div>
         </button>
+        <button class="button--contextual action--cancel">Cancel</button>
 
         <button class="done">
           <div class="tooltip">
@@ -360,7 +361,7 @@ export default class VideoDownloader extends HTMLElement {
         await this.removeFromIDB();
         window.removeEventListener('beforeunload', this.unloadHandler);
       }, 5000);
-    } else if (e.target.className === 'undo-remove') {
+    } else if (e.target.classList.contains('action--undo')) {
       if (this.willremove === true) {
         if (this.removalTimeout) {
           this.state = 'done';
@@ -369,7 +370,7 @@ export default class VideoDownloader extends HTMLElement {
           window.removeEventListener('beforeunload', this.unloadHandler);
         }
       }
-    } else if (e.target.className === 'cancel') {
+    } else if (e.target.classList.contains('action--cancel')) {
       this.removeFromIDB();
     } else if (this.downloading === false) {
       this.download();

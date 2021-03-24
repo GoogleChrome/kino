@@ -11,6 +11,14 @@
 :host {
   width: 27px;
   height: 27px;
+  display: none;
+  position: relative;
+}
+
+:host( :not( [state="not-initialized"] ) ) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 /**
@@ -25,6 +33,21 @@
   background: transparent;
   border: 0;
   line-height: 0;
+}
+:host > .button--contextual {
+  width: auto;
+  height: auto;
+  transform: translateX(calc(-100% - 28px - 8px));
+  font-size: 12px;
+  line-height: 20px;
+  border-radius: 2px;
+  color: var(--accent);
+  background: var(--accent-background);
+}
+
+:host > .button--contextual:hover {
+  color: var(--accent-background);
+  background: var(--accent);
 }
 
 /* Ready button (download icon) */
@@ -43,6 +66,10 @@
 :host( [state="ready"] ) button.ready:hover svg path:not([fill="none"]) {
   fill: var(--accent);
 }
+:host( [state="ready"][willremove="true"] ) button.ready + .button--contextual {
+  display: inline-block;
+}
+
 
 /* Ready button (downloaded / remove combo icon) */
 :host( [state="done"] ) button.done {
@@ -118,8 +145,11 @@
 :host( [state="partial"][downloading="false"] ) button.paused:hover svg circle[stroke-dasharray] {
   stroke: var(--accent);
 }
+:host( [state="partial"][downloading="false"] ) button.paused + .button--contextual {
+  display: inline-block;
+}
 
-
+/*
 .expanded {
   display: none;
 }
@@ -142,7 +172,6 @@ button.cancel {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  /*
   border: 1px solid var(--accent);
   color: var(--accent);
   font-size: 0.8rem;
@@ -153,10 +182,6 @@ button.cancel {
   text-transform: uppercase;
 
   background: transparent;
-  */
-}
-:host( :not( [state="not-initialized"] ) ) {
-    display: inline-block;
 }
 
 :host( [state="partial"] ) .partial,
@@ -244,6 +269,7 @@ button.cancel {
 :host( [state="ready"] ) button:hover {
     filter: brightness(95%);
 }
+*/
 
 /**
  * Tooltips styling.
