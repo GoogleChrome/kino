@@ -65,18 +65,16 @@
   outline-color: var(--accent);
 }
 
-/* Section Header: Breakpoints */
-@media (min-width: 720px) {
-  .section-header a {
-    background: var(--accent-background);
-    padding: 10px 20px;
-    transition: color 100ms ease-in-out, background-color 100ms ease-in-out;
-  }
-  .section-header a:hover {
-    text-decoration: none;
-    color: var(--accent-background);
-    background: var(--accent);
-  }
+.section-header a {
+  white-space: pre;
+  background: var(--accent-background);
+  padding: 10px 20px;
+  transition: color 100ms ease-in-out, background-color 100ms ease-in-out;
+}
+.section-header a:hover {
+  text-decoration: none;
+  color: var(--accent-background);
+  background: var(--accent);
 }
 
 /* Video Cards */
@@ -142,6 +140,7 @@
 @media (min-width: 960px) {
   .video-cards {
     padding: 0 var(--gutter);
+    overflow-x: auto;
     overflow-y: hidden;
   }
   .video-cards ul {
@@ -161,7 +160,7 @@
     grid-auto-columns: calc(50% - var(--gutter) * 2.5);
     grid-column: 3 / -1;
     overflow-x: scroll;
-    scroll-snap-type: x proximity;
+    scroll-snap-type: x mandatory;
     scrollbar-width: none;
   }
 }

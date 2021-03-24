@@ -274,31 +274,34 @@ export default class VideoDownloader extends HTMLElement {
   render() {
     const templateElement = document.createElement('template');
     templateElement.innerHTML = `<style>${styles}</style>
-      <span class="partial">
-        <button class="cancel" title="Cancel and remove">Cancel</button>
-      </span>
-      <span class="willremove">
-        <button class="undo-remove" title="Undo deletion">Undo</button>
-      </span>
-      <button class="ready">
-        <img src="/images/download-circle.svg" alt="Download" />
-        <span class="expanded">Make available offline</span>
-      </button>
-      <button class="partial">
-        <div class="progress">
-          <progress-ring stroke="2" radius="13" progress="0"></progress-ring>
-          <img class="resume" src="/images/download-resume.svg" alt="Resume" />
-          <img class="pause" src="/images/download-pause.svg" alt="Pause" />
-        </div>
-        <span class="expanded pause">Pause download</span>
-        <span class="expanded resume">Resume download</span>
-      </button>
-      <button class="done">
-        <img class="ok" src="/images/download-done.svg" alt="Done" />
-        <img class="delete" src="/images/download-delete.svg" alt="Delete" title="Delete the video from cache." />
-        <span class="expanded ok">Downloaded</span>
-        <span class="expanded delete">Remove video</span>
-      </button>`;
+      <div class="tooltip">
+        <span class="partial">
+          <button class="cancel" title="Cancel and remove">Cancel</button>
+        </span>
+        <span class="willremove">
+          <button class="undo-remove" title="Undo deletion">Undo</button>
+        </span>
+        <button class="ready">
+          <img src="/images/download-circle.svg" alt="Download" />
+          <span class="expanded">Make available offline</span>
+        </button>
+        <button class="partial">
+          <div class="progress">
+            <progress-ring stroke="2" radius="13" progress="0"></progress-ring>
+            <img class="resume" src="/images/download-resume.svg" alt="Resume" />
+            <img class="pause" src="/images/download-pause.svg" alt="Pause" />
+          </div>
+          <span class="expanded pause">Pause download</span>
+          <span class="expanded resume">Resume download</span>
+        </button>
+        <button class="done">
+          <img class="ok" src="/images/download-done.svg" alt="Done" />
+          <img class="delete" src="/images/download-delete.svg" alt="Delete" title="Delete the video from cache." />
+          <span class="expanded ok">Downloaded</span>
+          <span class="expanded delete">Remove video</span>
+        </button>
+        <div class="tooltip--message">Make available offline<span class="tooltip--arrow"></span></div>
+      </div>`;
 
     while (this.internal.root.firstChild) {
       this.internal.root.removeChild(this.internal.root.firstChild);

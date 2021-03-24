@@ -1,5 +1,5 @@
 :host,
-:host > * {
+.tooltip > * {
     display: none;
 }
 :host {
@@ -139,4 +139,65 @@ button {
 }
 :host( [state="ready"] ) button:hover {
     filter: brightness(95%);
+}
+
+.tooltip--message {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .tooltip {
+    display: inline-block;
+    position: relative;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .tooltip--message {
+    min-width: 100px;
+    max-width: 300px;
+    display: block;
+
+    top: -20px;
+    left: 50%;
+    transform: translate(-50%, -100%);
+
+    padding: calc(var(--gutter) / 3) calc(var(--gutter) / 2);
+    color: var(--tooltip);
+    background-color: var(--tooltip-background);
+    font-weight: normal;
+    font-size: 12px;
+    border-radius: 8px;
+    position: absolute;
+    box-sizing: border-box;
+    white-space: pre;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 200ms ease-in-out 500ms;
+    pointer-events: none;
+  }
+
+  .tooltip:hover > .tooltip--message {
+    opacity: 1;
+  }
+
+  .tooltip--arrow {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -12px;
+    width: 24px;
+    height: 12px;
+    overflow: hidden;
+  }
+
+  .tooltip--arrow::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    left: 50%;
+    transform: translate(-50%,-50%) rotate(45deg);
+    background-color: var(--tooltip-background);
+  }
 }

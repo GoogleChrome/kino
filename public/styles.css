@@ -15,6 +15,8 @@
   --accent: #3740FF;
   --accent-text: #000;
   --separator: #E6E4E7;
+  --tooltip: #fff;
+  --tooltip-background: #1E1E20;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,6 +29,8 @@
     --accent: #00C9DB;
     --accent-text: #fff;
     --separator: #3D3B3F;
+    --tooltip: #1E1E20;
+    --tooltip-background: #fff;
   }
 }
 
