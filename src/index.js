@@ -14,7 +14,6 @@ import VideoDownloader from './js/web-components/video-download/VideoDownloader'
 import VideoGrid from './js/web-components/video-grid/VideoGrid';
 import ToggleButton from './js/web-components/toggle-button/ToggleButton';
 import OfflineToggleButton from './js/web-components/offline-toggle-button/OfflineToggleButton';
-import ProgressRing from './js/web-components/progress-ring/ProgressRing';
 
 /**
  * Pages.
@@ -40,7 +39,6 @@ customElements.define('video-downloader', VideoDownloader);
 customElements.define('video-grid', VideoGrid);
 customElements.define('toggle-button', ToggleButton);
 customElements.define('offline-toggle-button', OfflineToggleButton);
-customElements.define('progress-ring', ProgressRing);
 
 /**
  * Tracks the connection status of the application and broadcasts

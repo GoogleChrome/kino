@@ -14,14 +14,17 @@
 }
 
 /**
- * Default and hover button styles.
+ * Default button styles.
  */
-:host button {
+:host > button {
   cursor: pointer;
   width: 27px;
   height: 27px;
   justify-content: center;
   align-items: center;
+  background: transparent;
+  border: 0;
+  line-height: 0;
 }
 
 /* Ready button (download icon) */
@@ -69,6 +72,53 @@
 :host( [state="done"] ) button.done:hover svg path:not([fill="none"]) {
   fill: var(--alarm);
 }
+
+/* Progress icon (downloading state) */
+:host( [state="partial"][downloading="true"] ) button.downloading {
+  display: flex;
+}
+:host( [state="partial"][downloading="true"] ) button.downloading svg {
+  transform: rotate(-90deg);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading svg path[fill] {
+  fill: var(--accent-text);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading svg circle[stroke-dasharray] {
+  stroke: var(--accent-text);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading svg circle:not([stroke-dasharray]) {
+  stroke: var(--accent-background);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading:hover svg path[fill] {
+  fill: var(--accent);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading:hover svg circle[stroke-dasharray] {
+  stroke: var(--accent);
+}
+
+/* Progress icon (paused state) */
+:host( [state="partial"][downloading="false"] ) button.paused {
+  display: flex;
+}
+:host( [state="partial"][downloading="false"] ) button.paused svg {
+  transform: rotate(-90deg);
+}
+:host( [state="partial"][downloading="false"] ) button.paused svg path[fill] {
+  fill: var(--accent-text);
+}
+:host( [state="partial"][downloading="false"] ) button.paused svg circle[stroke-dasharray] {
+  stroke: var(--accent-text);
+}
+:host( [state="partial"][downloading="false"] ) button.paused svg circle:not([stroke-dasharray]) {
+  stroke: var(--accent-background);
+}
+:host( [state="partial"][downloading="false"] ) button.paused:hover svg path[fill] {
+  fill: var(--accent);
+}
+:host( [state="partial"][downloading="false"] ) button.paused:hover svg circle[stroke-dasharray] {
+  stroke: var(--accent);
+}
+
 
 .expanded {
   display: none;
@@ -190,13 +240,6 @@ button.cancel {
 
 :host( [state="done"] ) button:hover .ok {
     display: none;
-}
-button {
-    cursor: pointer;
-    padding: 0;
-    background: transparent;
-    border: 0;
-    line-height: 0;
 }
 :host( [state="ready"] ) button:hover {
     filter: brightness(95%);

@@ -93,7 +93,8 @@ export default class VideoDownloader extends HTMLElement {
    */
   attributeChangedCallback(name, old, value) {
     if (name === 'progress') {
-      this.internal.elements.progress.setAttribute('progress', value);
+      const percentageAsDashOffset = 82 - (82 * value);
+      this.internal.root.host.style.setProperty('--progress', percentageAsDashOffset);
     }
   }
 
@@ -217,7 +218,7 @@ export default class VideoDownloader extends HTMLElement {
       },
       0,
     );
-    const clampedPercents = Math.max(0, Math.min(percentageProgress, 100));
+    const clampedPercents = Math.max(0, Math.min(percentageProgress, 1));
 
     return clampedPercents;
   }
@@ -274,9 +275,7 @@ export default class VideoDownloader extends HTMLElement {
   render() {
     const templateElement = document.createElement('template');
     templateElement.innerHTML = `<style>${styles}</style>
-        <span class="partial">
-          <button class="cancel" title="Cancel and remove">Cancel</button>
-        </span>
+
         <span class="willremove">
           <button class="undo-remove" title="Undo deletion">Undo</button>
         </span>
@@ -289,15 +288,30 @@ export default class VideoDownloader extends HTMLElement {
             <div class="tooltip--message">Make available offline<span class="tooltip--arrow"></span></div>
           </div>
         </button>
-        <button class="partial">
-          <div class="progress">
-            <progress-ring stroke="2" radius="14" progress="0"></progress-ring>
-            <img class="resume" src="/images/download-resume.svg" alt="Resume" />
-            <img class="pause" src="/images/download-pause.svg" alt="Pause" />
+
+        <button class="downloading">
+          <div class="tooltip">
+            <svg class="icon icon--progress" width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+              <circle cx="14" cy="14" r="13" fill="none" stroke="#e6e4e7" stroke-width="1.5" />
+              <circle cx="14" cy="14" r="13" fill="none" stroke="#000" stroke-width="1.5" stroke-dashoffset="var(--progress, 82)" stroke-dasharray="82" />
+              <path d="M18.385 11.615a2 2 0 00-2-2h-4.74a2 2 0 00-2 2v4.74a2 2 0 002 2h4.74a2 2 0 002-2v-4.74z" fill="#141216"/>
+            </svg>
+            <div class="tooltip--message">Pause download<span class="tooltip--arrow"></span></div>
           </div>
-          <span class="expanded pause">Pause download</span>
-          <span class="expanded resume">Resume download</span>
         </button>
+        <button class="button--contextual action--cancel">Cancel</button>
+
+        <button class="paused">
+          <div class="tooltip">
+            <svg class="icon icon--progress" width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+              <circle cx="14" cy="14" r="13" fill="none" stroke="#e6e4e7" stroke-width="1.5" />
+              <circle cx="14" cy="14" r="13" fill="none" stroke="#000" stroke-width="1.5" stroke-dashoffset="var(--progress, 82)" stroke-dasharray="82" />
+              <path d="M17.36 11.23a1.026 1.026 0 000-2.05h-6.69a1.026 1.026 0 000 2.05h6.69zM14 19.94c.566 0 4.385-5.922 4.385-6.488 0-.566-.46-1.025-1.025-1.025h-6.69c-.566 0-1.026.46-1.026 1.025 0 .566 4.356 6.488 4.356 6.488z" fill="#141216"/>
+            </svg>
+            <div class="tooltip--message">Continue download<span class="tooltip--arrow"></span></div>
+          </div>
+        </button>
+
         <button class="done">
           <div class="tooltip">
             <svg viewBox="0 0 27 27" width="27" height="27" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
@@ -321,8 +335,6 @@ export default class VideoDownloader extends HTMLElement {
 
     const ui = templateElement.content.cloneNode(true);
     this.internal.root.appendChild(ui);
-
-    this.internal.elements.progress = this.internal.root.querySelector('progress-ring');
     this.internal.elements.buttons = this.internal.root.querySelectorAll('button');
 
     this.setDownloadState();
