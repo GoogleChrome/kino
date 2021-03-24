@@ -25,9 +25,18 @@ export default class Router {
       this.renderPage(e.state.href, true);
     });
 
-    document.querySelector('.mobile-button').addEventListener('click', () => {
-      document.querySelector('body').classList.toggle('mobile');
+    // Toggle menu open.
+    document.querySelector('.site-header--hamburger-btn').addEventListener('click', (event) => {
+      event.preventDefault();
+      document.querySelector('.site-header').classList.toggle('open');
     });
+
+    // Toggle dark mode.
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
 
     // Global click listener setup
     const navigate = this.navigate.bind(this);

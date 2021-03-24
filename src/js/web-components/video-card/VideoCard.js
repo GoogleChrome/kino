@@ -34,13 +34,13 @@ export default class VideoCard extends HTMLElement {
     }
 
     templateElement.innerHTML = `<style>${styles}</style>
-        <a data-use-router href="/${videoData.id}" class="poster" style="background-image: url('${posterImage}')"></a>
-        <div class="info">
-          <div class="title-icon">
-            <a data-use-router href="/${videoData.id}" class="title">${videoData.title}</a>
-            <div class="downloader"></div>
-          </div>
-          <div class="desc">${videoData.description}</div>
+        <a data-use-router class="video-card--image-link" href="/${videoData.id}/">
+          <img class="video-card--image" src="${posterImage}" alt="${videoData.title}" />
+        </a>
+        <div class="video-card--content">
+          <h2><a data-use-router href="/${videoData.id}/" class="video-card--title">${videoData.title}</a></h2>
+          <div class="video-card--downloader"></div>
+          <p class="video-card--summary">${videoData.description}</p>
         </div>
       `;
 
@@ -50,7 +50,7 @@ export default class VideoCard extends HTMLElement {
 
     const ui = templateElement.content.cloneNode(true);
     this._root.appendChild(ui);
-    this._root.querySelector('.downloader').appendChild(downloader);
+    this._root.querySelector('.video-card--downloader').appendChild(downloader);
 
     const boundHandler = connectionStatusChangeHandler.bind(this, connectionStatus, downloader);
 

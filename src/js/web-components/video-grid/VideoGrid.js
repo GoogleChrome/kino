@@ -4,13 +4,13 @@ import styles from './VideoGrid.css';
 const template = document.createElement('template');
 template.innerHTML = `
   <style>${styles}</style>
-  <section>
-    <div class="container">
-      <div class="section-header">
-        <h2>...</h2>
-        <a data-use-router href="/" class="view-all">View all</a>
-      </div>
-      <div class="grid"></div>
+  <section class="container container--no-padding">
+    <header class="section-header">
+        <h2 class="h3"></h2>
+        <a data-use-router="" href="#">View all</a>
+    </header>
+    <div class="video-cards">
+      <ul></ul>
     </div>
   </section>
 `;
@@ -23,24 +23,15 @@ export default class VideoGrid extends HTMLElement {
     this.$sectionHeader = this._root.querySelector('.section-header');
     this.$category = this._root.querySelector('.section-header h2');
     this.$categoryLink = this._root.querySelector('.section-header a');
-    this.$background = this._root.querySelector('section');
     this.render();
   }
 
   static get observedAttributes() {
-    return ['category', 'background'];
+    return ['category'];
   }
 
   get category() {
     return this.getAttribute('category');
-  }
-
-  set background(value) {
-    this.setAttribute('background', value);
-  }
-
-  get background() {
-    return this.getAttribute('background');
   }
 
   set category(value) {
@@ -53,12 +44,8 @@ export default class VideoGrid extends HTMLElement {
 
   render() {
     if (this.category) {
-      this.$sectionHeader.style.display = 'flex';
       this.$category.innerHTML = this.category;
-      this.$categoryLink.href = `/category/${slugify(this.category)}`;
-    } else {
-      this.$sectionHeader.style.display = 'none';
+      this.$categoryLink.href = `/category/${slugify(this.category)}/`;
     }
-    this.$background.style.backgroundColor = this.background;
   }
 }

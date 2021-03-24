@@ -1,3 +1,4 @@
+/*
 :host {
   overflow: hidden;
   border-radius: 7px;
@@ -47,4 +48,59 @@
   font-size: 1rem;
   line-height: 1.5;
   color: #667F96;
+}
+*/
+
+/* Video Card */
+:host {
+  margin-bottom: auto;
+}
+
+:host a {
+  display: inline-block;
+  color: var(--accent-text-light);
+  text-decoration: none;
+}
+
+:host a:hover,
+:host a:active {
+  text-decoration: underline;
+}
+
+:host *:focus {
+  border: none;
+  outline-style: dotted;
+  outline-color: var(--accent-light);
+}
+
+:host img {
+  border-radius: 8px;
+  display: block;
+  max-width: 100%;
+}
+
+:host h2 {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 32px;
+}
+
+/* Video Card: Breakpoints */
+@media (min-width: 960px) {
+  .video-card--image-link {
+    transition: transform .2s cubic-bezier(0, 0, .4, 1);
+  }
+
+  .video-card--image-link:hover {
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :host a {
+    color: var(--accent-text-dark);
+  }
+  :host *:focus {
+    outline-color: var(--accent-dark);
+  }
 }

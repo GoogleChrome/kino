@@ -1,15 +1,19 @@
 import appendVideoToGallery from '../utils/appendVideoToGallery';
-import getPoster from './partials/Poster.partial';
 
 /**
  * @param {RouterContext} routerContext Context object passed by the Router.
  */
 export default (routerContext) => {
   const { mainContent, apiData } = routerContext;
-  if (apiData[0]) {
-    const mainVideoData = apiData[0] || {};
-    mainContent.appendChild(getPoster(mainVideoData));
-  }
+
+  mainContent.innerHTML = `
+    <div class="container">
+      <header class="home-header">
+        <h1>Bye bye buffering, hello video!</h1>
+        <p>All our content is available on the web, which means you can get access to it whenever you want it. What's more, if your browser supports the latest technologies, you can save videos to view whenever you're offline!</p>
+      </header>
+    </div>
+  `;
 
   const videosByCategories = apiData.reduce((acc, videoData) => {
     videoData.categories.forEach((category) => {

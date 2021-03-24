@@ -14,15 +14,14 @@ function appendVideoToGallery(routerContext, localContext) {
   } = routerContext;
 
   const category = localContext.category || '';
-  const index = localContext.index || 0;
 
   const videoGrid = document.createElement('video-grid');
   videoGrid.category = category || '';
-  videoGrid.background = getComputedStyle(document.documentElement)
-    .getPropertyValue(`--background-${index % 2 === 0 ? 'light' : 'dark'}`);
-  const videoGallery = videoGrid.shadowRoot.querySelector('.grid');
+
+  const videoGallery = videoGrid.shadowRoot.querySelector('.video-cards ul');
 
   apiData.forEach((videoData) => {
+    const item = document.createElement('li');
     const card = document.createElement('video-card');
     const downloader = getDownloaderElement(videoDownloaderRegistry, videoData);
 
@@ -33,7 +32,8 @@ function appendVideoToGallery(routerContext, localContext) {
       downloader,
     });
 
-    videoGallery.appendChild(card);
+    item.appendChild(card);
+    videoGallery.appendChild(item);
   });
 
   mainContent.appendChild(videoGrid);
