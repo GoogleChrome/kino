@@ -19,7 +19,7 @@
 }
 
 .section-header h2 {
-  color: var(--accent-text-light);
+  color: var(--accent-text);
   font-size: 32px;
   font-weight: 700;
   line-height: 44px;
@@ -29,7 +29,7 @@
 
 .section-header a {
   border-radius: 8px;
-  color: var(--accent-light);
+  color: var(--accent);
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
@@ -39,7 +39,7 @@
 
 :host a {
   display: inline-block;
-  color: var(--accent-text-light);
+  color: var(--accent-text);
   text-decoration: none;
 }
 
@@ -51,40 +51,14 @@
 :host *:focus {
   border: none;
   outline-style: dotted;
-  outline-color: var(--accent-light);
+  outline-color: var(--accent);
 }
 
 /* Section Header: Breakpoints */
 @media (min-width: 720px) {
   .section-header a {
-    background: var(--accent-background-light);
+    background: var(--accent-background);
     padding: 10px 20px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :host a {
-    color: var(--accent-text-dark);
-  }
-
-  :host *:focus {
-    outline-color: var(--accent-dark);
-  }
-
-  /* Section Header: Dark Mode */
-  :host .section-header a {
-    color: var(--accent-dark);
-  }
-
-  :host .section-header h2 {
-    color: var(--accent-text-dark);
-  }
-
-  /* Section Header: Dark Mode - Breakpoints */
-  @media (min-width: 720px) {
-    :host .section-header a {
-      background: var(--accent-background-dark);
-    }
   }
 }
 

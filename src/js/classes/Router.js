@@ -31,13 +31,6 @@ export default class Router {
       document.querySelector('.site-header').classList.toggle('open');
     });
 
-    // Toggle dark mode.
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark');
-    }
-
     // Global click listener setup
     const navigate = this.navigate.bind(this);
     document.addEventListener('click', globalClickHandler(navigate));

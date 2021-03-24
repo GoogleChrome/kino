@@ -58,7 +58,7 @@
 
 :host a {
   display: inline-block;
-  color: var(--accent-text-light);
+  color: var(--accent-text);
   text-decoration: none;
 }
 
@@ -70,7 +70,7 @@
 :host *:focus {
   border: none;
   outline-style: dotted;
-  outline-color: var(--accent-light);
+  outline-color: var(--accent);
 }
 
 :host img {
@@ -93,14 +93,5 @@
 
   .video-card--image-link:hover {
     transform: scale(1.03);
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :host a {
-    color: var(--accent-text-dark);
-  }
-  :host *:focus {
-    outline-color: var(--accent-dark);
   }
 }
