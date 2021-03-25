@@ -94,6 +94,11 @@ body {
   padding: 0;
   width: 100%;
 }
+@media (min-width: 960px) {
+  body {
+    overflow-y: scroll;
+  }
+}
 body.disable-scroll {
   overflow: hidden;
 }
