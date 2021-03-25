@@ -39,14 +39,18 @@
 }
 :host( [expanded="true"] ) > button {
   height: calc(var(--gutter) * 1.5 + 28px);
-  padding: 0 calc(var(--gutter) * 0.666);
-  color: var(--accent);
-  background-color: var(--accent-background);
   font-weight: 700;
   font-size: 16px;
   border: none;
   border-radius: 8px;
   align-items: center;
+  color: var(--text);
+  background-color: transparent;
+}
+:host( [expanded="true"] ) > button.ready {
+  padding: 0 calc(var(--gutter) * 0.666);
+  color: var(--accent);
+  background-color: var(--accent-background);
 }
 :host( [expanded="true"] ) > button > .tooltip {
   display: flex;
@@ -66,6 +70,7 @@
   line-height: 0;
 }
 :host( [expanded="true"] ) > .button--contextual {
+  margin-left: calc(var(--gutter) * 0.666);
   background: transparent;
 }
 :host( :not( [expanded="true"] ) ) > .button--contextual {
