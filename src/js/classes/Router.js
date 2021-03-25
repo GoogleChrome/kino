@@ -1,12 +1,3 @@
-const globalClickHandler = (navigate) => (e) => {
-  const target = e.path[0];
-  if (e.ctrlKey || e.metaKey) return;
-  if ('useRouter' in target.dataset) {
-    e.preventDefault();
-    navigate(target.href);
-  }
-};
-
 /**
  * Facilitates navigation within the application and initializes
  * page views based on the matched routes.
@@ -32,8 +23,7 @@ export default class Router {
     });
 
     // Global click listener setup
-    const navigate = this.navigate.bind(this);
-    document.addEventListener('click', globalClickHandler(navigate));
+    document.addEventListener('click', this.clickHandler.bind(this));
 
     this.init();
   }
@@ -46,6 +36,24 @@ export default class Router {
    */
   route(path, callback) {
     this.routes.push({ path, callback });
+  }
+
+  /**
+   * Responds to click events anywhere in the document and when
+   * the click happens on a link that is supposed to be handled
+   * by the router, loads and displays the target page.
+   *
+   * @param {Event} e Click event.
+   */
+  clickHandler(e) {
+    const closestParentLink = e.path.find((el) => el.tagName === 'A');
+    const isRouterLink = closestParentLink && 'useRouter' in closestParentLink.dataset;
+    const isStandardClick = !e.ctrlKey && !e.metaKey;
+
+    if (isRouterLink && isStandardClick) {
+      e.preventDefault();
+      this.navigate(closestParentLink.href);
+    }
   }
 
   async init() {
