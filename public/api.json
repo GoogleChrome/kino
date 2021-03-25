@@ -160,39 +160,5 @@
       }
     ],
     "thumbnail": "https://storage.googleapis.com/wdm-assets/images/gui-challenges/tabs.jpg"
-  },
-  {
-    "id": "pwa-intro-and-setup",
-    "title": "Intro & Setup",
-    "description": "Welcome to the Progressive Web Apps Training course! This video provides a short introduction to the course, giving an overview of what topics and API’s are covered.\nThe format of this course is simple: we show you something, you build stuff, and repeat!",
-    "categories": [
-      "Progressive Web Apps"
-    ],
-    "date": "4th March, 2017",
-    "length": "7:43",
-    "video-sources": [
-      {
-        "src": "https://storage.googleapis.com/wdm-assets/videos/pwa/pwa-intro.mp4",
-        "type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
-      }
-    ],
-    "thumbnail": "https://storage.googleapis.com/wdm-assets/images/pwa/pwa-intro.jpg"
-  },
-  {
-    "id": "pwa-when-to-use-one",
-    "title": "When should you use a PWA?",
-    "description": "The hardest problem with software is distribution. App developers often spend more on distribution than they earn back. This problem is solved by the web platform, however web apps have historically been less capable than native apps. With the advent of PWAs, web apps have become just as capable as native, supporting features such as push notifications and Add to Home Screen, without giving up the reach of the web.",
-    "categories": [
-      "Progressive Web Apps"
-    ],
-    "date": "4th March, 2017",
-    "length": "7:43",
-    "video-sources": [
-      {
-        "src": "https://storage.googleapis.com/wdm-assets/videos/pwa/pwa-when.mp4",
-        "type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
-      }
-    ],
-    "thumbnail": "https://storage.googleapis.com/wdm-assets/images/pwa/pwa-when.jpg"
   }
 ]
