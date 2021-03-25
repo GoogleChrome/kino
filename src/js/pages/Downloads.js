@@ -33,7 +33,13 @@ export default async (routerContext) => {
         </span>
       </div>
       <div>
-        <button class="primary delete-all" disabled>Delete all</button>
+        <button class="primary delete-all" disabled>
+          <svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M26.309 18.726c0 4.771-2.812 7.582-7.582 7.582H8.345c-4.783 0-7.595-2.81-7.595-7.582V8.332C.75 3.562 2.503.75 7.274.75h2.665c.958 0 1.86.451 2.434 1.217l1.217 1.618a3.052 3.052 0 002.435 1.217h3.772c4.784 0 6.548 2.435 6.548 7.303l-.036 6.621z" fill="none" stroke="#858287" stroke-width="1.5"/>
+            <path d="M16.91 11.842l-6.39 6.39M16.912 18.235l-6.395-6.396" fill="none" stroke="#858287" stroke-width="2"/>
+          </svg>
+          <span>Delete all</span>
+        </button>
       </div>
     </div>
     <div class="container container--no-padding">
