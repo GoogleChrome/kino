@@ -13,7 +13,7 @@
 .container {
   display: grid;
   margin: 0 auto;
-  max-width: 1200px;
+  max-width: calc(1200px + var(--gutter) * 2);
   padding: 0 var(--gutter);
   position: relative;
 }
