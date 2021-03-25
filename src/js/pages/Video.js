@@ -10,6 +10,7 @@ export default (routerContext) => {
     mainContent,
     apiData,
     path,
+    connectionStatus,
     videoDownloaderRegistry,
   } = routerContext;
 
@@ -31,6 +32,16 @@ export default (routerContext) => {
 
   const posterWrapper = document.createElement('div');
   const { thumbnail } = currentVideoData;
+
+  let downloader = videoDownloaderRegistry.get(currentVideoData.id);
+  if (!downloader) {
+    downloader = videoDownloaderRegistry.create(currentVideoData.id);
+    downloader.init(currentVideoData, SW_CACHE_NAME);
+  }
+  downloader.setAttribute('expanded', 'true');
+
+  const disabled = (connectionStatus.status === 'offline' && downloader.state !== 'done');
+
   let videoImageHTML;
 
   if (Array.isArray(thumbnail)) {
@@ -47,7 +58,7 @@ export default (routerContext) => {
 
   mainContent.innerHTML = `
   <div class="container">
-    <article>
+    <article${disabled ? ' class="video--disabled"' : ''}>
       <div class="video-container">
         <div class="video-container--image">
           ${videoImageHTML}
@@ -84,19 +95,11 @@ export default (routerContext) => {
   </div>
 `;
   mainContent.prepend(posterWrapper);
-
-  let downloader = videoDownloaderRegistry.get(currentVideoData.id);
-  if (!downloader) {
-    downloader = videoDownloaderRegistry.create(currentVideoData.id);
-    downloader.init(currentVideoData, SW_CACHE_NAME);
-  }
-  downloader.setAttribute('expanded', 'true');
-
   mainContent.querySelector('.downloader').appendChild(downloader);
+
   const localContext = {
     category: currentVideoData.categories[0],
   };
-
   const playButton = mainContent.querySelector('.play');
 
   playButton.addEventListener('click', (e) => {

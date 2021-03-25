@@ -13,6 +13,13 @@
 :host {
   margin-bottom: auto;
 }
+:host(.disabled) {
+  filter: grayscale(1);
+}
+
+:host(.disabled) video-downloader {
+  pointer-events: none;
+}
 
 :host a {
   display: inline-block;

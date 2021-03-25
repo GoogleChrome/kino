@@ -523,6 +523,11 @@ main {
   display: block;
   height: auto;
 }
+.video--disabled .video-container--image,
+.video--disabled video-downloader {
+  filter: grayscale(1);
+  pointer-events: none;
+}
 
 /*
 !* http://meyerweb.com/eric/tools/css/reset/
