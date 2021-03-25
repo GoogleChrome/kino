@@ -17,35 +17,6 @@ export default async (routerContext) => {
   mainContent.innerHTML = `
     <style>
       ${styles}
-      .page-header h1 {
-        margin-bottom: 0.45em;
-      }
-      .downloads > div {
-        grid-template-columns: 1fr 1fr;
-      }
-      .quota {
-        display: block;
-        font-size: 24px;
-        line-height: 32px;
-      }
-      .quota span {
-        color: var(--accent-text);
-        font-weight: 500;
-      }
-      .download-tip {
-        padding-top: 4rem;
-        padding-bottom: 2rem;
-        text-align: center;
-      }
-      .download-tip svg {
-        vertical-align: text-bottom;
-      }
-      .download-tip svg path[stroke] {
-        stroke: var(--accent);
-      }
-      .download-tip svg path:not([fill="none"]) {
-        fill: var(--background);
-      }
     </style>
     <div class="container">
       <header class="page-header">
@@ -54,9 +25,12 @@ export default async (routerContext) => {
       </header>
     </div>
     <div class="container downloads">
-      <div>
-        <span>Storage available</span>
-        <span class="quota"></span>
+      <div class="quota">
+        <span class="quota--text">Storage used</span>
+        <span class="quota--value"></span>
+        <span class="quota--progress">
+          <span class="quota--progress-value"></span>
+        </span>
       </div>
       <div>
         <button class="primary delete-all" disabled>Delete all</button>
@@ -81,14 +55,16 @@ export default async (routerContext) => {
     if (navigator.storage?.estimate) {
       navigator.storage.estimate().then(
         (quota) => {
-          const quotaElement = mainContent.querySelector('.quota');
+          const quotaElement = mainContent.querySelector('.quota--value');
+          const progressValueElement = mainContent.querySelector('.quota--progress-value');
 
           if (quotaElement) {
             const bytesPerGB = 1000 * 1000 * 1000;
-            const availableGB = ((quota.quota - quota.usage) / bytesPerGB).toFixed(2);
+            const usedGB = (quota.usage / bytesPerGB).toFixed(2);
             const totalGB = (quota.quota / bytesPerGB).toFixed(2);
 
-            quotaElement.innerHTML = `<span>${availableGB} GB</span> of ${totalGB} GB`;
+            quotaElement.innerHTML = `<span>${usedGB} GB</span> of ${totalGB} GB`;
+            progressValueElement.style.width = `${(quota.usage / quota.quota) * 100}%`;
           }
         },
       );

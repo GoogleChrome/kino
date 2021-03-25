@@ -529,6 +529,67 @@ main {
   pointer-events: none;
 }
 
+/**
+ * Downloads Page
+ */
+.quota {
+  display: grid;
+  grid-template-columns: max-content min-content;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    'text text'
+    'value progress';
+  column-gap: var(--gutter);
+  row-gap: calc(var(--gutter) / 6);
+  align-items: center;
+
+  color: var(--accent-text);
+  font-size: 16px;
+  line-height: 28px;
+}
+.quota--text {
+  grid-area: text;
+}
+.quota--value {
+  grid-area: value;
+  display: block;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 500;
+}
+.quota--progress {
+  grid-area: progress;
+  display: inline-block;
+  height: 12px;
+  width: 48px;
+  border-radius: 6px;
+  background: var(--accent-background);
+  overflow: hidden;
+  line-height: 0;
+}
+.quota--progress-value {
+  display: inline-block;
+  background: var(--accent);
+  height: 12px;
+}
+.page-header h1 {
+  margin-bottom: 0.45em;
+}
+.download-tip {
+  padding-top: 4rem;
+  padding-bottom: 2rem;
+  text-align: center;
+}
+.download-tip svg {
+  vertical-align: text-bottom;
+}
+.download-tip svg path[stroke] {
+  stroke: var(--accent);
+}
+.download-tip svg path:not([fill="none"]) {
+  fill: var(--background);
+}
+
 /*
 !* http://meyerweb.com/eric/tools/css/reset/
  v2.0 | 20110126
