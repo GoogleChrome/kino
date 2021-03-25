@@ -115,6 +115,6 @@ export default (routerContext) => {
    */
   appendVideoToGallery({
     ...routerContext,
-    apiData: restVideoData,
+    apiData: restVideoData.filter((obj) => obj.categories.includes(localContext.category)),
   }, localContext);
 };
