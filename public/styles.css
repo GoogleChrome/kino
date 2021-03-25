@@ -117,14 +117,13 @@ h4,
 /* Container */
 .container {
   display: grid;
-  max-width: 1200px;
+  max-width: calc(1200px + var(--gutter) * 2);
   padding: 0 var(--gutter);
   position: relative;
   width: 100%;
   box-sizing: border-box;
 }
 .container--no-padding {
-  max-width: calc(1200px + var(--gutter) * 2);
   padding: 0;
 }
 
@@ -449,6 +448,48 @@ main {
   }
 }
 
+.poster-bg {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.poster-image {
+  height: 0;
+  padding-bottom: 56.25%; /* 16:9 */
+  position: relative;
+}
+.poster-image picture img,
+.poster-image > img {
+  width: 100%;
+  height: auto;
+}
+.poster-bg .play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #000;
+  z-index: 2;
+}
+.poster-bg .play {
+  background: transparent;
+  border-radius: 50%;
+  width: 112px;
+  height: 112px;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+}
+.poster-bg .main-player {
+  display: none;
+  height: 720px;
+}
+.poster-bg.has-player .poster-image {
+  display: none;
+}
+.poster-bg.has-player .main-player {
+  display: block;
+  height: auto;
+}
 
 /*
 !* http://meyerweb.com/eric/tools/css/reset/
@@ -574,51 +615,6 @@ header {
   height: auto;
   padding-top: 118px;
   position: relative;
-}
-.poster-bg {
-  max-width: 1280px;
-  margin: 0 auto;
-}
-.poster-image {
-  height: 0;
-  padding-bottom: 56.25%; !* 16:9 *!
-  position: relative;
-}
-.poster-image picture img,
-.poster-image > img {
-  width: 100%;
-  height: auto;
-}
-header.with-video {
-  background: #12283C;
-}
-.poster-bg .play {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #000;
-  z-index: 2;
-}
-.poster-bg .play {
-  background: transparent;
-  border-radius: 50%;
-  width: 79px;
-  height: 79px;
-  padding: 0;
-  border: none;
-  cursor: pointer;
-}
-.poster-bg .main-player {
-  display: none;
-  height: 720px;
-}
-.poster-bg.has-player .poster-image {
-  display: none;
-}
-.poster-bg.has-player .main-player {
-  display: block;
-  height: auto;
 }
 .poster-wrapper .info {
   padding: 2rem 0;
