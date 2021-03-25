@@ -21,6 +21,12 @@
   align-items: center;
 }
 
+:host *:focus {
+  border: none;
+  outline-style: dotted;
+  outline-color: var(--accent);
+}
+
 /**
  * Default button styles.
  */
