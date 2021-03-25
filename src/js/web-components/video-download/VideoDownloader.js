@@ -93,26 +93,27 @@ export default class VideoDownloader extends HTMLElement {
    */
   attributeChangedCallback(name, old, value) {
     if (name === 'progress') {
-      this.internal.elements.progress.setAttribute('progress', value);
+      const percentageAsDashOffset = 82 - (82 * value);
+      this.internal.root.host.style.setProperty('--progress', percentageAsDashOffset);
     }
   }
 
   /**
    * Component logic.
    *
-   * @param {object} apiData   Video data coming from the API.
+   * @param {object} videoData   Video data coming from the API.
    * @param {string} cacheName Cache name.
    */
-  init(apiData, cacheName = 'v1') {
+  init(videoData, cacheName = 'v1') {
     this.internal = {
       ...this.internal,
-      apiData,
+      videoData,
       cacheName,
       elements: {},
     };
 
     const videoId = this.getId();
-    const sources = this.internal.apiData['video-sources'] || [];
+    const sources = this.internal.videoData['video-sources'] || [];
 
     getURLsForDownload(videoId, sources).then(async (files) => {
       const db = await getIDBConnection();
@@ -143,10 +144,10 @@ export default class VideoDownloader extends HTMLElement {
    */
   getPosterURLs() {
     const urls = [];
-    if (Array.isArray(this.internal.apiData.thumbnail)) {
-      this.internal.apiData.thumbnail.forEach((thumbnail) => urls.push(thumbnail.src));
+    if (Array.isArray(this.internal.videoData.thumbnail)) {
+      this.internal.videoData.thumbnail.forEach((thumbnail) => urls.push(thumbnail.src));
     } else {
-      urls.push(this.internal.apiData.thumbnail);
+      urls.push(this.internal.videoData.thumbnail);
     }
     return urls;
   }
@@ -157,7 +158,7 @@ export default class VideoDownloader extends HTMLElement {
    * @returns {string[]} URLs.
    */
   getSubtitlesUrls() {
-    const subtitlesObjects = this.internal.apiData['video-subtitles'] || [];
+    const subtitlesObjects = this.internal.videoData['video-subtitles'] || [];
     const subtitlesUrls = subtitlesObjects.map((subObject) => subObject.src);
 
     return subtitlesUrls;
@@ -217,7 +218,7 @@ export default class VideoDownloader extends HTMLElement {
       },
       0,
     );
-    const clampedPercents = Math.max(0, Math.min(percentageProgress, 100));
+    const clampedPercents = Math.max(0, Math.min(percentageProgress, 1));
 
     return clampedPercents;
   }
@@ -274,31 +275,60 @@ export default class VideoDownloader extends HTMLElement {
   render() {
     const templateElement = document.createElement('template');
     templateElement.innerHTML = `<style>${styles}</style>
-      <span class="partial">
-        <button class="cancel" title="Cancel and remove">Cancel</button>
-      </span>
-      <span class="willremove">
-        <button class="undo-remove" title="Undo deletion">Undo</button>
-      </span>
-      <button class="ready">
-        <img src="/images/download-circle.svg" alt="Download" />
-        <span class="expanded">Make available offline</span>
-      </button>
-      <button class="partial">
-        <div class="progress">
-          <progress-ring stroke="2" radius="13" progress="0"></progress-ring>
-          <img class="resume" src="/images/download-resume.svg" alt="Resume" />
-          <img class="pause" src="/images/download-pause.svg" alt="Pause" />
-        </div>
-        <span class="expanded pause">Pause download</span>
-        <span class="expanded resume">Resume download</span>
-      </button>
-      <button class="done">
-        <img class="ok" src="/images/download-done.svg" alt="Done" />
-        <img class="delete" src="/images/download-delete.svg" alt="Delete" title="Delete the video from cache." />
-        <span class="expanded ok">Downloaded</span>
-        <span class="expanded delete">Remove video</span>
-      </button>`;
+
+        <span class="willremove">
+          <button class="undo-remove" title="Undo deletion">Undo</button>
+        </span>
+        <button class="ready">
+          <div class="tooltip">
+            <svg class="icon icon--download" viewBox="0 0 27 27" width="27" height="27" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7.304 25.416h11.56c4.026 0 6.552-2.852 6.552-6.888V7.638c0-4.036-2.512-6.888-6.552-6.888H7.304C3.265.75.752 3.602.752 7.638v10.89c0 4.036 2.514 6.888 6.554 6.888z" fill="" stroke="" stroke-width="1.5"/>
+              <path d="M13.084 18.531V7.635M18.08 13.513l-4.996 5.018-4.998-5.018" fill="none" stroke="" stroke-width="1.5"/>
+            </svg>
+            <div class="tooltip--message">Make available offline<span class="tooltip--arrow"></span></div>
+          </div>
+        </button>
+        <button class="button--contextual action--undo">Undo</button>
+
+        <button class="downloading">
+          <div class="tooltip">
+            <svg class="icon icon--progress" width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+              <circle cx="14" cy="14" r="13" fill="none" stroke="#e6e4e7" stroke-width="1.5" />
+              <circle cx="14" cy="14" r="13" fill="none" stroke="#000" stroke-width="1.5" stroke-dashoffset="var(--progress, 82)" stroke-dasharray="82" />
+              <path d="M18.385 11.615a2 2 0 00-2-2h-4.74a2 2 0 00-2 2v4.74a2 2 0 002 2h4.74a2 2 0 002-2v-4.74z" fill="#141216"/>
+            </svg>
+            <div class="tooltip--message">Pause download<span class="tooltip--arrow"></span></div>
+          </div>
+        </button>
+
+        <button class="paused">
+          <div class="tooltip">
+            <svg class="icon icon--progress" width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+              <circle cx="14" cy="14" r="13" fill="none" stroke="#e6e4e7" stroke-width="1.5" />
+              <circle cx="14" cy="14" r="13" fill="none" stroke="#000" stroke-width="1.5" stroke-dashoffset="var(--progress, 82)" stroke-dasharray="82" />
+              <path d="M17.36 11.23a1.026 1.026 0 000-2.05h-6.69a1.026 1.026 0 000 2.05h6.69zM14 19.94c.566 0 4.385-5.922 4.385-6.488 0-.566-.46-1.025-1.025-1.025h-6.69c-.566 0-1.026.46-1.026 1.025 0 .566 4.356 6.488 4.356 6.488z" fill="#141216"/>
+            </svg>
+            <div class="tooltip--message">Continue download<span class="tooltip--arrow"></span></div>
+          </div>
+        </button>
+        <button class="button--contextual action--cancel">Cancel</button>
+
+        <button class="done">
+          <div class="tooltip">
+            <svg class="icon icon--downloaded-remove" viewBox="0 0 27 27" width="27" height="27" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+              <g class="remove">
+                <path d="M26.308 18.726c0 4.77-2.812 7.582-7.582 7.582H8.344c-4.783 0-7.594-2.812-7.594-7.582V8.332C.75 3.562 2.502.75 7.273.75h2.665c.958 0 1.86.45 2.435 1.217l1.217 1.618a3.051 3.051 0 002.434 1.217h3.773c4.783 0 6.547 2.434 6.547 7.303l-.036 6.621z" fill="#ff375c" stroke="#ff375c" stroke-width="1.5"/>
+                <path d="M16.91 11.842l-6.39 6.39M16.911 18.235l-6.395-6.396" fill="none" stroke="#fff" stroke-width="2"/>
+              </g>
+              <g class="downloaded">
+                <path d="M26.308 18.726c0 4.77-2.812 7.582-7.582 7.582H8.344c-4.783 0-7.594-2.812-7.594-7.582V8.332C.75 3.562 2.502.75 7.273.75h2.665c.958 0 1.86.45 2.435 1.217l1.216 1.618a3.055 3.055 0 002.435 1.217h3.773c4.783 0 6.547 2.434 6.547 7.303l-.036 6.621z" fill="none" stroke="#858287" stroke-width="1.5"/>
+                <path d="M8.968 15.05l3.166 3.163 6.328-6.328" fill="none" stroke="#858287" stroke-width="1.5"/>
+              </g>
+            </svg>
+            <div class="tooltip--message">Remove offline version<span class="tooltip--arrow"></span></div>
+          </div>
+        </button>
+      </div>`;
 
     while (this.internal.root.firstChild) {
       this.internal.root.removeChild(this.internal.root.firstChild);
@@ -306,8 +336,6 @@ export default class VideoDownloader extends HTMLElement {
 
     const ui = templateElement.content.cloneNode(true);
     this.internal.root.appendChild(ui);
-
-    this.internal.elements.progress = this.internal.root.querySelector('progress-ring');
     this.internal.elements.buttons = this.internal.root.querySelectorAll('button');
 
     this.setDownloadState();
@@ -333,7 +361,7 @@ export default class VideoDownloader extends HTMLElement {
         await this.removeFromIDB();
         window.removeEventListener('beforeunload', this.unloadHandler);
       }, 5000);
-    } else if (e.target.className === 'undo-remove') {
+    } else if (e.target.classList.contains('action--undo')) {
       if (this.willremove === true) {
         if (this.removalTimeout) {
           this.state = 'done';
@@ -342,7 +370,7 @@ export default class VideoDownloader extends HTMLElement {
           window.removeEventListener('beforeunload', this.unloadHandler);
         }
       }
-    } else if (e.target.className === 'cancel') {
+    } else if (e.target.classList.contains('action--cancel')) {
       this.removeFromIDB();
     } else if (this.downloading === false) {
       this.download();
@@ -392,7 +420,7 @@ export default class VideoDownloader extends HTMLElement {
    * @returns {string} Video ID.
    */
   getId() {
-    return this.internal.apiData?.id || '';
+    return this.internal.videoData?.id || '';
   }
 
   /**
@@ -421,6 +449,6 @@ export default class VideoDownloader extends HTMLElement {
     const db = await getIDBConnection();
 
     await db.removeVideo(this.getId(), this.internal.files);
-    this.init(this.internal.apiData, this.internal.cacheName);
+    this.init(this.internal.videoData, this.internal.cacheName);
   }
 }

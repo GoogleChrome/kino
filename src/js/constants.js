@@ -7,7 +7,7 @@
  * There may be adjacent caches used for other purposes and we
  * want to let the SW know which caches it should purge on upgrade.
  */
-export const SW_CACHE_NAME = 'static-assets-v1.0.0-alpha3';
+export const SW_CACHE_NAME = 'static-assets-v1.0.0-alpha4';
 export const SW_CACHE_FORMAT = /^static-assets-v[a-z0-9.-]+$/;
 
 /**
@@ -107,6 +107,7 @@ export const ALL_STREAM_TYPES = ['audio', 'video'];
  * Settings key names.
  */
 export const SETTING_KEY_TOGGLE_OFFLINE = 'toggle-offline';
+export const SETTING_KEY_DARK_MODE = 'dark-mode';
 
 /**
  * Event name signalling that data in IDB has changes.

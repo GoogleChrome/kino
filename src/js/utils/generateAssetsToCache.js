@@ -43,7 +43,7 @@ export default async function generateAssetsToCache(api) {
   }
 
   // Add files from the API.
-  api.forEach((video) => {
+  api.videos.forEach((video) => {
     if (Array.isArray(video.thumbnail)) {
       video.thumbnail.forEach((thumbnail) => assetsToCache.push(thumbnail.src));
     } else if (Object.prototype.toString.call(video.thumbnail) === '[object String]') {

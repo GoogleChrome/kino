@@ -69,7 +69,7 @@
 
 /**
  * @typedef  {object}      RouterContext
- * @property {Array}       apiData     Array of sets of video metadata information from the API.
+ * @property {Array}       apiData     Video and category metadata information from the API.
  * @property {HTMLElement} mainContent Elements representing the main content area in the page.
  * @property {Function}    navigate    Method to navigate between pages.
  * @property {string}      path        Current URL path.

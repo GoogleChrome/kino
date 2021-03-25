@@ -1,142 +1,260 @@
+@media screen and (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0ms !important;
+  }
+}
+
 :host,
 :host > * {
     display: none;
 }
 :host {
-  min-width: 26px;
-  min-height: 26px;
-}
-:host button {
-  cursor: pointer;
-}
-.expanded {
+  width: 27px;
+  height: 27px;
   display: none;
-}
-span.expanded {
-  margin-left: 1rem;
-}
-button.cancel {
-    border-color: #FF8383 !important;
-}
-:host( [expanded="true"] ) .expanded {
-    display: inline-block;
+  position: relative;
 }
 :host( [expanded="true"] ) {
-  display: inline-block;
-}
-:host( :not( [expanded="true"] ) ) .expanded {
-  display: none;
-}
-:host( [expanded="true"] ) button {
-  justify-content: center;
-  align-items: center;
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  font-size: 0.8rem;
-  font-weight: bold;
-  letter-spacing: 0.085em;
-  border-radius: 5px;
-  padding: 0.5rem 1rem 0.5rem 1rem;
-  text-transform: uppercase;
-  cursor: pointer;
-  background: transparent;
-}
-:host( :not( [state="not-initialized"] ) ) {
-    display: inline-block;
-}
-:host( [state="ready"] ) .ready {
-    display: flex;
-    align-items: center;
-}
-:host( [state="partial"] ) .partial,
-:host( [state="ready"][willremove="true"] ) .willremove {
-    display: flex;
-    position: relative;
-}
-.progress {
-    position: relative;
-    display: inline-block;
-}
-:host( [state="partial"][downloading="true"] ) .cancel {
-    display: none;
-}
-:host( [state="partial"][downloading="false"] ) .cancel,
-:host( [state="ready"][willremove="true"] ) .willremove button {
-    display: block;
-    position: absolute;
-    bottom: 0;
-    background: #FFF;
-    padding: 0.5rem;
-    border-radius: 5px;
-    left: 50%;
-    transform: translate(-50%, 0);
-    color: #FF8383;
-    font-size: 0.7rem;
-    font-weight: bold;
-    line-height: initial;
-    cursor: pointer;
-    text-transform: uppercase;
-}
-:host( [expanded="true"][state="partial"][downloading="false"] ) .cancel,
-:host( [expanded="true"][state="ready"][willremove="true"] ) .willremove button {
-    right: 0;
-    left: initial;
-    bottom: initial;
-    transform: translate(110%, 0);
-}
-:host( [state="partial"][downloading="false"] ) .resume:not(.expanded) {
-    display: block;
-}
-:host( [state="partial"][downloading="false"] ) .pause {
-    display: none;
-}
-:host( [state="partial"][downloading="true"] ) .resume:not(.expanded) {
-    display: none;
-}
-:host( [state="partial"][downloading="true"] ) .pause:not(.expanded) {
-    display: block;
-}
-:host( [state="partial"][downloading="true"][expanded="true"] ) .resume {
-    display: none;
-}
-:host( [state="partial"] ) .partial img.resume,
-:host( [state="partial"] ) .partial img.pause {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
-:host( [state="partial"] ) .partial img.resume {
-    transform: translate(-40%, -50%);
-}
-:host( [state="done"] ) .done {
-    display: flex;
-}
-:host( [state="done"] ) button .delete {
-    display: none;
-    cursor: pointer;
-    color: #FF8383;
-}
-:host( [state="done"] ) button:hover {
-    border-color: #FF8383;
-}
-:host( [state="done"]:not( [expanded="true"] ) ) button:hover .delete:not(.expanded) {
-    display: block;
-}
-:host( [state="done"][expanded="true"] ) button:hover .delete {
-    display: block;
+  width: auto;
+  height: auto;
 }
 
-:host( [state="done"] ) button:hover .ok {
-    display: none;
+:host( :not( [state="not-initialized"] ) ) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
-button {
+
+:host *:focus {
+  border: none;
+  outline-style: dotted;
+  outline-color: var(--accent);
+}
+
+/**
+ * Default button styles.
+ */
+:host > button {
+  cursor: pointer;
+}
+:host( [expanded="true"] ) > button {
+  height: calc(var(--gutter) * 1.5 + 28px);
+  font-weight: 700;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  align-items: center;
+  color: var(--text);
+  background-color: transparent;
+}
+:host( [expanded="true"] ) > button.ready {
+  padding: 0 calc(var(--gutter) * 0.666);
+  color: var(--accent);
+  background-color: var(--accent-background);
+}
+:host( [expanded="true"] ) > button > .tooltip {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+:host( [expanded="true"] ) .icon {
+  margin-right: calc(var(--gutter) * 0.666);
+}
+:host( :not( [expanded="true"] ) ) > button {
+  width: 27px;
+  height: 27px;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  line-height: 0;
+}
+:host( [expanded="true"] ) > .button--contextual {
+  margin-left: calc(var(--gutter) * 0.666);
+  background: transparent;
+}
+:host( :not( [expanded="true"] ) ) > .button--contextual {
+  width: auto;
+  height: auto;
+  transform: translateX(calc(-100% - 28px - 8px));
+  font-size: 12px;
+  line-height: 20px;
+  border-radius: 2px;
+  color: var(--accent);
+  background: var(--accent-background);
+}
+:host( :not( [expanded="true"] ) ) > .button--contextual:hover {
+  color: var(--accent-background);
+  background: var(--accent);
+}
+
+/* Ready button (download icon) */
+:host( [state="ready"] ) button.ready {
+  display: flex;
+}
+:host( [state="ready"] ) button.ready svg path[stroke] {
+  stroke: var(--accent);
+}
+:host( [state="ready"] ) button.ready svg path:not([fill="none"]) {
+  fill: var(--background);
+}
+:host( [state="ready"][expanded="true"] ) button.ready svg path:not([fill="none"]) {
+  fill: var(--accent-background);
+}
+:host( [state="ready"] ) button.ready:hover svg path[stroke] {
+  stroke: var(--background);
+}
+:host( [state="ready"] ) button.ready:hover svg path:not([fill="none"]) {
+  fill: var(--accent);
+}
+:host( [state="ready"][willremove="true"] ) button.ready + .button--contextual {
+  display: inline-block;
+}
+
+
+/* Ready button (downloaded / remove combo icon) */
+:host( [state="done"] ) button.done {
+  display: flex;
+}
+:host( [state="done"] ) button.done svg g.remove {
+  display: none;
+}
+:host( [state="done"] ) button.done svg g.downloaded {
+  display: inline-block;
+}
+:host( [state="done"] ) button.done svg g.downloaded path[stroke] {
+  stroke: var(--icon);
+}
+:host( [state="done"] ) button.done:hover svg g.downloaded {
+  display: none;
+}
+:host( [state="done"] ) button.done:hover svg g.remove {
+  display: inline-block;
+}
+:host( [state="done"] ) button.done svg path:not([fill="none"]) {
+  fill: var(--background);
+}
+:host( [state="done"] ) button.done:hover svg path[stroke] {
+  stroke: var(--background);
+}
+:host( [state="done"] ) button.done:hover svg path:not([fill="none"]) {
+  fill: var(--alarm);
+}
+
+/* Progress icon (downloading state) */
+:host( [state="partial"][downloading="true"] ) button.downloading {
+  display: flex;
+}
+:host( [state="partial"][downloading="true"] ) button.downloading svg {
+  transform: rotate(-90deg);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading svg path[fill] {
+  fill: var(--accent-text);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading svg circle[stroke-dasharray] {
+  stroke: var(--accent-text);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading svg circle:not([stroke-dasharray]) {
+  stroke: var(--accent-background);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading:hover svg path[fill] {
+  fill: var(--accent);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading:hover svg circle[stroke-dasharray] {
+  stroke: var(--accent);
+}
+
+/* Progress icon (paused state) */
+:host( [state="partial"][downloading="false"] ) button.paused {
+  display: flex;
+}
+:host( [state="partial"][downloading="false"] ) button.paused svg {
+  transform: rotate(-90deg);
+}
+:host( [state="partial"][downloading="false"] ) button.paused svg path[fill] {
+  fill: var(--accent-text);
+}
+:host( [state="partial"][downloading="false"] ) button.paused svg circle[stroke-dasharray] {
+  stroke: var(--accent-text);
+}
+:host( [state="partial"][downloading="false"] ) button.paused svg circle:not([stroke-dasharray]) {
+  stroke: var(--accent-background);
+}
+:host( [state="partial"][downloading="false"] ) button.paused:hover svg path[fill] {
+  fill: var(--accent);
+}
+:host( [state="partial"][downloading="false"] ) button.paused:hover svg circle[stroke-dasharray] {
+  stroke: var(--accent);
+}
+:host( [state="partial"][downloading="false"] ) button.paused + .button--contextual {
+  display: inline-block;
+}
+
+/**
+ * Tooltips styling.
+ */
+:host( :not([expanded="true"]) ) .tooltip--message {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  :host( :not([expanded="true"]) ) .tooltip {
+    display: inline-block;
+    position: relative;
+    text-align: left;
     cursor: pointer;
-    padding: 0;
-    background: transparent;
-    border: 0;
-    line-height: 0;
+  }
+
+  :host( :not([expanded="true"]) ) .tooltip--message {
+    min-width: 100px;
+    max-width: 300px;
+    display: block;
+
+    top: -16px;
+    left: 50%;
+    transform: translate(-50%, -100%);
+
+    padding: calc(var(--gutter) / 2);
+    color: var(--tooltip);
+    background-color: var(--tooltip-background);
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 12px;
+    border-radius: 8px;
+    position: absolute;
+    box-sizing: border-box;
+    white-space: pre;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 200ms ease-in-out 300ms;
+    pointer-events: none;
+  }
+
+  :host( :not([expanded="true"]) ) .tooltip:hover > .tooltip--message {
+    opacity: 1;
+  }
+
+  :host( :not([expanded="true"]) ) .tooltip--arrow {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -12px;
+    width: 24px;
+    height: 12px;
+    overflow: hidden;
+  }
+
+  :host( :not([expanded="true"]) ) .tooltip--arrow::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    left: 50%;
+    transform: translate(-50%,-50%) rotate(45deg);
+    background-color: var(--tooltip-background);
+  }
 }
-:host( [state="ready"] ) button:hover {
-    filter: brightness(95%);
+
+:host( [expanded="true"] ) .tooltip--message {
+  display: inline-block;
 }

@@ -1,50 +1,73 @@
-:host {
-  overflow: hidden;
-  border-radius: 7px;
-  box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.28);
-  transition: all 120ms;
+/**
+ * Remove animations when the user indicates the preference.
+ *
+ * Also on slow updating devices.
+ */
+ @media screen and (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0ms !important;
+  }
 }
-:host(:hover:not(.disabled)) {
-    box-shadow: 0px 10px 13px rgba(0, 0, 0, 0.30);
-    transform: scale(1.02);
+
+/* Video Card */
+:host {
+  margin-bottom: auto;
 }
 :host(.disabled) {
-  filter: grayscale(100%);
-  opacity: 0.5;
+  filter: grayscale(1);
 }
-.poster {
-  background-size: cover;
-  height: 0;
-  padding-top: 56.25%;
-  display: block;
+
+:host(.disabled) video-downloader {
+  pointer-events: none;
 }
-.info {
-  padding: 1rem;
-  background: #FFF;
-  height: 100%;
-}
-.info .title-icon {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-}
-.info .title-icon .downloader {
-  margin-top: 2px;
-  margin-left: 10px;
-}
-.info .title {
-  font-size: 1.3rem;
-  line-height: 1.5;
-  font-weight: bold;
-  color: #12283C;
+
+:host a {
+  display: inline-block;
+  color: var(--accent-text);
   text-decoration: none;
 }
-.info .title:hover {
+
+:host a:hover,
+:host a:active {
   text-decoration: underline;
 }
-.info .desc {
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #667F96;
+
+:host *:focus {
+  border: none;
+  outline-style: dotted;
+  outline-color: var(--accent);
+}
+
+:host img {
+  border-radius: 8px;
+  display: block;
+  max-width: 100%;
+}
+
+:host h2 {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 32px;
+  margin-right: 40px;
+}
+
+.video-card--content {
+  position: relative;
+}
+
+.video-card--downloader {
+  position: absolute;
+  top: 4px;
+  right: 0;
+}
+
+/* Video Card: Breakpoints */
+@media (min-width: 960px) {
+  .video-card--image-link {
+    transition: transform .2s cubic-bezier(0, 0, .4, 1);
+  }
+
+  .video-card--image-link:hover {
+    transform: scale(1.03);
+  }
 }

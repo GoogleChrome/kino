@@ -1,3 +1,4 @@
+import { loadSetting, saveSetting, removeSetting } from '../../utils/settings';
 import styles from './ToggleButton.css';
 
 const template = document.createElement('template');
@@ -12,17 +13,17 @@ export default class ToggleButton extends HTMLElement {
     super();
     this._root = this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
+
     this.$checkbox = this._root.querySelector('input');
     this.$checkbox.addEventListener('change', (e) => {
-      this.checked = e.target.checked;
-      this.dispatchEvent(
-        new CustomEvent('change', { detail: { value: e.target.checked } }),
-      );
+      this.setNewToggleState(e.target.checked);
     });
+
+    this.render();
   }
 
   static get observedAttributes() {
-    return ['checked'];
+    return ['checked', 'setting'];
   }
 
   get checked() {
@@ -34,11 +35,39 @@ export default class ToggleButton extends HTMLElement {
     this.$checkbox.checked = value;
   }
 
-  attributeChangedCallback() {
-    this.render();
+  get setting() {
+    return this.getAttribute('setting');
   }
 
+  set setting(value) {
+    this.setAttribute('setting', value);
+  }
+
+  setNewToggleState(isChecked) {
+    this.checked = isChecked;
+    if (isChecked) {
+      saveSetting(this.setting, isChecked);
+    } else {
+      removeSetting(this.setting);
+    }
+
+    this.dispatchEvent(
+      new CustomEvent('setting-change', {
+        bubbles: true,
+        cancelable: true,
+        detail: { setting: this.setting, value: this.checked },
+      }),
+    );
+  }
+
+  attributeChangedCallback(name) {
+    if (name === 'setting') this.render();
+  }
+
+  /**
+   * Renders the toggle button.
+   */
   render() {
-    this.$checkbox.checked = this.checked;
+    this.checked = (loadSetting(this.setting) === true);
   }
 }

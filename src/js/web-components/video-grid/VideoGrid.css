@@ -1,48 +1,177 @@
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-section {
-  background: var(--background-light);
-  padding: 2rem;
-}
-@media screen and (max-width: 700px) {
-  section {
-    padding: 1.5rem;
+/**
+ * Remove animations when the user indicates the preference.
+ *
+ * Also on slow updating devices.
+ */
+@media screen and (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0ms !important;
   }
 }
 
-section .section-header {
-  margin: 1rem 0 2rem 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+/* Container */
+.container {
+  display: grid;
+  margin: 0 auto;
+  max-width: calc(1200px + var(--gutter) * 2);
+  padding: 0 var(--gutter);
+  position: relative;
 }
-section .section-header .view-all {
-  text-transform: uppercase;
-  font-size: 0.8rem;
-  font-weight: bold;
-  letter-spacing: 0.085em;
-  color: #27BBA0;
+
+.container--no-padding {
+  max-width: calc(1200px + var(--gutter) * 2);
+  padding: 0;
+}
+
+/* Section Header */
+.section-header {
+  display: flex;
+  align-items: flex-end;
+  padding: 0 var(--gutter);
+}
+
+:host(.hide-header) .section-header {
+  display: none;
+}
+
+.section-header h2 {
+  color: var(--accent-text);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 44px;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+:host a {
+  display: inline-block;
+  color: var(--accent-text);
   text-decoration: none;
 }
-section h2 {
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #FFF;
+
+.section-header a {
+  border-radius: 8px;
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  margin-left: auto;
+  padding: 10px 0px;
 }
-section.dark {
-  background: var(--background-dark);
+
+:host a:hover,
+:host a:active {
+  text-decoration: underline;
 }
-.grid {
+
+:host *:focus {
+  border: none;
+  outline-style: dotted;
+  outline-color: var(--accent);
+}
+
+.section-header a {
+  white-space: pre;
+  background: var(--accent-background);
+  padding: 10px 20px;
+  transition: color 100ms ease-in-out, background-color 100ms ease-in-out;
+}
+.section-header a:hover,
+.section-header a:focus {
+  text-decoration: none;
+  color: var(--accent-background);
+  background: var(--accent);
+}
+
+/* Video Cards */
+.video-cards {
+  align-content: start;
+  grid-gap: var(--gutter) 0;
+  grid-template-columns: var(--gutter) 1fr var(--gutter);
+  overflow-x: hidden;
+  overflow-y: scroll;
+  padding: 0;
+}
+
+.video-cards ul {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
-  grid-gap: 2rem;
+  grid-auto-flow: row;
+  grid-gap: var(--gutter);
+  grid-template-columns: 1fr;
+  list-style: none;
+  margin: 0 var(--gutter);
+  padding-inline-start: 0;
 }
-.grid > div {
-  color: #000;
-  background: #FFF;
-  /*padding: 1.5rem;*/
-  border-radius: 7px;
-  min-height: 150px;
+
+.video-cards ul li {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  scroll-snap-align: center;
+  margin: var(--gutter) 0px;
+}
+
+@media (min-width: 360px) {
+  .video-cards ul {
+    grid-auto-flow: column;
+    grid-template-columns: 0px;
+    grid-template-rows: minmax(auto, 1fr);
+    list-style: none;
+    padding: 0;
+    margin: 0 0 3rem 0;
+  }
+
+  .video-cards ul::-webkit-scrollbar {
+    display: none;
+  }
+
+  .video-cards ul:before,
+  .video-cards ul:after {
+    content: '';
+    width: var(--gutter);
+  }
+
+  .video-cards ul:after {
+    width: 1px;
+  }
+}
+
+@media (min-width: 720px) {
+  .video-cards ul {
+    margin-bottom: 3.5rem;
+  }
+}
+
+@media (min-width: 960px) {
+  .video-cards {
+    padding: 0 var(--gutter);
+    overflow: visible;
+  }
+  .video-cards ul {
+    grid-auto-flow: initial;
+    grid-template-columns: 1fr 1fr 1fr;
+    margin-bottom: 4rem;
+  }
+  .video-cards ul:before,
+  .video-cards ul:after {
+    display: none;
+    width: 0;
+  }
+}
+
+@media (max-width: 959px) {
+  .video-cards ul {
+    grid-auto-columns: calc(50% - var(--gutter) * 2.5);
+    grid-column: 3 / -1;
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+}
+
+@media (max-width: 719px) {
+  .video-cards ul {
+    grid-auto-columns: calc(100% - var(--gutter) * 4);
+  }
 }

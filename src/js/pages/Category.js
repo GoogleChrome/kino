@@ -1,27 +1,4 @@
-import slugify from '../utils/slugify';
 import appendVideoToGallery from '../utils/appendVideoToGallery';
-
-/**
- * Finds category name by slug (reverse lookup).
- *
- * @todo Later on if we introduce Categories endpoint that will be changed.
- *
- * @param {string} slug Slug.
- * @param {object[]} apiData Array of video metadata objects.
- *
- * @returns {string} Category name or empty string.
- */
-function findCategoryNameBySlug(slug, apiData) {
-  for (let i = 0; i < apiData.length; i += 1) {
-    for (let j = 0; j < apiData[i].categories.length; j += 1) {
-      const cat = apiData[i].categories[j];
-      if (slugify(cat) === slug) {
-        return cat;
-      }
-    }
-  }
-  return '';
-}
 
 /**
  * @param {RouterContext} routerContext Context object passed by the Router.
@@ -33,25 +10,35 @@ export default (routerContext) => {
     path,
   } = routerContext;
 
-  const categorySlug = path.replace('/category/', '');
-  const categoryName = findCategoryNameBySlug(categorySlug, apiData);
+  const categorySlug = path.replace('/category/', '').replace(/\/$/, '');
+  const categoryObject = apiData.categories.find((candidate) => candidate.slug === categorySlug);
+
   mainContent.innerHTML = `
-    <div class="page-title">
-        <h2>${categoryName}</h2>
-        <img src="/images/arrow-down.svg" alt="" />
+    <div class="container">
+      <header class="page-header">
+        <h1>${categoryObject.name}</h1>
+        <p>${categoryObject.description}</p>
+      </header>
     </div>
-    <div class="category"></div>
   `;
 
-  const filteredApiData = apiData.filter(
-    (videoData) => videoData.categories.includes(categoryName),
+  const videosFromCurrentCategory = apiData.videos.filter(
+    (videoData) => videoData.categories.includes(categoryObject.name),
   );
-  const localContext = {
-    content: mainContent.querySelector('.category'),
+  const apiDataCurrentCategory = {
+    videos: videosFromCurrentCategory,
+    categories: apiData.categories,
   };
+
+  const localContext = {
+    category: categoryObject.name,
+    class: 'hide-header',
+  };
+
+  document.body.classList.add('is-category');
 
   appendVideoToGallery({
     ...routerContext,
-    apiData: filteredApiData,
+    apiData: apiDataCurrentCategory,
   }, localContext);
 };
