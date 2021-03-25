@@ -19,7 +19,7 @@ function appendVideoToGallery(routerContext, localContext) {
 
   const videoGallery = videoGrid.shadowRoot.querySelector('.video-cards ul');
 
-  apiData.forEach((videoData) => {
+  apiData.videos.forEach((videoData) => {
     const item = document.createElement('li');
     const card = document.createElement('video-card');
     const downloader = getDownloaderElement(videoDownloaderRegistry, videoData);

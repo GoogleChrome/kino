@@ -101,19 +101,19 @@ export default class VideoDownloader extends HTMLElement {
   /**
    * Component logic.
    *
-   * @param {object} apiData   Video data coming from the API.
+   * @param {object} videoData   Video data coming from the API.
    * @param {string} cacheName Cache name.
    */
-  init(apiData, cacheName = 'v1') {
+  init(videoData, cacheName = 'v1') {
     this.internal = {
       ...this.internal,
-      apiData,
+      videoData,
       cacheName,
       elements: {},
     };
 
     const videoId = this.getId();
-    const sources = this.internal.apiData['video-sources'] || [];
+    const sources = this.internal.videoData['video-sources'] || [];
 
     getURLsForDownload(videoId, sources).then(async (files) => {
       const db = await getIDBConnection();
@@ -144,10 +144,10 @@ export default class VideoDownloader extends HTMLElement {
    */
   getPosterURLs() {
     const urls = [];
-    if (Array.isArray(this.internal.apiData.thumbnail)) {
-      this.internal.apiData.thumbnail.forEach((thumbnail) => urls.push(thumbnail.src));
+    if (Array.isArray(this.internal.videoData.thumbnail)) {
+      this.internal.videoData.thumbnail.forEach((thumbnail) => urls.push(thumbnail.src));
     } else {
-      urls.push(this.internal.apiData.thumbnail);
+      urls.push(this.internal.videoData.thumbnail);
     }
     return urls;
   }
@@ -158,7 +158,7 @@ export default class VideoDownloader extends HTMLElement {
    * @returns {string[]} URLs.
    */
   getSubtitlesUrls() {
-    const subtitlesObjects = this.internal.apiData['video-subtitles'] || [];
+    const subtitlesObjects = this.internal.videoData['video-subtitles'] || [];
     const subtitlesUrls = subtitlesObjects.map((subObject) => subObject.src);
 
     return subtitlesUrls;
@@ -420,7 +420,7 @@ export default class VideoDownloader extends HTMLElement {
    * @returns {string} Video ID.
    */
   getId() {
-    return this.internal.apiData?.id || '';
+    return this.internal.videoData?.id || '';
   }
 
   /**
@@ -449,6 +449,6 @@ export default class VideoDownloader extends HTMLElement {
     const db = await getIDBConnection();
 
     await db.removeVideo(this.getId(), this.internal.files);
-    this.init(this.internal.apiData, this.internal.cacheName);
+    this.init(this.internal.videoData, this.internal.cacheName);
   }
 }

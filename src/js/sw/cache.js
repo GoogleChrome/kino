@@ -1,7 +1,6 @@
 export default [
   '/',
   '/api.json',
-  '/dist/js/index.js',
   '/images/apple-touch-icon.png',
   '/images/arrow-down.svg',
   '/images/close.svg',
@@ -35,6 +34,4 @@ export default [
   'https://storage.googleapis.com/wdm-assets/images/gui-challenges/centering.jpg',
   'https://storage.googleapis.com/wdm-assets/images/gui-challenges/sidenav.jpg',
   'https://storage.googleapis.com/wdm-assets/images/gui-challenges/tabs.jpg',
-  'https://storage.googleapis.com/wdm-assets/images/pwa/pwa-intro.jpg',
-  'https://storage.googleapis.com/wdm-assets/images/pwa/pwa-when.jpg',
 ];

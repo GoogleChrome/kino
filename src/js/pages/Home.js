@@ -15,7 +15,7 @@ export default (routerContext) => {
     </div>
   `;
 
-  const videosByCategories = apiData.reduce((acc, videoData) => {
+  const videosByCategories = apiData.videos.reduce((acc, videoData) => {
     videoData.categories.forEach((category) => {
       if (!(category in acc)) acc[category] = [];
       acc[category].push(videoData);
@@ -31,11 +31,14 @@ export default (routerContext) => {
     /**
      * Limit the number of videos to 3 per category on the homepage.
      */
-    const firstSetOfVideos = videosByCategories[category].slice(0, 3);
+    const categoryApiData = {
+      videos: videosByCategories[category].slice(0, 3),
+      categories: apiData.categories,
+    };
 
     appendVideoToGallery({
       ...routerContext,
-      apiData: firstSetOfVideos,
+      apiData: categoryApiData,
     }, localContext);
   });
 };

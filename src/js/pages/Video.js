@@ -18,7 +18,7 @@ export default (routerContext) => {
    * Pick the current video data out of the `apiData` array
    * and also return the rest of that data.
    */
-  const [currentVideoData, restVideoData] = apiData.reduce(
+  const [currentVideoData, restVideoData] = apiData.videos.reduce(
     (returnValue, videoMeta) => {
       if (path.includes(`/${videoMeta.id}`)) {
         returnValue[0] = videoMeta;
@@ -113,12 +113,20 @@ export default (routerContext) => {
     videoPlayer.play();
   });
 
+  const sameCategoryVideos = restVideoData.filter(
+    (obj) => obj.categories.includes(localContext.category),
+  ).slice(0, 3);
+
+  const galleryApiData = {
+    videos: sameCategoryVideos,
+    categories: apiData.categories,
+  };
+
   /**
    * Passing `restVideoData` to avoid duplication of content on the single page.
    */
   appendVideoToGallery({
     ...routerContext,
-    /* eslint-disable-next-line max-len */
-    apiData: restVideoData.filter((obj) => obj.categories.includes(localContext.category)).slice(0, 3),
+    apiData: galleryApiData,
   }, localContext);
 };

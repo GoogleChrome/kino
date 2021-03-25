@@ -81,7 +81,7 @@ export default async (routerContext) => {
 
     allMeta.forEach((meta) => {
       const item = document.createElement('li');
-      const videoData = apiData.find((vd) => vd.id === meta.videoId);
+      const videoData = apiData.videos.find((vd) => vd.id === meta.videoId);
       const card = document.createElement('video-card');
       const downloader = getDownloaderElement(videoDownloaderRegistry, videoData);
 

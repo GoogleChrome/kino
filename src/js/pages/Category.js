@@ -1,4 +1,3 @@
-import findCategoryNameBySlug from '../utils/findCategoryNameBySlug';
 import appendVideoToGallery from '../utils/appendVideoToGallery';
 
 /**
@@ -12,21 +11,27 @@ export default (routerContext) => {
   } = routerContext;
 
   const categorySlug = path.replace('/category/', '').replace(/\/$/, '');
-  const categoryName = findCategoryNameBySlug(categorySlug, apiData);
+  const categoryObject = apiData.categories.find((candidate) => candidate.slug === categorySlug);
+
   mainContent.innerHTML = `
     <div class="container">
       <header class="page-header">
-        <h1>${categoryName}</h1>
+        <h1>${categoryObject.name}</h1>
+        <p>${categoryObject.description}</p>
       </header>
     </div>
   `;
 
-  const filteredApiData = apiData.filter(
-    (videoData) => videoData.categories.includes(categoryName),
+  const videosFromCurrentCategory = apiData.videos.filter(
+    (videoData) => videoData.categories.includes(categoryObject.name),
   );
+  const apiDataCurrentCategory = {
+    videos: videosFromCurrentCategory,
+    categories: apiData.categories,
+  };
 
   const localContext = {
-    category: categoryName,
+    category: categoryObject.name,
     class: 'hide-header',
   };
 
@@ -34,6 +39,6 @@ export default (routerContext) => {
 
   appendVideoToGallery({
     ...routerContext,
-    apiData: filteredApiData,
+    apiData: apiDataCurrentCategory,
   }, localContext);
 };
