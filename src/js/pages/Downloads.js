@@ -1,6 +1,7 @@
 import { IDB_DATA_CHANGED_EVENT } from '../constants';
 import getIDBConnection from '../classes/IDBConnection';
 import getDownloaderElement from '../utils/getDownloaderElement';
+import styles from '../web-components/video-grid/VideoGrid.css';
 
 /**
  * @param {RouterContext} routerContext Context object passed by the Router.
@@ -15,35 +16,63 @@ export default async (routerContext) => {
   } = routerContext;
   mainContent.innerHTML = `
     <style>
-      .grid {
-        margin-top: 2rem;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
-        grid-gap: 2rem;
-        max-width: 1200px;
+      ${styles}
+      .page-header h1 {
+        margin-bottom: 0.45em;
       }
-      .clearing {
-        opacity: 0.3;
+      .downloads > div {
+        grid-template-columns: 1fr 1fr;
+      }
+      .quota {
+        display: block;
+        font-size: 24px;
+        line-height: 32px;
+      }
+      .quota span {
+        color: var(--accent-text);
+        font-weight: 500;
+      }
+      .download-tip {
+        padding-top: 4rem;
+        padding-bottom: 2rem;
+        text-align: center;
+      }
+      .download-tip svg {
+        vertical-align: text-bottom;
+      }
+      .download-tip svg path[stroke] {
+        stroke: var(--accent);
+      }
+      .download-tip svg path:not([fill="none"]) {
+        fill: var(--background);
       }
     </style>
-    <div class="page-title">
-        <h2>Manage your downloads</h2>
-        <img src="/images/arrow-down.svg" alt="" />
+    <div class="container">
+      <header class="page-header">
+        <h1>Manage downloads</h1>
+        <p>This content is available offline.</p>
+      </header>
     </div>
-    <div class="downloads container">
-        <div class="header">
-            <span class="quota"></span>
-            <div>
-                <button class="primary delete-all" disabled>Delete all</button>
-            </div>
-        </div>
-        <div class="grid"></div>
+    <div class="container downloads">
+      <div>
+        <span>Storage available</span>
+        <span class="quota"></span>
+      </div>
+      <div>
+        <button class="primary delete-all" disabled>Delete all</button>
+      </div>
     </div>
+    <div class="container container--no-padding">
+      <div class="video-cards">
+        <ul></ul>
+      </div>
+    </div>
+</div>
   `;
 
   const db = await getIDBConnection();
   const deleteAllBtn = mainContent.querySelector('.delete-all');
-  const grid = mainContent.querySelector('.grid');
+  const videoGallery = mainContent.querySelector('.video-cards ul');
 
   /**
    * Displays the current storage quota.
@@ -59,7 +88,7 @@ export default async (routerContext) => {
             const availableGB = ((quota.quota - quota.usage) / bytesPerGB).toFixed(2);
             const totalGB = (quota.quota / bytesPerGB).toFixed(2);
 
-            quotaElement.innerHTML = `${availableGB} GB available <span>of ${totalGB} GB</span>`;
+            quotaElement.innerHTML = `<span>${availableGB} GB</span> of ${totalGB} GB`;
           }
         },
       );
@@ -70,11 +99,12 @@ export default async (routerContext) => {
     // Should partial downloads also be visible here? For now - yes.
     // .filter((meta) => meta.done)
     const allMeta = await db.meta.getAll();
-    while (grid.firstChild) {
-      grid.removeChild(grid.firstChild);
+    while (videoGallery.firstChild) {
+      videoGallery.removeChild(videoGallery.firstChild);
     }
 
     allMeta.forEach((meta) => {
+      const item = document.createElement('li');
       const videoData = apiData.find((vd) => vd.id === meta.videoId);
       const card = document.createElement('video-card');
       const downloader = getDownloaderElement(videoDownloaderRegistry, videoData);
@@ -86,14 +116,26 @@ export default async (routerContext) => {
         downloader,
       });
 
-      grid.appendChild(card);
+      item.appendChild(card);
+      videoGallery.appendChild(item);
     });
 
     if (allMeta.length === 0) {
       const tipDownload = document.createElement('div');
-      tipDownload.className = 'center-text tip';
-      tipDownload.innerHTML = 'No videos. To download a video press the <img class="vertical-bottom" src="/images/download-circle.svg" /> button.';
-      mainContent.querySelector('.downloads').appendChild(tipDownload);
+      const referenceNode = mainContent.querySelector('.downloads');
+
+      tipDownload.className = 'container download-tip';
+      tipDownload.innerHTML = `
+        <p>
+          No videos. To download a video press the
+          <svg class="ready" viewBox="0 0 27 27" width="27" height="27" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7.304 25.416h11.56c4.026 0 6.552-2.852 6.552-6.888V7.638c0-4.036-2.512-6.888-6.552-6.888H7.304C3.265.75.752 3.602.752 7.638v10.89c0 4.036 2.514 6.888 6.554 6.888z" fill="" stroke="" stroke-width="1.5"/>
+            <path d="M13.084 18.531V7.635M18.08 13.513l-4.996 5.018-4.998-5.018" fill="none" stroke="" stroke-width="1.5"/>
+          </svg>
+          button.
+        </p>
+       `;
+      referenceNode.parentNode.insertBefore(tipDownload, referenceNode.nextSibling);
     } else {
       deleteAllBtn.removeAttribute('disabled');
     }
@@ -107,12 +149,8 @@ export default async (routerContext) => {
 
   /**
    * Removes all entries from the database on a click event.
-   *
-   * @param {Event} e Click event.
    */
-  deleteAllBtn.addEventListener('click', async (e) => {
-    const btn = e.target;
-
+  deleteAllBtn.addEventListener('click', async () => {
     /**
      * @type {Iterator<string, VideoDownloader>}
      */
@@ -120,9 +158,6 @@ export default async (routerContext) => {
     allDownloaders.forEach(
       ([, downloader]) => downloader.cancel(),
     );
-
-    grid.classList.add('clearing');
-    btn.classList.add('clearing');
 
     /**
      * Clears all data from IDB.
@@ -134,7 +169,6 @@ export default async (routerContext) => {
      */
     videoDownloaderRegistry.destroyAll();
 
-    btn.classList.remove('clearing');
     deleteAllBtn.setAttribute('disabled', '');
     renderPage();
   });
