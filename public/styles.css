@@ -20,6 +20,8 @@
   --tooltip-background: #1E1E20;
   --alarm: #FF375C;
   --alert: #FFA24C;
+  --toggle-background-off: #BFBEC1;
+  --toggle-background-on: #3740FF;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -35,6 +37,8 @@
     --separator: #3D3B3F;
     --tooltip: #1E1E20;
     --tooltip-background: #fff;
+    --toggle-background-off: #3D3B3F;
+    --toggle-background-on: #00C9DB;
   }
 }
 
