@@ -451,21 +451,23 @@ main {
   }
 }
 
-.poster-bg {
-  max-width: 1280px;
+.video-container {
+  border-radius: 8px;
+  max-width: 1200px;
   margin: 0 auto;
+  overflow: hidden;
 }
-.poster-image {
+.video-container--image {
   height: 0;
   padding-bottom: 56.25%; /* 16:9 */
   position: relative;
 }
-.poster-image picture img,
-.poster-image > img {
+.video-container--image picture img,
+.video-container--image > img {
   width: 100%;
   height: auto;
 }
-.poster-bg .play {
+.video-container .play {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -473,7 +475,7 @@ main {
   color: #000;
   z-index: 2;
 }
-.poster-bg .play {
+.video-container .play {
   background: transparent;
   border-radius: 50%;
   width: 112px;
@@ -482,14 +484,14 @@ main {
   border: none;
   cursor: pointer;
 }
-.poster-bg .main-player {
+.video-container .video-container--player {
   display: none;
   height: 720px;
 }
-.poster-bg.has-player .poster-image {
+.video-container.has-player .video-container--image {
   display: none;
 }
-.poster-bg.has-player .main-player {
+.video-container.has-player .video-container--player {
   display: block;
   height: auto;
 }

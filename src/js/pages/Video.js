@@ -19,7 +19,7 @@ export default (routerContext) => {
    */
   const [currentVideoData, restVideoData] = apiData.reduce(
     (returnValue, videoMeta) => {
-      if (path.includes(videoMeta.id)) {
+      if (path.includes(`/${videoMeta.id}`)) {
         returnValue[0] = videoMeta;
       } else {
         returnValue[1].push(videoMeta);
@@ -48,8 +48,8 @@ export default (routerContext) => {
   mainContent.innerHTML = `
   <div class="container">
     <article>
-      <div class="poster-bg">
-        <div class="poster-image">
+      <div class="video-container">
+        <div class="video-container--image">
           ${videoImageHTML}
           <button class="play">
             <svg width="112" height="112" viewBox="0 0 112 112" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -71,7 +71,7 @@ export default (routerContext) => {
             </svg>
           </button>
         </div>
-        <div class="main-player"></div>
+        <div class="video-container--player"></div>
       </div>
       <h2>${currentVideoData.title}</h2>
       <div class="info">
@@ -100,11 +100,11 @@ export default (routerContext) => {
   const playButton = mainContent.querySelector('.play');
 
   playButton.addEventListener('click', (e) => {
-    const poster = e.target.closest('.poster-bg');
-    const playerWrapper = poster.querySelector('.main-player');
+    const videoContainer = e.target.closest('.video-container');
+    const playerWrapper = videoContainer.querySelector('.video-container--player');
     const videoPlayer = new VideoPlayer();
 
-    poster.classList.add('has-player');
+    videoContainer.classList.add('has-player');
     videoPlayer.render(currentVideoData);
     playerWrapper.appendChild(videoPlayer);
     videoPlayer.play();
@@ -115,6 +115,7 @@ export default (routerContext) => {
    */
   appendVideoToGallery({
     ...routerContext,
-    apiData: restVideoData.filter((obj) => obj.categories.includes(localContext.category)),
+    /* eslint-disable-next-line max-len */
+    apiData: restVideoData.filter((obj) => obj.categories.includes(localContext.category)).slice(0, 3),
   }, localContext);
 };
