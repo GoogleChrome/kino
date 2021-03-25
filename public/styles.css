@@ -318,15 +318,16 @@ h4,
     width: auto;
     margin: 0;
     transform: none;
-    overflow: auto;
+    overflow: visible;
+    margin-right: calc(var(--gutter) / -2);
   }
   .site-header--menu-item {
     display: inline-block;
     text-align: right;
   }
   .site-header--menu-item .site-header--menu-link {
-    margin: 0 0 0 calc(var(--gutter) * 1.5);
-    padding: calc(var(--gutter) / 3) 0;
+    margin: 0 0 0 calc(var(--gutter) / 2);
+    padding: calc(var(--gutter) / 3) calc(var(--gutter) / 2);
   }
   .site-header--menu-item .site-header--menu-link.active,
   .site-header--menu-item .site-header--menu-link:active,

@@ -76,7 +76,8 @@
   padding: 10px 20px;
   transition: color 100ms ease-in-out, background-color 100ms ease-in-out;
 }
-.section-header a:hover {
+.section-header a:hover,
+.section-header a:focus {
   text-decoration: none;
   color: var(--accent-background);
   background: var(--accent);
