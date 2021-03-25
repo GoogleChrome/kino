@@ -53,6 +53,11 @@ export default class OfflineToggleButton extends ToggleButton {
   }
 
   /**
+   * We override default toggling logic with custom implementation.
+   */
+  setNewToggleState() {}
+
+  /**
    * @param {ConnectionStatus} connectionStatus ConnectionStatus instance.
    */
   assignConnectionStatus(connectionStatus) {

@@ -28,7 +28,7 @@ import SettingsPage from './js/pages/Settings';
  * Settings
  */
 import { loadSetting } from './js/utils/settings';
-import { SETTING_KEY_TOGGLE_OFFLINE } from './js/constants';
+import { SETTING_KEY_TOGGLE_OFFLINE, SETTING_KEY_DARK_MODE } from './js/constants';
 
 /**
  * Custom Elements definition.
@@ -39,6 +39,22 @@ customElements.define('video-downloader', VideoDownloader);
 customElements.define('video-grid', VideoGrid);
 customElements.define('toggle-button', ToggleButton);
 customElements.define('offline-toggle-button', OfflineToggleButton);
+
+/**
+ * Forced dark mode logic.
+ */
+const darkModeForced = loadSetting(SETTING_KEY_DARK_MODE) || false;
+const dakrModeChangeHandler = (isDarkMode) => {
+  if (isDarkMode) {
+    document.documentElement.classList.add('dark-mode');
+  } else {
+    document.documentElement.classList.remove('dark-mode');
+  }
+};
+window.addEventListener('setting-change', (e) => {
+  if (e.detail?.setting === SETTING_KEY_DARK_MODE) dakrModeChangeHandler(e.detail.value);
+});
+dakrModeChangeHandler(darkModeForced);
 
 /**
  * Tracks the connection status of the application and broadcasts
@@ -66,18 +82,18 @@ connectionStatus.subscribe(
 );
 
 /**
- * Initialize a registry holding instances of the `VideoDownload` web components.
- *
- * This is to allow us to share these instances between pages.
- */
-const videoDownloaderRegistry = new VideoDownloaderRegistry({ connectionStatus });
-
-/**
  * Bind the offline toggle(s) to the `ConnectionStatus` instance.
  */
 [...document.querySelectorAll('offline-toggle-button')].forEach(
   (button) => button.assignConnectionStatus(connectionStatus),
 );
+
+/**
+ * Initialize a registry holding instances of the `VideoDownload` web components.
+ *
+ * This is to allow us to share these instances between pages.
+ */
+const videoDownloaderRegistry = new VideoDownloaderRegistry({ connectionStatus });
 
 /**
  * Router setup.

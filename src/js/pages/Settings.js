@@ -1,3 +1,5 @@
+import { SETTING_KEY_DARK_MODE } from '../constants';
+
 /**
  * @param {RouterContext} routerContext Context object passed by the Router.
  */
@@ -20,7 +22,7 @@ export default (routerContext) => {
       .settings--option {
         border: 1px solid var(--separator);
         border-radius: 8px;
-        margin: var(--gutter) 0;
+        margin-top: var(--gutter);
         padding: var(--gutter);
         text-align: center;
         width: calc(100% - calc(var(--gutter) * 2));
@@ -83,6 +85,11 @@ export default (routerContext) => {
         .settings--option {
           width: calc(63.333333333% - calc(var(--gutter) * 2));
         }
+        toggle-button,
+        offline-toggle-button {
+          align-self: center;
+          justify-self: center;
+        }
       }
     </style>
     <div class="container settings">
@@ -103,6 +110,18 @@ export default (routerContext) => {
           <p class="setting--option__desc">When enabled, you will only be shown content that is available offline.</p>
         </div>
         <offline-toggle-button></offline-toggle-button>
+      </div>
+      <div class="settings--option">
+        <div class="setting--option__icon">
+          <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 12h1M4.2 4.2l.7.7M12 1v1M19.8 4.2l-.7.7M23 12h-1M19.8 19.8l-.7-.7M12 23v-1M4.2 19.8l.7-.7M12 18a6 6 0 100-12 6 6 0 000 12z" stroke="var(--accent)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <p class="setting--option__title">Dark mode</p>
+          <p class="setting--option__desc">Force dark color scheme regardless of system settings.</p>
+        </div>
+        <toggle-button setting="${SETTING_KEY_DARK_MODE}"></toggle-button>
       </div>
 <!--      <div class="settings--option">-->
 <!--        <toggle-button></toggle-button>-->

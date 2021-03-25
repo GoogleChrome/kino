@@ -3,50 +3,72 @@
    * Layout.
    */
   --gutter: 1rem;
-
-  /**
-   * Colors.
-   */
-  --background: #fff;
-  --text: #3D3B3F;
-  --logo: #5F6368;
-  --icon: #858287;
-  --footer-text: #858287;
-  --accent-background: #ECEFFF;
-  --accent: #3740FF;
-  --accent-text: #000;
-  --separator: #E6E4E7;
-  --tooltip: #fff;
-  --tooltip-background: #1E1E20;
-  --alarm: #FF375C;
-  --alert: #FFA24C;
-  --toggle-background-off: #BFBEC1;
-  --toggle-background-on: #3740FF;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #141216;
-    --text: #BFBEC1;
-    --logo: #E5E4E7;
-    --icon: #F7F7F8;
+:root {
+  --background: #141216;
+  --text: #BFBEC1;
+  --logo: #E5E4E7;
+  --icon: #F7F7F8;
+  --footer-text: #858287;
+  --accent-background: #12292B;
+  --accent: #00C9DB;
+  --accent-text: #fff;
+  --separator: #3D3B3F;
+  --tooltip: #1E1E20;
+  --tooltip-background: #fff;
+  --toggle-background-off: #3D3B3F;
+  --toggle-background-on: #00C9DB;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not(.dark-mode) {
+    /**
+    * Colors.
+    */
+    --background: #fff;
+    --text: #3D3B3F;
+    --logo: #5F6368;
+    --icon: #858287;
     --footer-text: #858287;
-    --accent-background: #12292B;
-    --accent: #00C9DB;
-    --accent-text: #fff;
-    --separator: #3D3B3F;
-    --tooltip: #1E1E20;
-    --tooltip-background: #fff;
-    --toggle-background-off: #3D3B3F;
-    --toggle-background-on: #00C9DB;
+    --accent-background: #ECEFFF;
+    --accent: #3740FF;
+    --accent-text: #000;
+    --separator: #E6E4E7;
+    --tooltip: #fff;
+    --tooltip-background: #1E1E20;
+    --alarm: #FF375C;
+    --alert: #FFA24C;
+    --toggle-background-off: #BFBEC1;
+    --toggle-background-on: #3740FF;
   }
 }
-
 
 @media (min-width: 720px) {
   :root {
     --gutter: 1.5rem;
   }
+}
+
+/**
+ * Animations.
+ */
+@keyframes shake {
+ 10%, 90% {
+   transform: translateX(-50.5%);
+ }
+
+ 20%, 80% {
+   transform: translateX(-49%);
+ }
+
+ 30%, 50%, 70% {
+   transform: translateX(-48%);
+ }
+
+ 40%, 60% {
+   transform: translateX(-52%);
+ }
 }
 
 /**
@@ -57,6 +79,7 @@
 @media screen and (prefers-reduced-motion: reduce) {
   * {
     transition-duration: 0ms !important;
+    animation: none !important;
   }
 }
 
@@ -552,27 +575,6 @@ table {
 
 *, *:before, *:after {
   box-sizing: border-box;
-}
-
-!**
- * Animations.
- *!
-@keyframes shake {
-  10%, 90% {
-    transform: translateX(-50.5%);
-  }
-
-  20%, 80% {
-    transform: translateX(-49%);
-  }
-
-  30%, 50%, 70% {
-    transform: translateX(-48%);
-  }
-
-  40%, 60% {
-    transform: translateX(-52%);
-  }
 }
 
 !* App Styles *!
