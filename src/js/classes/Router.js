@@ -78,6 +78,7 @@ export default class Router {
 
     // Close mobile menu when navigation takes place.
     headerElement.classList.remove('open');
+    document.body.classList.remove('disable-scroll');
 
     // Mark the active page in menu.
     [...headerElement.querySelectorAll('.site-header--menu-item a')].forEach(
