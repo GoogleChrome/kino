@@ -74,6 +74,19 @@ export default class Router {
    * @param {boolean} skipState Flag indicating whether push state should be skipped.
    */
   renderPage(href = '/', skipState = false) {
+    const headerElement = document.querySelector('.site-header');
+
+    // Close mobile menu when navigation takes place.
+    headerElement.classList.remove('open');
+
+    // Mark the active page in menu.
+    [...headerElement.querySelectorAll('.site-header--menu-item a')].forEach(
+      (menuLink) => (menuLink.href === href
+        ? menuLink.classList.add('active')
+        : menuLink.classList.remove('active')
+      ),
+    );
+
     const targetUrl = new URL(href, window.location.origin);
     const foundRoute = this.routes.find(
       ({ path }) => new RegExp(path).test(targetUrl.pathname),
@@ -101,7 +114,7 @@ export default class Router {
    * @param {string} href Target URL to navigate to.
    */
   navigate(href) {
-    document.querySelector('body').classList.remove('mobile');
+    // Render the new page.
     this.renderPage(href);
   }
 }
