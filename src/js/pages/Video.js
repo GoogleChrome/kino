@@ -59,7 +59,7 @@ export default (routerContext) => {
   mainContent.innerHTML = `
   <div class="container">
     <article${disabled ? ' class="video--disabled"' : ''}>
-      <div class="video-container">
+      <div class="video-container width-full">
         <div class="video-container--image">
           ${videoImageHTML}
           <button class="play">
@@ -86,11 +86,41 @@ export default (routerContext) => {
       </div>
       <h2>${currentVideoData.title}</h2>
       <div class="info">
-        <span class="date">${currentVideoData.date}</span>
-        <span class="length">${videoMinutes}min ${videoSeconds}sec</span>
+        <span class="date">${currentVideoData.date}</span> • <span class="length">${videoMinutes}min ${videoSeconds}sec</span>
       </div>
-      <span class="downloader"></span>
       <p>${currentVideoData.description}</p>
+      <p><span class="downloader"></span></p>
+      <h2>Introduction</h2>
+      <p>Totam sint vero rerum est. Voluptates illum eligendi quis consequatur. Ullam non et accusamus incidunt optio laborum omnis. Beatae debitis quaerat. Magnam magnam provident voluptas veniam. Sint dicta qui.</p>
+      <div class="code-sample">
+        <h4 class="code-sample--title">Code Sample</h4>
+        <div class="code-sample--content">{% Compare 'worse' %}
+\`\`\`text
+Bad code example
+\`\`\`
+{% endCompare %}
+
+{% Compare 'better' %}
+\`\`\`text
+Good code example
+\`\`\`
+{% endCompare %}</div>
+      <h2>Section</h2>
+      <p>Ad autem est ea amet assumenda odio quibusdam dolorem. Qui est ab optio inventore qui. Aperiam dolorum labore eius amet cum. Ipsam et iusto magnam officia nihil dolorum.</p>
+      <p>Saepe culpa rerum. Magnam reiciendis velit in provident. Adipisci sint ut vero sed quia architecto. Magni accusantium ratione corporis blanditiis culpa beatae earum.</p>
+      <div class="code-sample code-sample--do">
+        <h4 class="code-sample--title">Code Sample</h4>
+        <div class="code-sample--content">Good code example</div>
+        <p class="code-sample--footnote">Explanation of why \`example\` is good.</p>
+      </div>
+      <div class="code-sample code-sample--dont">
+        <h4 class="code-sample--title">Code Sample</h4>
+        <div class="code-sample--content">Bad code example</div>
+        <p class="code-sample--footnote">Explanation of why \`example\` is wrong.</p>
+      </div>
+      <h2>Summary</h2>
+      <p>Ad autem est ea amet assumenda odio quibusdam dolorem. Qui est ab optio inventore qui. Aperiam dolorum labore eius amet cum. Ipsam et iusto magnam officia nihil dolorum.</p>
+      <p>Saepe culpa rerum. Magnam reiciendis velit in provident. Adipisci sint ut vero sed quia architecto. Magni accusantium ratione corporis blanditiis culpa beatae earum.</p>
     </article>
   </div>
 `;
