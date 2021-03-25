@@ -67,6 +67,9 @@ body {
   padding: 0;
   width: 100%;
 }
+body.disable-scroll {
+  overflow: hidden;
+}
 a {
   color: var(--accent-text);
   text-decoration: none;

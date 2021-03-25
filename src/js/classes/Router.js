@@ -28,6 +28,7 @@ export default class Router {
     // Toggle menu open.
     document.querySelector('.site-header--hamburger-btn').addEventListener('click', () => {
       document.querySelector('.site-header').classList.toggle('open');
+      document.body.classList.toggle('disable-scroll');
     });
 
     // Global click listener setup
