@@ -544,6 +544,9 @@ article h2 {
   background: var(--code-background);
 }
 .video-container {
+  --play-button-size: 112px;
+  --aspect-ratio-16-9-padding: 56.25%;
+
   border-radius: 8px;
   max-width: 1200px;
   margin: 0 auto;
@@ -551,27 +554,31 @@ article h2 {
 }
 .video-container--image {
   height: 0;
-  padding-bottom: 56.25%; /* 16:9 */
+  padding-bottom: var(--aspect-ratio-16-9-padding);
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  flex-flow: column nowrap;
 }
 .video-container--image picture img,
 .video-container--image > img {
   width: 100%;
   height: auto;
+
+  /*
+   * Centers the button without using absolute positioning.
+   *
+   * This helps to avoid stacking issues and clashes with fixed navigation.
+   */
+  margin-bottom: calc(-1 * (var(--aspect-ratio-16-9-padding) / 2) - (var(--play-button-size) / 2));
 }
 .video-container .play {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   color: #000;
-  z-index: 2;
-}
-.video-container .play {
   background: transparent;
   border-radius: 50%;
-  width: 112px;
-  height: 112px;
+  width: var(--play-button-size);
+  height: var(--play-button-size);
   padding: 0;
   border: none;
   cursor: pointer;
@@ -690,4 +697,89 @@ button.delete-all:hover {
 }
 button.delete-all:hover svg path {
   stroke: var(--alarm);
+}
+
+/**
+ * Settings page.
+ */
+ .settings {
+  margin-bottom: 4rem;
+}
+.settings .page-header {
+  margin-bottom: 1.25rem;
+}
+.settings .page-header h1 {
+  margin-bottom: 0;
+}
+.settings--option {
+  border: 1px solid var(--separator);
+  border-radius: 8px;
+  margin-top: var(--gutter);
+  padding: var(--gutter);
+  text-align: center;
+  width: calc(100% - calc(var(--gutter) * 2));
+}
+.setting--option__icon {
+  align-items: center;
+  background: var(--accent-background);
+  border-radius: 50%;
+  display: inline-block;
+  height: 64px;
+  justify-content: center;
+  position: relative;
+  width: 64px;
+}
+.setting--option__icon svg {
+  position: absolute;
+  top: calc(50% - 12px);
+  left: calc(50% - 12px);
+}
+.settings--option .setting--option__title {
+  color: var(--accent-text);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 26px;
+  margin-bottom: 0;
+}
+.settings--option .setting--option__desc {
+  font-size: 14px;
+  line-height: 25px;
+  margin-top: 0.25rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 720px) {
+  .settings {
+    margin-bottom: 4.5rem;
+  }
+  .settings .page-header {
+    margin-bottom: 2rem;
+  }
+  .settings--option {
+    display: grid;
+    grid-template-columns: 88px 1fr 72px;
+    text-align: left;
+  }
+  .settings--option .setting--option__title {
+    margin-top: 0;
+    box-sizing: border-box;
+  }
+  .settings--option .setting--option__desc {
+    margin-bottom: 0;
+  }
+}
+@media (min-width: 960px) {
+  .settings {
+    margin-bottom: 5rem;
+  }
+  .settings .page-header {
+    margin-bottom: 3rem;
+  }
+  .settings--option {
+    width: calc(63.333333333% - calc(var(--gutter) * 2));
+  }
+  toggle-button,
+  offline-toggle-button {
+    align-self: center;
+    justify-self: center;
+  }
 }
