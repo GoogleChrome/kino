@@ -315,7 +315,7 @@ export default class VideoDownloader extends HTMLElement {
 
         <button class="done">
           <div class="tooltip">
-            <svg viewBox="0 0 27 27" width="27" height="27" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="icon icon--downloaded-remove" viewBox="0 0 27 27" width="27" height="27" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
               <g class="remove">
                 <path d="M26.308 18.726c0 4.77-2.812 7.582-7.582 7.582H8.344c-4.783 0-7.594-2.812-7.594-7.582V8.332C.75 3.562 2.502.75 7.273.75h2.665c.958 0 1.86.45 2.435 1.217l1.217 1.618a3.051 3.051 0 002.434 1.217h3.773c4.783 0 6.547 2.434 6.547 7.303l-.036 6.621z" fill="#ff375c" stroke="#ff375c" stroke-width="1.5"/>
                 <path d="M16.91 11.842l-6.39 6.39M16.911 18.235l-6.395-6.396" fill="none" stroke="#fff" stroke-width="2"/>
