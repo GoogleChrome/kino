@@ -57,6 +57,7 @@ export default class {
     const videoMeta = {
       done: isDone,
       videoId: this.internal.videoDownloader.getId(),
+      timestamp: Date.now(),
     };
     const txAbortHandler = (e) => {
       const { error } = e.target;
