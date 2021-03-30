@@ -1,6 +1,6 @@
 ---
-title: Thinking on ways to solve SIDENAV
-description: 'In today’s GUI challenge we create a responsive, accessible slide out side navigation user experience using CSS and JS. The sidenav works on multiple browsers, screen sizes and input devices. Rad right? Follow as we employ grid, transforms, pseudo classes and a dollop of JavaScript to handle this UX.'
+title: 'Streaming: Efficient Formats'
+description: 'Improve the visual quality of your streams by encoding videos using more efficient formats targeting different platforms.'
 date: 4th March, 2017
 length: '7:43'
 video-sources:

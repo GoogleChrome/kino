@@ -1,6 +1,6 @@
 ---
-title: Thinking on ways to solve TABS
-description: 'In today’s GUI challenge, we’re building a tabs component with some really cool features that you may not have thought about. Our tabs component is responsive, supports multiple device inputs, works across browsers, and let’s you mimic some of the buttery features you love on apps.'
+title: 'Streaming: Adaptive Bitrates'
+description: 'Respond to changing network conditions by detecting the available bandwidth and inserting video chunks of appropriate bitrates.'
 date: 4th March, 2017
 length: '7:43'
 video-sources:

@@ -1,6 +1,6 @@
 ---
-title: JavaScript for-loops are… complicated
-description: In this episode, Jake and Surma dissect how for-loops actually work and how they’ve evolved. Turns out, it got complicated.
+title: 'HTML5: Using WebVTT'
+description: 'Add subtitles, captions and other text tracks to your content and make your videos accessible by a wider audience.'
 date: 4th March, 2017
 length: '7:43'
 video-sources:
