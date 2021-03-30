@@ -4,9 +4,6 @@
       "id": "background-fetch",
       "title": "Background Fetch",
       "description": "Background Fetch. This is a chunked DASH video that should adapt to available bandwidth changes.",
-      "categories": [
-        "HTTP 203"
-      ],
       "date": "4th March, 2017",
       "length": "7:43",
       "video-sources": [
@@ -19,38 +16,34 @@
           "type": "application/x-mpegURL"
         }
       ],
-      "thumbnail": [
+      "thumbnail": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-background-fetch.jpg",
+      "categories": [
+        "HTTP 203"
+      ],
+      "body": "<h2 id=\"heading\">Heading</h2>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n<h3 id=\"subheading\">Subheading</h3>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n"
+    },
+    {
+      "id": "conditional-polyfills",
+      "title": "Polyfills",
+      "description": "In this episode, Surma & Jake talks about the conditional loading of polyfills and how to implement it in the world of ES2015 modules. The non-blocking nature of modules makes the old approach of blocking script tags both inefficient and undesirable and with dynamic import landing, the web now offers better ways.",
+      "date": "4th March, 2017",
+      "length": "7:43",
+      "video-sources": [
         {
-          "src": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-background-fetch.avif",
-          "type": "image/avif"
-        },
-        {
-          "src": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-background-fetch.webp",
-          "type": "image/webp"
-        },
-        {
-          "src": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-background-fetch.jpg",
-          "type": "image/jpg",
-          "default": true
+          "src": "https://storage.googleapis.com/wdm-assets/videos/http-203/http-203-polyfills.mp4",
+          "type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
         }
       ],
-      "video-subtitles": [
-        {
-          "default": true,
-          "kind": "subtitles",
-          "label": "English",
-          "src": "https://storage.googleapis.com/wdm-assets/subtitles/http-203/http-203-background-fetch.vtt",
-          "srclang": "en"
-        }
-      ]
+      "thumbnail": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-polyfills.jpg",
+      "categories": [
+        "HTTP 203"
+      ],
+      "body": "<h2 id=\"heading\">Heading</h2>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n<h3 id=\"subheading\">Subheading</h3>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n"
     },
     {
       "id": "javascript-for-loops-are-complicated",
       "title": "JavaScript for-loops are… complicated",
       "description": "In this episode, Jake and Surma dissect how for-loops actually work and how they’ve evolved. Turns out, it got complicated.",
-      "categories": [
-        "HTTP 203"
-      ],
       "date": "4th March, 2017",
       "length": "7:43",
       "video-sources": [
@@ -75,49 +68,34 @@
           "srclang": "cz"
         }
       ],
-      "thumbnail": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-for-loops.jpg"
+      "thumbnail": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-for-loops.jpg",
+      "categories": [
+        "HTTP 203"
+      ],
+      "body": "<h2 id=\"heading\">Heading</h2>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n<h3 id=\"subheading\">Subheading</h3>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n"
     },
     {
       "id": "old-vs-new-javascript",
-      "title": "Old vs New JavaScript",
-      "description": "Jake and Surma look at the modern JS & web features we take for granted.",
-      "categories": [
-        "HTTP 203"
-      ],
-      "date": "4th March, 2017",
+      "title": "Old vs New JavaScript,",
+      "description": "Jake and Surma look at the modern JS & web features we take for granted.,",
+      "date": "4th March, 2017,",
       "length": "7:43",
       "video-sources": [
         {
-          "src": "https://storage.googleapis.com/wdm-assets/videos/http-203/http-203-old-vs-new-js.mp4",
+          "src": "https://storage.googleapis.com/wdm-assets/videos/http-203/http-203-old-vs-new-js.mp4,",
           "type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
         }
       ],
-      "thumbnail": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-old-vs-new-js.jpg"
-    },
-    {
-      "id": "conditional-polyfills",
-      "title": "Polyfills",
-      "description": "In this episode, Surma & Jake talks about the conditional loading of polyfills and how to implement it in the world of ES2015 modules. The non-blocking nature of modules makes the old approach of blocking script tags both inefficient and undesirable and with dynamic import landing, the web now offers better ways.",
+      "thumbnail": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-old-vs-new-js.jpg",
       "categories": [
         "HTTP 203"
       ],
-      "date": "4th March, 2017",
-      "length": "7:43",
-      "video-sources": [
-        {
-          "src": "https://storage.googleapis.com/wdm-assets/videos/http-203/http-203-polyfills.mp4",
-          "type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
-        }
-      ],
-      "thumbnail": "https://storage.googleapis.com/wdm-assets/images/http-203/http-203-polyfills.jpg"
+      "body": "<h2 id=\"heading\">Heading</h2>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n<h3 id=\"subheading\">Subheading</h3>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n"
     },
     {
       "id": "gui-centering",
       "title": "Thinking on ways to solve CENTERING",
       "description": "In today’s challenge, we’re stress testing 5 different CSS centering techniques. See what techniques should earn a place in your tool belt by watching how they react to common layout stress. The contestants: content center, gentle flex, autobot, fluffy center, and pop & plop.",
-      "categories": [
-        "GUI Challenges"
-      ],
       "date": "4th March, 2017",
       "length": "7:43",
       "video-sources": [
@@ -126,15 +104,16 @@
           "type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
         }
       ],
-      "thumbnail": "https://storage.googleapis.com/wdm-assets/images/gui-challenges/centering.jpg"
-    },
-    {
-      "id": "gui-sidenav",
-      "title": "Thinking on ways to solve a SIDENAV",
-      "description": "In today’s GUI challenge we create a responsive, accessible slide out side navigation user experience using CSS and JS. The sidenav works on multiple browsers, screen sizes and input devices. Rad right? Follow as we employ grid, transforms, pseudo classes and a dollop of JavaScript to handle this UX.",
+      "thumbnail": "https://storage.googleapis.com/wdm-assets/images/gui-challenges/centering.jpg",
       "categories": [
         "GUI Challenges"
       ],
+      "body": "<h2 id=\"heading\">Heading</h2>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n<h3 id=\"subheading\">Subheading</h3>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n"
+    },
+    {
+      "id": "gui-sidenav",
+      "title": "Thinking on ways to solve SIDENAV",
+      "description": "In today’s GUI challenge we create a responsive, accessible slide out side navigation user experience using CSS and JS. The sidenav works on multiple browsers, screen sizes and input devices. Rad right? Follow as we employ grid, transforms, pseudo classes and a dollop of JavaScript to handle this UX.",
       "date": "4th March, 2017",
       "length": "7:43",
       "video-sources": [
@@ -143,15 +122,16 @@
           "type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
         }
       ],
-      "thumbnail": "https://storage.googleapis.com/wdm-assets/images/gui-challenges/sidenav.jpg"
+      "thumbnail": "https://storage.googleapis.com/wdm-assets/images/gui-challenges/sidenav.jpg",
+      "categories": [
+        "GUI Challenges"
+      ],
+      "body": "<h2 id=\"heading\">Heading</h2>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n<h3 id=\"subheading\">Subheading</h3>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n"
     },
     {
       "id": "gui-tabs",
       "title": "Thinking on ways to solve TABS",
       "description": "In today’s GUI challenge, we’re building a tabs component with some really cool features that you may not have thought about. Our tabs component is responsive, supports multiple device inputs, works across browsers, and let’s you mimic some of the buttery features you love on apps.",
-      "categories": [
-        "GUI Challenges"
-      ],
       "date": "4th March, 2017",
       "length": "7:43",
       "video-sources": [
@@ -160,7 +140,11 @@
           "type": "video/mp4; codecs=\"avc1.64001f,mp4a.40.2\""
         }
       ],
-      "thumbnail": "https://storage.googleapis.com/wdm-assets/images/gui-challenges/tabs.jpg"
+      "thumbnail": "https://storage.googleapis.com/wdm-assets/images/gui-challenges/tabs.jpg",
+      "categories": [
+        "GUI Challenges"
+      ],
+      "body": "<h2 id=\"heading\">Heading</h2>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n<h3 id=\"subheading\">Subheading</h3>\n<p>There is <em>some content</em>. And here is <strong>some more</strong>. And a <a href=\"http://test.com\">link</a>.</p>\n"
     }
   ],
   "categories": [

@@ -11,7 +11,8 @@
     "lint:fix": "eslint src/ --fix",
     "start": "firebase serve --only hosting",
     "build": "rollup -c",
-    "watch": "rollup -c -w"
+    "watch": "rollup -c -w",
+    "api:generate": "node src/js/utils/generateApi.js"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.12.13",
@@ -33,5 +34,9 @@
     "hooks": {
       "pre-commit": "npm run lint"
     }
+  },
+  "dependencies": {
+    "front-matter": "^4.0.2",
+    "marked": "^2.0.1"
   }
 }

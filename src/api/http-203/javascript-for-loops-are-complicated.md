@@ -1,0 +1,30 @@
+---
+title: JavaScript for-loops are… complicated
+description: In this episode, Jake and Surma dissect how for-loops actually work and how they’ve evolved. Turns out, it got complicated.
+date: 4th March, 2017
+length: '7:43'
+video-sources:
+  - src: https://storage.googleapis.com/wdm-assets/videos/http-203/http-203-for-loops.mp4
+    type: video/mp4; codecs="avc1.64001f,mp4a.40.2"
+video-subtitles:
+  - default: true
+    kind: subtitles
+    label: English
+    src: https://storage.googleapis.com/wdm-assets/subtitles/ForBiggerEscapes-en.vtt
+    srclang: en
+  - default: true
+    kind: subtitles
+    label: Czech
+    src: https://storage.googleapis.com/wdm-assets/subtitles/ForBiggerEscapes-cz.vtt
+    srclang: cz
+thumbnail: https://storage.googleapis.com/wdm-assets/images/http-203/http-203-for-loops.jpg
+---
+## Heading
+
+There is *some content*. And here is **some more**. And a [link](http://test.com).
+
+There is *some content*. And here is **some more**. And a [link](http://test.com).
+
+### Subheading
+
+There is *some content*. And here is **some more**. And a [link](http://test.com).
