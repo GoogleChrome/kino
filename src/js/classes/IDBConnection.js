@@ -44,7 +44,12 @@ const metaAccessorFactory = (abstractedIDB) => ({
     const data = await new Promise((resolve, reject) => {
       const request = store.getAll();
 
-      request.onsuccess = (e) => resolve(e.target.result);
+      request.onsuccess = (e) => {
+        const sortedEntries = e.target.result.sort(
+          (meta1, meta2) => (meta1.timestamp < meta2.timestamp ? 1 : -1),
+        );
+        resolve(sortedEntries);
+      };
       request.onerror = () => reject('Unable to fetch meta information.');
     });
 
