@@ -1,5 +1,5 @@
 ---
-title: 'HTML5: Single Video File'
+title: 'Single Video File'
 description: 'Pick a suitable video format to make sure your single media file can be played by a vast majority of browsers and players on the web.'
 date: 4th March, 2017
 length: '7:43'

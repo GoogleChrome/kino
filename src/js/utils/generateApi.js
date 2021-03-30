@@ -12,7 +12,7 @@ const apiDestFile = 'public/api.json';
 /**
  * Optional ordering of categories in the resulting API file.
  */
-const categoriesOrder = ['http-203', 'gui-challenges'];
+const categoriesOrder = ['html', 'streaming'];
 
 /**
  * Retuns categories data.

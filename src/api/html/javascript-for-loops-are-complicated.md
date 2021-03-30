@@ -1,5 +1,5 @@
 ---
-title: 'HTML5: Using WebVTT'
+title: 'Using WebVTT'
 description: 'Add subtitles, captions and other text tracks to your content and make your videos accessible by a wider audience.'
 date: 4th March, 2017
 length: '7:43'

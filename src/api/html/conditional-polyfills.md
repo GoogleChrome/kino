@@ -1,12 +1,12 @@
 ---
-title: 'Streaming: Adaptive Bitrates'
-description: 'Respond to changing network conditions by detecting the available bandwidth and inserting video chunks of appropriate bitrates.'
+title: 'Multiple Sources'
+description: 'Use advanced video formats to save bandwidth and improve visual quality of your videos and let the browser choose between them.'
 date: 4th March, 2017
 length: '7:43'
 video-sources:
-  - src: https://storage.googleapis.com/wdm-assets/videos/gui-challenges/tabs.mp4
+  - src: https://storage.googleapis.com/wdm-assets/videos/http-203/http-203-polyfills.mp4
     type: video/mp4; codecs="avc1.64001f,mp4a.40.2"
-thumbnail: https://storage.googleapis.com/wdm-assets/images/gui-challenges/tabs.jpg
+thumbnail: https://storage.googleapis.com/wdm-assets/images/http-203/http-203-polyfills.jpg
 ---
 ## Heading
 

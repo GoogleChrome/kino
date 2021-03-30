@@ -1,12 +1,12 @@
 ---
-title: Old vs New JavaScript,
-description: Jake and Surma look at the modern JS & web features we take for granted.,
-date: 4th March, 2017,
+title: 'The Universal Source'
+description: 'Encode your streams in a universal format to ensure your media can be served using both the DASH and HLS protocols.'
+date: 4th March, 2017
 length: '7:43'
 video-sources:
-  - src: https://storage.googleapis.com/wdm-assets/videos/http-203/http-203-old-vs-new-js.mp4,
+  - src: https://storage.googleapis.com/wdm-assets/videos/gui-challenges/centering.mp4
     type: video/mp4; codecs="avc1.64001f,mp4a.40.2"
-thumbnail: https://storage.googleapis.com/wdm-assets/images/http-203/http-203-old-vs-new-js.jpg
+thumbnail: https://storage.googleapis.com/wdm-assets/images/gui-challenges/centering.jpg
 ---
 ## Heading
 
