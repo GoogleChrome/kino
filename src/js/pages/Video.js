@@ -97,8 +97,10 @@ export default (routerContext) => {
   mainContent.prepend(posterWrapper);
   mainContent.querySelector('.downloader').appendChild(downloader);
 
+  const categorySlug = currentVideoData.categories[0];
+  const { name, slug } = apiData.categories.find((obj) => obj.slug === categorySlug);
   const localContext = {
-    category: currentVideoData.categories[0],
+    category: `${name}:${slug}`,
   };
   const playButton = mainContent.querySelector('.play');
 
@@ -114,7 +116,7 @@ export default (routerContext) => {
   });
 
   const sameCategoryVideos = restVideoData.filter(
-    (obj) => obj.categories.includes(localContext.category),
+    (obj) => obj.categories.includes(categorySlug),
   ).slice(0, 3);
 
   const galleryApiData = {
