@@ -24,16 +24,17 @@ export default (routerContext) => {
   }, {});
 
   Object.keys(videosByCategories).forEach((category) => {
+    const categoryData = apiData.categories.find((obj) => obj.slug === category);
     const localContext = {
-      category,
+      category: `${categoryData.name}:${categoryData.slug}`,
     };
 
     /**
      * Limit the number of videos to 3 per category on the homepage.
      */
     const categoryApiData = {
-      videos: videosByCategories[category].slice(0, 3),
       categories: apiData.categories,
+      videos: videosByCategories[category].slice(0, 3),
     };
 
     appendVideoToGallery({

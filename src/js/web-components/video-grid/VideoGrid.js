@@ -1,4 +1,3 @@
-import slugify from '../../utils/slugify';
 import styles from './VideoGrid.css';
 
 const template = document.createElement('template');
@@ -43,8 +42,9 @@ export default class VideoGrid extends HTMLElement {
 
   render() {
     if (this.category) {
-      this.$category.innerHTML = this.category;
-      this.$categoryLink.href = `/category/${slugify(this.category)}/`;
+      const [name, slug] = this.category.split(':');
+      this.$category.innerHTML = name;
+      this.$categoryLink.href = `/category/${slug}/`;
     }
   }
 }

@@ -1,6 +1,6 @@
 ---
-title: Thinking on ways to solve CENTERING
-description: 'In today’s challenge, we’re stress testing 5 different CSS centering techniques. See what techniques should earn a place in your tool belt by watching how they react to common layout stress. The contestants: content center, gentle flex, autobot, fluffy center, and pop & plop.'
+title: 'The Universal Source'
+description: 'Encode your streams in a universal format to ensure your media can be served using both the DASH and HLS protocols.'
 date: 4th March, 2017
 length: '7:43'
 video-sources:

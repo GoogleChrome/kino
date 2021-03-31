@@ -1,6 +1,6 @@
 ---
-title: Polyfills
-description: In this episode, Surma & Jake talks about the conditional loading of polyfills and how to implement it in the world of ES2015 modules. The non-blocking nature of modules makes the old approach of blocking script tags both inefficient and undesirable and with dynamic import landing, the web now offers better ways.
+title: 'Multiple Sources'
+description: 'Use advanced video formats to save bandwidth and improve visual quality of your videos and let the browser choose between them.'
 date: 4th March, 2017
 length: '7:43'
 video-sources:

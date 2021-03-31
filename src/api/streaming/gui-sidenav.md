@@ -1,12 +1,12 @@
 ---
-title: Old vs New JavaScript,
-description: Jake and Surma look at the modern JS & web features we take for granted.,
-date: 4th March, 2017,
+title: 'Efficient Formats'
+description: 'Improve the visual quality of your streams by encoding videos using more efficient formats targeting different platforms.'
+date: 4th March, 2017
 length: '7:43'
 video-sources:
-  - src: https://storage.googleapis.com/wdm-assets/videos/http-203/http-203-old-vs-new-js.mp4,
+  - src: https://storage.googleapis.com/wdm-assets/videos/gui-challenges/sidenav.mp4
     type: video/mp4; codecs="avc1.64001f,mp4a.40.2"
-thumbnail: https://storage.googleapis.com/wdm-assets/images/http-203/http-203-old-vs-new-js.jpg
+thumbnail: https://storage.googleapis.com/wdm-assets/images/gui-challenges/sidenav.jpg
 ---
 ## Heading
 

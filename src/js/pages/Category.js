@@ -17,13 +17,13 @@ export default (routerContext) => {
     <div class="container">
       <header class="page-header">
         <h1>${categoryObject.name}</h1>
-        <p>${categoryObject.description}</p>
+        ${categoryObject.description}
       </header>
     </div>
   `;
 
   const videosFromCurrentCategory = apiData.videos.filter(
-    (videoData) => videoData.categories.includes(categoryObject.name),
+    (videoData) => videoData.categories.includes(categoryObject.slug),
   );
   const apiDataCurrentCategory = {
     videos: videosFromCurrentCategory,
@@ -31,7 +31,7 @@ export default (routerContext) => {
   };
 
   const localContext = {
-    category: categoryObject.name,
+    category: `${categoryObject.name}:${categoryObject.slug}`,
     class: 'hide-header',
   };
 

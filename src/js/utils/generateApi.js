@@ -3,82 +3,83 @@
  */
 
 const fs = require('fs');
-const frontmatter = require('front-matter');
+const path = require('path');
+const frontMatter = require('front-matter');
 const marked = require('marked');
 
 const apiSrcPath = 'src/api/';
 const apiDestFile = 'public/api.json';
 
 /**
- * Optional ordering of categories in the resulting API file.
+ * Iterator to recursively find all files in a given directory.
+ *
+ * @param {string} dir The directory to iterate over.
+ * @returns {any} The next directory iterator or the absolute path to the file.
  */
-const categoriesOrder = ['http-203', 'gui-challenges'];
+async function* getFiles(dir) {
+  const items = await fs.promises.readdir(dir, { withFileTypes: true });
+
+  // eslint-disable-next-line
+  for (const item of items) {
+    const resPath = path.resolve(dir, item.name);
+    if (item.isDirectory()) {
+      yield* getFiles(resPath);
+    } else {
+      yield resPath;
+    }
+  }
+}
 
 /**
- * Retuns categories data.
+ * Returns categories data.
  *
  * @returns {object[]} Array of categories data objects.
  */
-const getCategoriesData = () => {
-  const filenames = fs.readdirSync(apiSrcPath).filter((filename) => filename.endsWith('.json'));
-  const orderedCategories = [];
-  const categories = [];
+const generateApiData = async () => {
+  const apiData = {
+    categories: [],
+    videos: [],
+  };
 
-  filenames.forEach(
-    (filename) => {
-      const textData = fs.readFileSync(`${apiSrcPath}${filename}`, { encoding: 'utf-8' });
-      const jsonData = JSON.parse(textData);
-      const index = categoriesOrder.indexOf(jsonData.slug);
+  // eslint-disable-next-line
+  for await (const file of getFiles(apiSrcPath)) {
+    const fileName = path.basename(file);
+    const categoryName = path.basename(path.dirname(file));
+    const textData = fs.readFileSync(file, 'utf8');
+    const fmContent = frontMatter(textData);
 
-      if (index > -1) {
-        orderedCategories[index] = jsonData;
-      } else {
-        categories.push(jsonData);
-      }
-    },
-  );
+    if (fileName === 'index.md') {
+      apiData.categories.push({
+        ...fmContent.attributes,
+        description: marked(fmContent.body),
+      });
+    } else {
+      apiData.videos.push({
+        id: fileName.replace('.md', ''),
+        ...fmContent.attributes,
+        categories: [categoryName],
+        body: marked(fmContent.body),
+      });
+    }
+  }
 
-  return [...orderedCategories, ...categories];
+  return apiData;
 };
 
 /**
- * Returns video data entries.
+ * Generates the JSON API.
  *
- * @param {object[]} categories Array of categories objects to retrieve video data for.
- *
- * @returns {object[]} Video data entries.
+ * @returns {object} The API object.
  */
-const getVideosData = (categories) => {
-  const videosData = [];
+export default async function generateApi() {
+  const start = Date.now();
+  const apiData = await generateApiData();
+  const apiDataJSON = JSON.stringify(apiData, undefined, 2);
 
-  categories.forEach(
-    (category) => {
-      const contentPath = `${apiSrcPath}${category.slug}/`;
-      const filenames = fs.readdirSync(contentPath).filter((filename) => filename.endsWith('.md'));
+  fs.writeFile(apiDestFile, apiDataJSON, { encoding: 'utf-8' }, () => {
+    const time = Date.now() - start;
+    process.stdout.write(`\x1b[32mcreated \x1b[1m${apiDestFile}\x1b[22m in \x1b[1m${time}ms\x1b[22m\x1b[89m\n`);
+  });
 
-      filenames.forEach(
-        (filename) => {
-          const textData = fs.readFileSync(`${contentPath}${filename}`, { encoding: 'utf-8' });
-          const fmContent = frontmatter(textData);
-          const apiEntry = {
-            id: filename.replace('.md', ''),
-            ...fmContent.attributes,
-            categories: [category.name],
-            body: marked(fmContent.body),
-          };
-          videosData.push(apiEntry);
-        },
-      );
-    },
-  );
-  return videosData;
-};
-
-const categories = getCategoriesData();
-const apiData = {
-  videos: getVideosData(categories),
-  categories,
-};
-const apiDataJSON = JSON.stringify(apiData, undefined, 2);
-
-fs.writeFileSync(apiDestFile, apiDataJSON, { encoding: 'utf-8' });
+  return apiData;
+}
