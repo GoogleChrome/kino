@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * Iterator to recursively find the all the assets to cache.
+ * Iterator to recursively find all files in a given directory.
  *
  * @param {string} dir The directory to iterate over.
  * @returns {any} The next directory iterator or the absolute path to the file.
@@ -24,7 +24,7 @@ async function* getFiles(dir) {
 /**
  * Generates the cached assets for the service worker.
  *
- * @param {Array} api The video files API.
+ * @param {object} api The video files API.
  */
 export default async function generateAssetsToCache(api) {
   const start = Date.now();
@@ -55,6 +55,6 @@ export default async function generateAssetsToCache(api) {
 
   fs.writeFile('src/js/sw/cache.js', data, () => {
     const time = Date.now() - start;
-    process.stdout.write(`created src/js/sw/cache.js in ${time}ms\n`);
+    process.stdout.write(`\x1b[32mcreated \x1b[1msrc/js/sw/cache.js\x1b[22m in \x1b[1m${time}ms\x1b[22m\x1b[89m\n`);
   });
 }

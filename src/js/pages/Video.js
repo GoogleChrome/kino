@@ -90,45 +90,17 @@ export default (routerContext) => {
       </div>
       <p>${currentVideoData.description}</p>
       <p><span class="downloader"></span></p>
-      <h2>Introduction</h2>
-      <p>Totam sint vero rerum est. Voluptates illum eligendi quis consequatur. Ullam non et accusamus incidunt optio laborum omnis. Beatae debitis quaerat. Magnam magnam provident voluptas veniam. Sint dicta qui.</p>
-      <div class="code-sample">
-        <h4 class="code-sample--title">Code Sample</h4>
-        <div class="code-sample--content">{% Compare 'worse' %}
-\`\`\`text
-Bad code example
-\`\`\`
-{% endCompare %}
-
-{% Compare 'better' %}
-\`\`\`text
-Good code example
-\`\`\`
-{% endCompare %}</div>
-      <h2>Section</h2>
-      <p>Ad autem est ea amet assumenda odio quibusdam dolorem. Qui est ab optio inventore qui. Aperiam dolorum labore eius amet cum. Ipsam et iusto magnam officia nihil dolorum.</p>
-      <p>Saepe culpa rerum. Magnam reiciendis velit in provident. Adipisci sint ut vero sed quia architecto. Magni accusantium ratione corporis blanditiis culpa beatae earum.</p>
-      <div class="code-sample code-sample--do">
-        <h4 class="code-sample--title">Code Sample</h4>
-        <div class="code-sample--content">Good code example</div>
-        <p class="code-sample--footnote">Explanation of why \`example\` is good.</p>
-      </div>
-      <div class="code-sample code-sample--dont">
-        <h4 class="code-sample--title">Code Sample</h4>
-        <div class="code-sample--content">Bad code example</div>
-        <p class="code-sample--footnote">Explanation of why \`example\` is wrong.</p>
-      </div>
-      <h2>Summary</h2>
-      <p>Ad autem est ea amet assumenda odio quibusdam dolorem. Qui est ab optio inventore qui. Aperiam dolorum labore eius amet cum. Ipsam et iusto magnam officia nihil dolorum.</p>
-      <p>Saepe culpa rerum. Magnam reiciendis velit in provident. Adipisci sint ut vero sed quia architecto. Magni accusantium ratione corporis blanditiis culpa beatae earum.</p>
+      ${currentVideoData.body}
     </article>
   </div>
 `;
   mainContent.prepend(posterWrapper);
   mainContent.querySelector('.downloader').appendChild(downloader);
 
+  const categorySlug = currentVideoData.categories[0];
+  const { name, slug } = apiData.categories.find((obj) => obj.slug === categorySlug);
   const localContext = {
-    category: currentVideoData.categories[0],
+    category: `${name}:${slug}`,
   };
   const playButton = mainContent.querySelector('.play');
 
@@ -144,7 +116,7 @@ Good code example
   });
 
   const sameCategoryVideos = restVideoData.filter(
-    (obj) => obj.categories.includes(localContext.category),
+    (obj) => obj.categories.includes(categorySlug),
   ).slice(0, 3);
 
   const galleryApiData = {

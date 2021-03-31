@@ -8,6 +8,7 @@ firebase-debug.log
 /.firebase
 
 # Dist files
+/public/api.json
 /public/sw.js
 /public/dist
 
