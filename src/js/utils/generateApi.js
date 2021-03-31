@@ -3,7 +3,7 @@
  */
 
 const fs = require('fs');
-const frontmatter = require('front-matter');
+const frontMatter = require('front-matter');
 const marked = require('marked');
 
 const apiSrcPath = 'src/api/';
@@ -59,7 +59,7 @@ const getVideosData = (categories) => {
       filenames.forEach(
         (filename) => {
           const textData = fs.readFileSync(`${contentPath}${filename}`, { encoding: 'utf-8' });
-          const fmContent = frontmatter(textData);
+          const fmContent = frontMatter(textData);
           const apiEntry = {
             id: filename.replace('.md', ''),
             ...fmContent.attributes,
@@ -74,11 +74,24 @@ const getVideosData = (categories) => {
   return videosData;
 };
 
-const categories = getCategoriesData();
-const apiData = {
-  videos: getVideosData(categories),
-  categories,
-};
-const apiDataJSON = JSON.stringify(apiData, undefined, 2);
+/**
+ * Generates the JSON API.
+ *
+ * @returns {object} The API object.
+ */
+export default async function generateApi() {
+  const start = Date.now();
+  const categories = getCategoriesData();
+  const apiData = {
+    videos: getVideosData(categories),
+    categories,
+  };
+  const apiDataJSON = JSON.stringify(apiData, undefined, 2);
 
-fs.writeFileSync(apiDestFile, apiDataJSON, { encoding: 'utf-8' });
+  fs.writeFile(apiDestFile, apiDataJSON, { encoding: 'utf-8' }, () => {
+    const time = Date.now() - start;
+    process.stdout.write(`\x1b[32mcreated \x1b[1m${apiDestFile}\x1b[22m in ${time}ms\x1b[89m\n`);
+  });
+
+  return apiData;
+}

@@ -25,6 +25,13 @@
     "prefer-promise-reject-errors": "off",
     "class-methods-use-this": "off",
     "jsdoc/no-undefined-types": "off",
-    "no-restricted-syntax": "off"
+    "no-restricted-syntax": "off",
+    "import/no-extraneous-dependencies": [
+      "error", {
+        "devDependencies": [
+          "src/js/utils/generateApi.js"
+        ]
+      }
+    ]
   }
 }
