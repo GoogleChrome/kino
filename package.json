@@ -11,7 +11,7 @@
     "lint:fix": "eslint src/ --fix",
     "start": "firebase serve --only hosting",
     "build": "rollup -c",
-    "watch": "chokidar src/** -i src/js/sw/cache.js -c 'rollup -c'"
+    "watch": "chokidar --initial src/** -i src/js/sw/cache.js -c 'rollup -c'"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.12.13",

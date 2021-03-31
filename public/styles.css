@@ -507,10 +507,20 @@ article > *:not(.width-full) {
 }
 article p {
   font-size: 18px;
+  line-height: 32px;
 }
 article h2 {
   margin-top: calc(var(--gutter) * 2);
   margin-bottom: calc(var(--gutter) * 0.666);
+}
+article a {
+  color: var(--accent);
+}
+article code {
+  background: var(--code-background);
+  border: 1px solid var(--code-border);
+  padding: calc(var(--gutter) / 6);
+  border-radius: 4px;
 }
 .info {
   font-size: 16px;
