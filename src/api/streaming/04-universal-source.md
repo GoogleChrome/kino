@@ -4,10 +4,21 @@ description: 'Encode your streams in a universal format to ensure your media can
 date: 4th March, 2017
 length: '7:43'
 video-sources:
-  - src: https://storage.googleapis.com/wdm-assets/media/04/manifest.mpd
+  - src: https://storage.googleapis.com/wdm-assets/media/04/index.mpd
     type: application/dash+xml
   - src: https://storage.googleapis.com/wdm-assets/media/04/master.m3u8
     type: application/x-mpegURL
+video-subtitles:
+  - default: true
+    kind: captions
+    label: English
+    src: https://storage.googleapis.com/wdm-assets/media/03/captions/cap-en.vtt
+    srclang: en
+  - default: false
+    kind: captions
+    label: Česky
+    src: https://storage.googleapis.com/wdm-assets/media/03/captions/cap-cz.vtt
+    srclang: cz
 thumbnail: https://storage.googleapis.com/wdm-assets/images/the-universal-source.png
 ---
 ## Introduction

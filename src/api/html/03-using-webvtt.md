@@ -4,18 +4,22 @@ description: 'Add subtitles, captions and other text tracks to your content and 
 date: 4th March, 2017
 length: '7:43'
 video-sources:
-  - src: https://storage.googleapis.com/wdm-assets/videos/http-203/http-203-for-loops.mp4
-    type: video/mp4; codecs="avc1.64001f,mp4a.40.2"
+  - src: https://storage.googleapis.com/wdm-assets/media/02/av1.mp4
+    type: video/mp4; codecs="av01.0.04M.08, mp4a.40.2"
+  - src: https://storage.googleapis.com/wdm-assets/media/02/hevc.mp4
+    type: video/mp4; codecs="hev1.1.6.L93.90,mp4a.40.2"
+  - src: https://storage.googleapis.com/wdm-assets/media/02/vp9.webm
+    type: video/webm
 video-subtitles:
   - default: true
-    kind: subtitles
+    kind: captions
     label: English
-    src: https://storage.googleapis.com/wdm-assets/subtitles/ForBiggerEscapes-en.vtt
+    src: https://storage.googleapis.com/wdm-assets/media/03/captions/cap-en.vtt
     srclang: en
-  - default: true
-    kind: subtitles
-    label: Czech
-    src: https://storage.googleapis.com/wdm-assets/subtitles/ForBiggerEscapes-cz.vtt
+  - default: false
+    kind: captions
+    label: Česky
+    src: https://storage.googleapis.com/wdm-assets/media/03/captions/cap-cz.vtt
     srclang: cz
 thumbnail: https://storage.googleapis.com/wdm-assets/images/using-webvtt.png
 ---

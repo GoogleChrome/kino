@@ -4,10 +4,8 @@ description: 'Pick a suitable video format to make sure your single media file c
 date: 4th March, 2017
 length: '7:43'
 video-sources:
-  - src: https://storage.googleapis.com/wdm-assets/videos/http-203/background-fetch/manifest.mpd
-    type: application/dash+xml
-  - src: https://storage.googleapis.com/wdm-assets/videos/http-203/background-fetch/master.m3u8
-    type: application/x-mpegURL
+  - src: https://storage.googleapis.com/wdm-assets/media/01/video.mp4
+    type: video/mp4; codecs="avc1.640032,mp4a.40.2"
 thumbnail: https://storage.googleapis.com/wdm-assets/images/single-video-file.png
 ---
 ### Introduction
