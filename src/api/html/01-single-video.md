@@ -8,7 +8,7 @@ video-sources:
     type: application/dash+xml
   - src: https://storage.googleapis.com/wdm-assets/videos/http-203/background-fetch/master.m3u8
     type: application/x-mpegURL
-thumbnail: https://storage.googleapis.com/wdm-assets/images/http-203/http-203-background-fetch.jpg
+thumbnail: https://storage.googleapis.com/wdm-assets/images/single-video-file.png
 ---
 ### Introduction
 
