@@ -4,7 +4,7 @@ description: 'Improve the visual quality of your streams by encoding videos usin
 date: 4th March, 2017
 length: '7:43'
 video-sources:
-  - src: https://storage.googleapis.com/wdm-assets/media/05/index.mpd
+  - src: https://storage.googleapis.com/wdm-assets/media/05/manifest.mpd
     type: application/dash+xml
   - src: https://storage.googleapis.com/wdm-assets/media/05/master.m3u8
     type: application/x-mpegURL
