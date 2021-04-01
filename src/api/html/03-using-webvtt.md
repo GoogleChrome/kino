@@ -36,7 +36,7 @@ The WebVTT (Web Video Text Tracks) format is used to describe timed text data su
 
 ### WebVTT file structure
 
-You can create a `.vtt` manually just by following the [Web Video Text Tracks specification](https://w3c.github.io/webvtt/). Take a look at what the basic timings format looks like.
+The WebVTT format is simple. You can even create basic text track file manually. Just add your text data along with timings.
 
 ```
 WEBVTT
@@ -74,6 +74,8 @@ See how the caption placement is defined by adding settings after the time inter
 </video>
 ```
 
+If you're interested in learning more about styling and tagging of individual cues, the [WebVTT specification](https://w3c.github.io/webvtt/) is a good source of advanced examples.
+
 ### Kinds of text tracks
 
 Noticed the `kind` attribute of the `<track>` element? It's used to indicate what relation the particular text track has to the video. The possible values of the `kind` attribute are:
@@ -86,4 +88,11 @@ Noticed the `kind` attribute of the `<track>` element? It's used to indicate wha
 
 ### Next: Streaming
 
-Subtitles are useful, but what if your video contains multiple audio tracks? Or you want more control over the `<video>` data buffer? For that, we need to get more technical and talk about [streaming](#).
+Now that you understand the basics of making a video available on your web page, you might wonder about more complex use cases.
+
+* How do you support multiple audio tracks?
+* Is there a way to adjust video bitrate on the fly to fit available bandwidth?
+* Can you control how much data is held in memory at any given time?
+* How to play back a live video stream?
+
+To answer these questions, we need to talk about [Streaming](#).
