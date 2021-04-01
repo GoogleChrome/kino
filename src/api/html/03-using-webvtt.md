@@ -17,7 +17,7 @@ video-subtitles:
     label: Czech
     src: https://storage.googleapis.com/wdm-assets/subtitles/ForBiggerEscapes-cz.vtt
     srclang: cz
-thumbnail: https://storage.googleapis.com/wdm-assets/images/http-203/http-203-for-loops.jpg
+thumbnail: https://storage.googleapis.com/wdm-assets/images/using-webvtt.png
 ---
 ### Introduction
 

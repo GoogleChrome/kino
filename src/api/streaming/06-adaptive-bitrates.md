@@ -6,7 +6,7 @@ length: '7:43'
 video-sources:
   - src: https://storage.googleapis.com/wdm-assets/videos/gui-challenges/tabs.mp4
     type: video/mp4; codecs="avc1.64001f,mp4a.40.2"
-thumbnail: https://storage.googleapis.com/wdm-assets/images/gui-challenges/tabs.jpg
+thumbnail: https://storage.googleapis.com/wdm-assets/images/adaptive-bitrates.png
 ---
 ## Heading
 
