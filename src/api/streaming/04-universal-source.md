@@ -4,16 +4,24 @@ description: 'Encode your streams in a universal format to ensure your media can
 date: 4th March, 2017
 length: '7:43'
 video-sources:
-  - src: https://storage.googleapis.com/wdm-assets/videos/gui-challenges/centering.mp4
-    type: video/mp4; codecs="avc1.64001f,mp4a.40.2"
+  - src: https://storage.googleapis.com/wdm-assets/media/04/manifest.mpd
+    type: application/dash+xml
+  - src: https://storage.googleapis.com/wdm-assets/media/04/master.m3u8
+    type: application/x-mpegURL
 thumbnail: https://storage.googleapis.com/wdm-assets/images/the-universal-source.png
 ---
-## Heading
+## Introduction
 
-There is *some content*. And here is **some more**. And a [link](http://test.com).
+Media streaming is a way of delivering and playing back media content piece by piece. Instead of loading a single file containing the media, the player reads an index file describing how the target media is split up into individual chunks of data.
 
-There is *some content*. And here is **some more**. And a [link](http://test.com).
+## Use cases for streaming
 
-### Subheading
+Producing media chunks and the necessary index file describing the stream is not straightforward, but streaming unlocks some interesting use cases that are not possible to achieve just by pointing the `<video>` element on the page to a set of static source files.
 
-There is *some content*. And here is **some more**. And a [link](http://test.com).
+* **Adaptive streaming:** media is encoded in several bitrates and the highest quality media chunk that *fits* the current available bandwidth is sent down the wire.
+* **Live broadcast:** media chunks are encoded and made available in real time.
+* **Injecting media:** another media like advertisement can be injected into stream in progess without the player having to change the media source.
+
+## Anatomy of a stream
+
+
