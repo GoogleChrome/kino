@@ -12,7 +12,7 @@ thumbnail: https://storage.googleapis.com/wdm-assets/images/single-video-file.pn
 ---
 ### Introduction
 
-The simplest way of embedding a video on the web is using the <code>&lt;video></code> element. However, every browser supports a different set of video formats. Picking the right format will ensure your video is going to play everywhere.
+The simplest way of embedding a video on the web is using the `<video>` element. However, every browser supports a different set of video formats. Picking the right format will ensure your video is going to play everywhere.
 
 ### Choosing the right format
 
@@ -32,4 +32,4 @@ A single video source is simple to maintain, but it gives rise to some challenge
 
 ### Next: Advanced formats
 
-Advanced codecs like VP9 and HEVC generally produce smaller file sizes improving the experience on slower networks. Learn when and how to specify <a href="#">multiple sources</a> of your <code>&ltvideo></code>.
+Advanced codecs like VP9 and HEVC generally produce smaller file sizes improving the experience on slower networks. Learn when and how to specify <a href="#">multiple sources</a> of your `<video>`.
