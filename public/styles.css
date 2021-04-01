@@ -505,9 +505,18 @@ article > *:not(.width-full) {
   margin-left: auto;
   margin-right: auto;
 }
-article p {
+article p,
+article ul,
+article ol {
   font-size: 18px;
   line-height: 32px;
+}
+article ul,
+article ol {
+  margin: var(--gutter) 0;
+}
+article li {
+  margin: calc(var(--gutter) / 3) 0;
 }
 article h2 {
   margin-top: calc(var(--gutter) * 2);
@@ -516,7 +525,7 @@ article h2 {
 article a {
   color: var(--accent);
 }
-article code {
+article .video-content > *:not(pre) code {
   background: var(--code-background);
   border: 1px solid var(--code-border);
   padding: calc(var(--gutter) / 6);
@@ -528,6 +537,7 @@ article code {
   margin-bottom: var(--gutter);
   color: var(--footer-text);
 }
+article pre,
 .code-sample {
   margin-top: calc(var(--gutter) * 2);
   margin-bottom: calc(var(--gutter) * 2);
@@ -545,6 +555,7 @@ article code {
   margin-top: 0;
   margin-bottom: calc(var(--gutter) / 2);
 }
+article pre,
 .code-sample .code-sample--content {
   white-space: pre;
   font-size: 18px;
@@ -552,6 +563,7 @@ article code {
   padding: var(--gutter);
   border: 1px solid var(--code-border);
   background: var(--code-background);
+  overflow-y: auto;
 }
 .video-container {
   --play-button-size: 112px;

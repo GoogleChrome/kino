@@ -18,13 +18,13 @@ The simplest way of embedding a video on the web is using the `<video>` element.
 
 Browsers usually support multiple video formats, but there is a limited overlap in their capabilities. If you only want to encode your videos in a single format, the safe choice is to use a [MP4 container](https://caniuse.com/mpeg4) encapsulating H.264 video and AAC audio.
 
-<div class="code-sample">
-  <div class="code-sample--content">&lt;video>
-  &lt;source src="video.mp4" type="video/mp4">
-&lt/video></div>
-</div>
+```
+<video controls>
+  <source src="video.mp4" type="video/mp4">
+</video>
+```
 
-This simple approach is enough to get you up and running. Your video will now play in all major web browsers.
+This simple approach is enough to get you up and running. Your video will now play in all major web browsers. Notice the `controls` attribute that instructs browsers to allow users to control video playback, volume, select captions etc.
 
 A single video source is simple to maintain, but it gives rise to some challenges. Users of your site are going to use different classes of devices to watch the video. A high resolution video is going to look great on desktop, but may take a long time to load on slower cellular network – and vice versa.
 
@@ -32,4 +32,4 @@ A single video source is simple to maintain, but it gives rise to some challenge
 
 ### Next: Advanced formats
 
-Advanced codecs like VP9 and HEVC generally produce smaller file sizes improving the experience on slower networks. Learn when and how to specify <a href="#">multiple sources</a> of your `<video>`.
+Advanced codecs like VP9 and HEVC generally produce smaller file sizes improving the experience on slower networks. Learn when and how to specify [multiple sources](#) of your `<video>`.
