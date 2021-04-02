@@ -1,6 +1,6 @@
 ---
-title: 'The Universal Source'
-description: 'Encode your streams in a universal format to ensure your media can be served using both the DASH and HLS protocols.'
+title: 'Streaming Basics'
+description: 'Learn about basic concepts related to streaming and ensure your media can be served using both the DASH and HLS protocols.'
 date: 4th March, 2017
 length: '7:43'
 video-sources:

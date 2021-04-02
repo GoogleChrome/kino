@@ -99,4 +99,4 @@ Now that you understand the basics of making a video available on your web page,
 * Can you control how much data is held in memory at any given time?
 * How to play back a live video stream?
 
-To answer these questions, we need to talk about [Streaming](/universal-source/).
+To answer these questions, we need to talk about [Streaming](/streaming-basics/).

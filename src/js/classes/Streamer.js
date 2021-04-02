@@ -47,19 +47,29 @@ export default class {
      */
     document.body.addEventListener('downlink', (e) => {
       const downlinkInBits = e.detail;
+      const sample = {
+        size: 7,
+        discardSlowest: 1, // Smooth out random dips in download speeds.
+        discardFastest: 2, // Small chunks can lead to higher download speeds reported.
+      };
 
       this.stream.downlink.entries.unshift(downlinkInBits);
-      this.stream.downlink.entries = this.stream.downlink.entries.slice(0, 7);
+      this.stream.downlink.entries = this.stream.downlink.entries.slice(0, sample.size);
 
       // Make sure we have large enough sample size to draw any conclusions.
-      if (this.stream.downlink.entries.length === 7) {
+      if (this.stream.downlink.entries.length === sample.size) {
         /**
-         * Sort and remove extremes, but mostly the top values, because those
-         * can stem from rapid small file downloads like manifests.
+         * Sort and remove extremes.
          */
         const entriesSortedAsc = [...this.stream.downlink.entries].sort((a, b) => a - b);
-        const entriesWithoutExtremes = entriesSortedAsc.slice(1, 4);
+        const entriesWithoutExtremes = entriesSortedAsc.slice(
+          sample.discardSlowest,
+          sample.size - sample.discardFastest,
+        );
 
+        /**
+         * Rolling average of last entries without the extremes.
+         */
         this.stream.downlink.value = entriesWithoutExtremes.reduce(
           (a, b) => a + b,
           entriesWithoutExtremes[0],
@@ -383,7 +393,8 @@ export default class {
                *
                * Maybe cancel chunk loading if it takes too long and swap for lower quality in place
                */
-              if (data) {
+              const minSizeForDownlinkMeasurement = 10000;
+              if (data && data.length >= minSizeForDownlinkMeasurement) {
                 const elapsedInSecons = (performance.now() - startTime) / 1000;
                 const downlinkInBits = Math.round((data.length / elapsedInSecons) * 8);
                 const downlinkInMBits = downlinkInBits / 1000000;
