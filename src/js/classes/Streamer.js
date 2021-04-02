@@ -46,19 +46,23 @@ export default class {
      */
     document.body.addEventListener('downlink', (e) => {
       const downlinkInBits = e.detail;
-      let downlinkEntries = this.stream.downlink.entries;
 
-      downlinkEntries.unshift(downlinkInBits);
-      downlinkEntries = downlinkEntries.slice(0, 10);
-
-      this.stream.downlink.entries = downlinkEntries;
+      this.stream.downlink.entries.unshift(downlinkInBits);
+      this.stream.downlink.entries = this.stream.downlink.entries.slice(0, 7);
 
       // Make sure we have large enough sample size to draw any conclusions.
-      if (downlinkEntries.length === 10) {
-        this.stream.downlink.value = downlinkEntries.reduce(
+      if (this.stream.downlink.entries.length === 7) {
+        /**
+         * Sort and remove extremes, but mostly the top values, because those
+         * can stem from rapid small file downloads like manifests.
+         */
+        const entriesSortedAsc = [...this.stream.downlink.entries].sort((a, b) => a - b);
+        const entriesWithoutExtremes = entriesSortedAsc.slice(1, 4);
+
+        this.stream.downlink.value = entriesWithoutExtremes.reduce(
           (a, b) => a + b,
-          downlinkEntries[0],
-        ) / downlinkEntries.length;
+          entriesWithoutExtremes[0],
+        ) / entriesWithoutExtremes.length;
       }
     });
 

@@ -30,9 +30,10 @@ export default (parser, opts = {}) => {
   };
 
   const representations = {};
+
   const priorities = {
-    video: opts.videoPriorities || DEFAULT_VIDEO_PRIORITIES,
-    audio: opts.audioPriorities || DEFAULT_AUDIO_PRIORITIES,
+    video: [...(opts.videoPriorities || DEFAULT_VIDEO_PRIORITIES)],
+    audio: [...(opts.audioPriorities || DEFAULT_AUDIO_PRIORITIES)],
   };
 
   /**
