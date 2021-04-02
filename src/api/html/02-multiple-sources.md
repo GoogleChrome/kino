@@ -24,14 +24,26 @@ Should you then be using the more efficient codecs? Probably yes, but there is a
 
 ```
 <video>
-  <source src="av1.mp4" type="video/mp4; codecs=\"av01.0.05M.08\"">
+  <source src="av1.mp4" type="video/mp4; codecs=\"av01.0.04M.08\"">
   <source src="hevc.mp4" type="video/mp4; codecs=\"hvc1\"">
+  <source src="vp9.mp4" type="video/webm; codecs=\"vp9\"">
   <source src="h264.mp4" type="video/mp4">
 </video>
 ```
 
 Consider the larger time investment needed to encode one video multiple times and the associated higher disk space requirements. If you can afford both, your users will certainly benefit from being served videos in more efficient formats.
 
+### Example
+
+Let's compare the results of encoding the source video in these three formats:
+
+* **AV1:** size 7.02 MB, bitrate 867 kb/s
+* **HEVC:** size 7.62 MB, bitrate 941 kb/s
+* **VP9:** size 9.25 MB, bitrate 1143 kb/s
+* **H.264:** size 12.16 MB, bitrate 1503 kb/s
+
+Resolution of all videos is 1280×720 and their running time is 64 seconds. Encoders were set up to produce videos of comparable or better visual quality.
+
 ### Next: Text tracks and accessibility
 
-Now that your video is served everywhere in the most efficient format possible, take a second to think about its audience and accessibility. Learn how to use the `<track>` element to add closed captions, subtitles and more [using WebVTT](#).
+Now that your video is encoded in several efficient formats and served everywhere, take a second to think about its audience and accessibility. Learn how to use the `<track>` element to add closed captions, subtitles and more [using WebVTT](/using-webvtt/).

@@ -26,8 +26,10 @@ This simple approach is enough to get you up and running. Your video will now pl
 
 A single video source is simple to maintain, but it gives rise to some challenges. Users of your site are going to use different classes of devices to watch the video. A high resolution video is going to look great on desktop, but may take a long time to load on slower cellular network – and vice versa.
 
-@todo Take the video above as an example. Talk about its file size, resolution and illustrate the challenges with slower networks.
+### Example
+
+Take the video at the top of this page as an example. It's a 1280×720 H.264 video with an effective bit rate of 1503 kb/s. It looks decent on a desktop screen while being small enough to not cause stuttering on good quality 3G networks. It is clear, however, that it's not a perfect fit for either of those use cases.
 
 ### Next: Advanced formats
 
-Advanced codecs like VP9 and HEVC generally produce smaller file sizes improving the experience on slower networks. Learn when and how to specify [multiple sources](#) of your `<video>`.
+Advanced codecs like VP9 and HEVC generally produce smaller file sizes improving visual quality and experience on slower networks. Learn when and how to specify [multiple sources](/multiple-sources/) of your `<video>`.

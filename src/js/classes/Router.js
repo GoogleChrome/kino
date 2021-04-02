@@ -97,7 +97,7 @@ export default class Router {
      * Only push new state when this is a navigation between pages
      * and `skipState` is not true.
      */
-    const isNavigationBetweenPages = this.currentPage !== foundRoute.callback;
+    const isNavigationBetweenPages = this.currentPage !== targetUrl;
     if (!skipState && isNavigationBetweenPages) {
       window.history.pushState({ href }, null, targetUrl.pathname);
     }
@@ -105,7 +105,7 @@ export default class Router {
     window.scrollTo(0, 0);
     this.context.path = targetUrl.pathname;
     this.context.mainContent.innerHTML = '';
-    this.currentPage = foundRoute.callback;
+    this.currentPage = targetUrl;
     foundRoute.callback(this.context);
   }
 
