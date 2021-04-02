@@ -19,6 +19,7 @@ export default class {
         streamTypes: [],
         representations: selectRepresentations(parser, opts),
         lastRepresentationsIds: {},
+        lastRepresentationSwitch: 0,
         duration: this.parser.duration,
       },
       buffer: {
@@ -175,6 +176,21 @@ export default class {
       audio: this.stream.media.representations.audio[0] || null,
       video: null,
     };
+
+    /**
+     * Don't allow a representation switch more often than every 5 seconds.
+     */
+    const lastSwitchedBefore = Date.now() - this.stream.media.lastRepresentationSwitch;
+    const lockRepresentationFor = 5000;
+
+    if (lastSwitchedBefore < lockRepresentationFor) {
+      const lastVideoRepId = this.stream.media.lastRepresentationsIds.video;
+      representations.video = this.stream.media.representations.video.find(
+        (videoObj) => videoObj.id === lastVideoRepId,
+      );
+      return representations;
+    }
+
     const downlinkInBits = this.getDownlink() * 1000000;
     let usedBandwidth = 0;
 
@@ -443,7 +459,11 @@ export default class {
     this.throttleBuffer();
 
     const currentRepresentations = this.getRepresentationsByBandwidth();
-    const { baseURL, streamTypes, lastRepresentationsIds } = this.stream.media;
+    const {
+      baseURL,
+      streamTypes,
+      lastRepresentationsIds,
+    } = this.stream.media;
 
     streamTypes.forEach((streamType) => {
       const buffer = this.stream.buffer.sourceBuffers[streamType];
@@ -468,6 +488,7 @@ export default class {
        * initialization chunk again to indicate the parameters of the data ahead changed.
        */
       if (representation.id !== lastRepresentationId) {
+        this.stream.media.lastRepresentationSwitch = Date.now();
         filesToBuffer.push({
           id: `initial-${representation.id}`,
           url: `${baseURL}${representation.getInitialSegment()}`,
