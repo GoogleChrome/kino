@@ -1,10 +1,10 @@
 ---
-title: 'Adaptive Bitrates'
+title: 'Adaptive Streaming'
 description: 'Respond to changing network conditions by detecting the available bandwidth and inserting video chunks of appropriate bitrates.'
 date: 4th March, 2017
 length: '7:43'
 video-sources:
-  - src: https://storage.googleapis.com/wdm-assets/media/06/manifest.mpd?1
+  - src: https://storage.googleapis.com/wdm-assets/media/06/manifest.mpd
     type: application/dash+xml
   - src: https://storage.googleapis.com/wdm-assets/media/06/master.m3u8
     type: application/x-mpegURL
