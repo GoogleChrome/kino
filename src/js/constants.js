@@ -55,11 +55,6 @@ export const MEDIA_SESSION_DEFAULT_ARTWORK = [
 ];
 
 /**
- * Media Server URL.
- */
-export const MEDIA_SERVER_URL = 'https://storage.googleapis.com/wdm-assets';
-
-/**
  * MIME types associated with video streaming sources.
  */
 export const STREAMING_MIME_TYPES = [
