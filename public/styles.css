@@ -518,7 +518,7 @@ article ol {
 article li {
   margin: calc(var(--gutter) / 3) 0;
 }
-article h2 {
+article h1 {
   margin-top: calc(var(--gutter) * 2);
   margin-bottom: calc(var(--gutter) * 0.666);
 }
@@ -542,6 +542,9 @@ article pre,
   margin-top: calc(var(--gutter) * 2);
   margin-bottom: calc(var(--gutter) * 2);
 }
+article h3 + pre {
+  margin-top: 0;
+}
 .code-sample--do,
 .code-sample--dont {
   padding-left: calc(var(--gutter) * 0.666);
@@ -550,9 +553,11 @@ article pre,
 .code-sample--dont {
   border-left-color: var(--code-dont);
 }
-.code-sample .code-sample--title {
+.code-sample .code-sample--title,
+h3[id*="code"],
+h3[id*="sample"],
+h3[id*="example"]{
   font-size: 24px;
-  margin-top: 0;
   margin-bottom: calc(var(--gutter) / 2);
 }
 article pre,

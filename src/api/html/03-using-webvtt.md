@@ -1,8 +1,8 @@
 ---
-title: 'Using WebVTT'
-description: 'Add subtitles, captions and other text tracks to your content and make your videos accessible by a wider audience.'
-date: 4th March, 2017
-length: '7:43'
+title: Using WebVTT
+description: Add subtitles, captions and other text tracks to ensure your videos are accessible to a wider audience.
+date: April 2nd, 2021
+length: '1:04'
 video-sources:
   - src: https://storage.googleapis.com/wdm-assets/media/02/av1.mp4
     type: video/mp4; codecs="av01.0.04M.08, mp4a.40.2"
@@ -23,9 +23,12 @@ video-subtitles:
     srclang: cz
 thumbnail: https://storage.googleapis.com/wdm-assets/images/using-webvtt.png
 ---
-### Introduction
 
-The WebVTT (Web Video Text Tracks) format is used to describe timed text data such as closed captions or subtitles. You can use the `<track>` element to attach the `.vtt` files to your videos in order to make them more accessible by your audience.
+## Introduction
+
+The WebVTT (Web Video Text Tracks) format is used to describe timed text data such as closed captions or subtitles. You can use the `<track>` element to attach the `.vtt` files to your videos in order to make them more accessible to your audience. Visit the [media accessibility](https://web.dev/media-accessibility/) page on `web.dev` for more information.
+
+### Basic code example
 
 ```
 <video controls>
@@ -34,13 +37,13 @@ The WebVTT (Web Video Text Tracks) format is used to describe timed text data su
   <source src="h264.mp4" type="video/mp4">
 
   <track src="cap-en.vtt" srclang="en" label="English" kind="captions">
-  <track src="cap-cz.vtt" srclang="cz" label="Czech" kind="captions">
+  <track src="cap-cz.vtt" srclang="cz" label="Česky" kind="captions">
 </video>
 ```
 
-### WebVTT file structure
+## WebVTT file structure
 
-The WebVTT format is simple. You can even create basic text track file manually. Just add your text data along with timings.
+The WebVTT format is simple. You can even create basic text track files manually. Just add your text data along with timings.
 
 ```
 WEBVTT
@@ -53,7 +56,7 @@ The first line of the subtitles.
 – This time on two
 ```
 
-Want your captions to render in a different position with left or right alignment? Perhaps to align the captions with the current speaker position? WebVTT defines settings to do just that directly inside the `.vtt` file.
+Want your captions to render in a different position with left or right alignment? Perhaps to align the captions with the current speaker position? WebVTT defines settings to do that, and more, directly inside the `.vtt` file.
 
 ```
 WEBVTT
@@ -62,7 +65,7 @@ WEBVTT
 The first line of the subtitles.
 ```
 
-See how the caption placement is defined by adding settings after the time interval definitions? Another handy feature is the ability to style individual cues using CSS. Perhaps you want to use yellow text color and a semitransparent background for all captions.
+See how the caption placement is defined by adding settings after the time interval definitions. Another handy feature is the ability to style individual cues using CSS. Perhaps you want to use a yellow text color, and a semi-transparent background for all captions.
 
 ```
 <style>
@@ -74,15 +77,15 @@ See how the caption placement is defined by adding settings after the time inter
 <video controls>
   ...
   <track src="cap-en.vtt" srclang="en" label="English" kind="captions">
-  <track src="cap-cz.vtt" srclang="cz" label="Czech" kind="captions">
+  <track src="cap-cz.vtt" srclang="cz" label="Česky" kind="captions">
 </video>
 ```
 
-If you're interested in learning more about styling and tagging of individual cues, the [WebVTT specification](https://w3c.github.io/webvtt/) is a good source of advanced examples.
+If you're interested in learning more about styling and tagging of individual cues, the [WebVTT specification](https://w3c.github.io/webvtt/) is a good source for advanced examples.
 
-### Kinds of text tracks
+## Kinds of text tracks
 
-Noticed the `kind` attribute of the `<track>` element? It's used to indicate what relation the particular text track has to the video. The possible values of the `kind` attribute are:
+Did you notice the `kind` attribute of the `<track>` element? It's used to indicate what relation the particular text track has to the video. The possible values of the `kind` attribute are:
 
 * `captions`: For closed captions, i.e. transcripts and possibly translations of any audio. Suitable for hearing-impaired people and in cases when the video is playing muted.
 * `subtitles`: For subtitles, i.e. translations of speech and text in a language different from the main language of the video.
@@ -90,13 +93,13 @@ Noticed the `kind` attribute of the `<track>` element? It's used to indicate wha
 * `chapters`: Intended to be displayed when the user is navigating within the video.
 * `metadata`: Not visible. May be used by scripts.
 
-### Next: Streaming
+## What's Next?
 
-Now that you understand the basics of making a video available on your web page, you might wonder about more complex use cases.
+Now that you understand the basics of making a video available and accessible on your web page, you might wonder about more complex use cases.
 
 * How do you support multiple audio tracks?
 * Is there a way to adjust video bitrate on the fly to fit available bandwidth?
 * Can you control how much data is held in memory at any given time?
 * How to play back a live video stream?
 
-To answer these questions, we need to talk about [Streaming](/streaming-basics/).
+To answer these questions, continue reading about how this PWA was built in the [streaming basics](/streaming-basics/) article.

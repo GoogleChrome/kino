@@ -85,7 +85,7 @@ export default (routerContext) => {
         <div class="video-container--player"></div>
       </div>
       <div class="video-content">
-        <h2>${currentVideoData.title}</h2>
+        <h1>${currentVideoData.title}</h1>
         <div class="info">
           <span class="date">${currentVideoData.date}</span> • <span class="length">${videoMinutes}min ${videoSeconds}sec</span>
         </div>
