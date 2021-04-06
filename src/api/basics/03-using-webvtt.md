@@ -1,6 +1,6 @@
 ---
 title: Using WebVTT
-description: Add subtitles, captions and other text tracks to ensure your videos are accessible to a wider audience.
+description: Add subtitles, captions and other text tracks to ensure your videos are accessible to the widest possible audience.
 date: April 2nd, 2021
 length: '1:04'
 video-sources:
