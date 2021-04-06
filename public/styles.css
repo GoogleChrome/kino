@@ -472,6 +472,13 @@ main {
   margin-bottom: 3rem;
 }
 
+.page-header code {
+  background: var(--code-background);
+  border: 1px solid var(--code-border);
+  padding: calc(var(--gutter) / 6);
+  border-radius: 4px;
+}
+
 /* Home Header: Breakpoints */
 @media (min-width: 720px) {
   .page-header {
