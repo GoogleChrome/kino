@@ -6,11 +6,11 @@ description: |
 date: April 2nd, 2021
 length: '1:04'
 video-sources:
-  - src: https://storage.googleapis.com/wdm-assets/media/02/av1.mp4
+  - src: https://storage.googleapis.com/wdm-assets/media/03/av1.mp4
     type: video/mp4; codecs="av01.0.04M.08, mp4a.40.2"
-  - src: https://storage.googleapis.com/wdm-assets/media/02/hevc.mp4
+  - src: https://storage.googleapis.com/wdm-assets/media/03/hevc.mp4
     type: video/mp4; codecs="hev1.1.6.L93.90,mp4a.40.2"
-  - src: https://storage.googleapis.com/wdm-assets/media/02/vp9.webm
+  - src: https://storage.googleapis.com/wdm-assets/media/03/vp9.webm
     type: video/webm
 video-subtitles:
   - default: true
