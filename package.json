@@ -1,6 +1,6 @@
 {
   "name": "web-dev-media",
-  "version": "1.0.0-alpha5",
+  "version": "1.0.0-alpha6",
   "description": "A sample video PWA built for web.dev/media",
   "main": "src/index.js",
   "author": "Google",
@@ -11,7 +11,7 @@
     "lint:fix": "eslint src/ --fix",
     "start": "firebase serve --only hosting",
     "build": "rollup -c",
-    "watch": "chokidar src/** -i src/js/sw/cache.js -c 'rollup -c'"
+    "watch": "chokidar --initial src/** -i src/js/sw/cache.js -c 'rollup -c'"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.12.13",

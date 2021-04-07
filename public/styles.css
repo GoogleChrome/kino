@@ -472,6 +472,13 @@ main {
   margin-bottom: 3rem;
 }
 
+.page-header code {
+  background: var(--code-background);
+  border: 1px solid var(--code-border);
+  padding: calc(var(--gutter) / 6);
+  border-radius: 4px;
+}
+
 /* Home Header: Breakpoints */
 @media (min-width: 720px) {
   .page-header {
@@ -500,17 +507,36 @@ article {
   margin-bottom: calc(var(--gutter) * 3);
   border-bottom: 1px solid var(--separator);
 }
-article > *:not(.width-full) {
+article .video-content {
   max-width: 760px;
   margin-left: auto;
   margin-right: auto;
 }
-article p {
+article p,
+article ul,
+article ol {
   font-size: 18px;
+  line-height: 32px;
 }
-article h2 {
+article ul,
+article ol {
+  margin: var(--gutter) 0;
+}
+article li {
+  margin: calc(var(--gutter) / 3) 0;
+}
+article h1 {
   margin-top: calc(var(--gutter) * 2);
   margin-bottom: calc(var(--gutter) * 0.666);
+}
+article a {
+  color: var(--accent);
+}
+article .video-content > *:not(pre) code {
+  background: var(--code-background);
+  border: 1px solid var(--code-border);
+  padding: calc(var(--gutter) / 6);
+  border-radius: 4px;
 }
 .info {
   font-size: 16px;
@@ -518,9 +544,17 @@ article h2 {
   margin-bottom: var(--gutter);
   color: var(--footer-text);
 }
+article pre,
 .code-sample {
   margin-top: calc(var(--gutter) * 2);
   margin-bottom: calc(var(--gutter) * 2);
+}
+article h3 + pre {
+  margin-top: 0;
+}
+article pre + p > em {
+  position: relative;
+  top: calc(var(--gutter) * -1);
 }
 .code-sample--do,
 .code-sample--dont {
@@ -530,18 +564,23 @@ article h2 {
 .code-sample--dont {
   border-left-color: var(--code-dont);
 }
-.code-sample .code-sample--title {
+.code-sample .code-sample--title,
+h3[id*="code"],
+h3[id*="sample"],
+h3[id*="example"]{
   font-size: 24px;
-  margin-top: 0;
   margin-bottom: calc(var(--gutter) / 2);
 }
+article pre,
 .code-sample .code-sample--content {
-  white-space: pre;
+  max-width: 760px;
+  white-space: pre-wrap;
   font-size: 18px;
   font-family: monospace;
   padding: var(--gutter);
   border: 1px solid var(--code-border);
   background: var(--code-background);
+  overflow-y: auto;
 }
 .video-container {
   --play-button-size: 112px;

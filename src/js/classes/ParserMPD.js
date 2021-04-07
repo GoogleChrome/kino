@@ -252,7 +252,7 @@ export default class {
    *
    * @returns {RepresentationObject[]} Representation objects.
    */
-  queryRepresentations(representationQuery, contentType, lang = '') {
+  queryRepresentations(representationQuery, contentType, lang = null) {
     let adaptationSetsQuery = `AdaptationSet[contentType="${contentType}"]`;
     if (lang) adaptationSetsQuery += `[lang="${lang}"]`;
 

@@ -7,7 +7,7 @@
  * There may be adjacent caches used for other purposes and we
  * want to let the SW know which caches it should purge on upgrade.
  */
-export const SW_CACHE_NAME = 'static-assets-v1.0.0-alpha5';
+export const SW_CACHE_NAME = 'static-assets-v1.0.0-alpha6';
 export const SW_CACHE_FORMAT = /^static-assets-v[a-z0-9.-]+$/;
 
 /**
@@ -53,11 +53,6 @@ export const MEDIA_SESSION_DEFAULT_ARTWORK = [
   { src: '/images/media-session/artwork-384x384.jpg', sizes: '384x384', type: 'image/jpeg' },
   { src: '/images/media-session/artwork-512x512.jpg', sizes: '512x512', type: 'image/jpeg' },
 ];
-
-/**
- * Media Server URL.
- */
-export const MEDIA_SERVER_URL = 'https://storage.googleapis.com/wdm-assets';
 
 /**
  * MIME types associated with video streaming sources.

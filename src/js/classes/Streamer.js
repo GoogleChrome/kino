@@ -19,6 +19,7 @@ export default class {
         streamTypes: [],
         representations: selectRepresentations(parser, opts),
         lastRepresentationsIds: {},
+        lastRepresentationSwitch: 0,
         duration: this.parser.duration,
       },
       buffer: {
@@ -46,19 +47,33 @@ export default class {
      */
     document.body.addEventListener('downlink', (e) => {
       const downlinkInBits = e.detail;
-      let downlinkEntries = this.stream.downlink.entries;
+      const sample = {
+        size: 7,
+        discardSlowest: 1, // Smooth out random dips in download speeds.
+        discardFastest: 2, // Small chunks can lead to higher download speeds reported.
+      };
 
-      downlinkEntries.unshift(downlinkInBits);
-      downlinkEntries = downlinkEntries.slice(0, 10);
-
-      this.stream.downlink.entries = downlinkEntries;
+      this.stream.downlink.entries.unshift(downlinkInBits);
+      this.stream.downlink.entries = this.stream.downlink.entries.slice(0, sample.size);
 
       // Make sure we have large enough sample size to draw any conclusions.
-      if (downlinkEntries.length === 10) {
-        this.stream.downlink.value = downlinkEntries.reduce(
+      if (this.stream.downlink.entries.length === sample.size) {
+        /**
+         * Sort and remove extremes.
+         */
+        const entriesSortedAsc = [...this.stream.downlink.entries].sort((a, b) => a - b);
+        const entriesWithoutExtremes = entriesSortedAsc.slice(
+          sample.discardSlowest,
+          sample.size - sample.discardFastest,
+        );
+
+        /**
+         * Rolling average of last entries without the extremes.
+         */
+        this.stream.downlink.value = entriesWithoutExtremes.reduce(
           (a, b) => a + b,
-          downlinkEntries[0],
-        ) / downlinkEntries.length;
+          entriesWithoutExtremes[0],
+        ) / entriesWithoutExtremes.length;
       }
     });
 
@@ -171,6 +186,21 @@ export default class {
       audio: this.stream.media.representations.audio[0] || null,
       video: null,
     };
+
+    /**
+     * Don't allow a representation switch more often than every 5 seconds.
+     */
+    const lastSwitchedBefore = Date.now() - this.stream.media.lastRepresentationSwitch;
+    const lockRepresentationFor = 5000;
+
+    if (lastSwitchedBefore < lockRepresentationFor) {
+      const lastVideoRepId = this.stream.media.lastRepresentationsIds.video;
+      representations.video = this.stream.media.representations.video.find(
+        (videoObj) => videoObj.id === lastVideoRepId,
+      );
+      return representations;
+    }
+
     const downlinkInBits = this.getDownlink() * 1000000;
     let usedBandwidth = 0;
 
@@ -363,7 +393,8 @@ export default class {
                *
                * Maybe cancel chunk loading if it takes too long and swap for lower quality in place
                */
-              if (data) {
+              const minSizeForDownlinkMeasurement = 10000;
+              if (data && data.length >= minSizeForDownlinkMeasurement) {
                 const elapsedInSecons = (performance.now() - startTime) / 1000;
                 const downlinkInBits = Math.round((data.length / elapsedInSecons) * 8);
                 const downlinkInMBits = downlinkInBits / 1000000;
@@ -439,7 +470,11 @@ export default class {
     this.throttleBuffer();
 
     const currentRepresentations = this.getRepresentationsByBandwidth();
-    const { baseURL, streamTypes, lastRepresentationsIds } = this.stream.media;
+    const {
+      baseURL,
+      streamTypes,
+      lastRepresentationsIds,
+    } = this.stream.media;
 
     streamTypes.forEach((streamType) => {
       const buffer = this.stream.buffer.sourceBuffers[streamType];
@@ -464,6 +499,7 @@ export default class {
        * initialization chunk again to indicate the parameters of the data ahead changed.
        */
       if (representation.id !== lastRepresentationId) {
+        this.stream.media.lastRepresentationSwitch = Date.now();
         filesToBuffer.push({
           id: `initial-${representation.id}`,
           url: `${baseURL}${representation.getInitialSegment()}`,

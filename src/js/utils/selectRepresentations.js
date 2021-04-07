@@ -30,9 +30,10 @@ export default (parser, opts = {}) => {
   };
 
   const representations = {};
+
   const priorities = {
-    video: opts.videoPriorities || DEFAULT_VIDEO_PRIORITIES,
-    audio: opts.audioPriorities || DEFAULT_AUDIO_PRIORITIES,
+    video: [...(opts.videoPriorities || DEFAULT_VIDEO_PRIORITIES)],
+    audio: [...(opts.audioPriorities || DEFAULT_AUDIO_PRIORITIES)],
   };
 
   /**
@@ -45,12 +46,9 @@ export default (parser, opts = {}) => {
       do {
         query = priorities[contentType].shift() || '';
 
-        /**
-         * @todo Support languages other than the hardcoded English.
-         */
-        representations[contentType] = parser.queryRepresentations(query, contentType, 'eng');
+        representations[contentType] = parser.queryRepresentations(query, contentType);
         representations[contentType] = representations[contentType].filter(canPlayFilter);
-      } while (representations[contentType].length === 0);
+      } while (representations[contentType].length === 0 && query);
     },
   );
 

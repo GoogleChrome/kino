@@ -47,11 +47,11 @@ export default (routerContext) => {
   if (Array.isArray(thumbnail)) {
     const sources = thumbnail.filter((t) => !t.default).map((t) => `<source srcset="${t.src}" type="${t.type}">`).join('');
     const defaultSource = thumbnail.find((t) => t.default);
-    const defaultSourceHTML = `<img src="${defaultSource.src}" width="1280" height="720" alt="${currentVideoData.title}">`;
+    const defaultSourceHTML = `<img src="${defaultSource.src}" width="1200" height="675" alt="${currentVideoData.title}">`;
 
     videoImageHTML = `<picture>${sources}${defaultSourceHTML}</picture>`;
   } else {
-    videoImageHTML = `<img src="${currentVideoData.thumbnail}" width="1280" height="720" alt="${currentVideoData.title}">`;
+    videoImageHTML = `<img src="${currentVideoData.thumbnail}" width="1200" height="675" alt="${currentVideoData.title}">`;
   }
 
   const [videoMinutes, videoSeconds] = currentVideoData.length.split(':');
@@ -85,7 +85,7 @@ export default (routerContext) => {
         <div class="video-container--player"></div>
       </div>
       <div class="video-content">
-        <h2>${currentVideoData.title}</h2>
+        <h1>${currentVideoData.title}</h1>
         <div class="info">
           <span class="date">${currentVideoData.date}</span> • <span class="length">${videoMinutes}min ${videoSeconds}sec</span>
         </div>
@@ -99,12 +99,25 @@ export default (routerContext) => {
   mainContent.prepend(posterWrapper);
   mainContent.querySelector('.downloader').appendChild(downloader);
 
+  const playButton = mainContent.querySelector('.play');
   const categorySlug = currentVideoData.categories[0];
   const { name, slug } = apiData.categories.find((obj) => obj.slug === categorySlug);
   const localContext = {
     category: `${name}:${slug}`,
+    columns: 2,
   };
-  const playButton = mainContent.querySelector('.play');
+
+  const categoryVideos = restVideoData.filter(
+    (obj) => obj.categories.includes(categorySlug),
+  ).slice(0, 2);
+
+  appendVideoToGallery({
+    ...routerContext,
+    apiData: {
+      videos: categoryVideos,
+      categories: apiData.categories,
+    },
+  }, localContext);
 
   playButton.addEventListener('click', (e) => {
     const videoContainer = e.target.closest('.video-container');
@@ -116,21 +129,4 @@ export default (routerContext) => {
     playerWrapper.appendChild(videoPlayer);
     videoPlayer.play();
   });
-
-  const sameCategoryVideos = restVideoData.filter(
-    (obj) => obj.categories.includes(categorySlug),
-  ).slice(0, 3);
-
-  const galleryApiData = {
-    videos: sameCategoryVideos,
-    categories: apiData.categories,
-  };
-
-  /**
-   * Passing `restVideoData` to avoid duplication of content on the single page.
-   */
-  appendVideoToGallery({
-    ...routerContext,
-    apiData: galleryApiData,
-  }, localContext);
 };

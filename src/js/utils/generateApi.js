@@ -55,7 +55,7 @@ const generateApiData = async () => {
       });
     } else {
       apiData.videos.push({
-        id: fileName.replace('.md', ''),
+        id: fileName.replace('.md', '').replace(/^[0-9]+-/, ''),
         ...fmContent.attributes,
         categories: [categoryName],
         body: marked(fmContent.body),
