@@ -38,10 +38,10 @@ Consider the larger time investment needed to encode one video multiple times, a
 
 Let's compare the results of encoding the source video in these three formats:
 
-- **AV1**: size 7.02 MB, bitrate 867 kb/s
-- **HEVC**: size 7.62 MB, bitrate 941 kb/s
-- **VP9**: size 9.25 MB, bitrate 1143 kb/s
-- **H.264**: size 12.16 MB, bitrate 1503 kb/s
+* **AV1**: size 7.02 MB, bitrate 867 kb/s
+* **HEVC**: size 7.62 MB, bitrate 941 kb/s
+* **VP9**: size 9.25 MB, bitrate 1143 kb/s
+* **H.264**: size 12.16 MB, bitrate 1503 kb/s
 
 ### Example FFmpeg commands
 
