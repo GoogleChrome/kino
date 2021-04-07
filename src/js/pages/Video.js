@@ -104,6 +104,7 @@ export default (routerContext) => {
   const { name, slug } = apiData.categories.find((obj) => obj.slug === categorySlug);
   const localContext = {
     category: `${name}:${slug}`,
+    columns: 2,
   };
 
   const categoryVideos = restVideoData.filter(

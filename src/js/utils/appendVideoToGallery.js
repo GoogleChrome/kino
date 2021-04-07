@@ -17,7 +17,10 @@ function appendVideoToGallery(routerContext, localContext) {
   videoGrid.category = localContext.category || '';
   videoGrid.setAttribute('class', localContext.class || 'flex');
 
+  const videoCards = videoGrid.shadowRoot.querySelector('.video-cards');
   const videoGallery = videoGrid.shadowRoot.querySelector('.video-cards ul');
+
+  videoCards.classList.add(localContext.columns === 2 ? 'col-2' : 'col-3');
 
   apiData.videos.forEach((videoData) => {
     const item = document.createElement('li');

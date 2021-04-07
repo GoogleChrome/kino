@@ -43,7 +43,7 @@ export default async (routerContext) => {
       </div>
     </div>
     <div class="container container--no-padding">
-      <div class="video-cards">
+      <div class="video-cards col-2">
         <ul></ul>
       </div>
     </div>
