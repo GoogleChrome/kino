@@ -552,6 +552,10 @@ article pre,
 article h3 + pre {
   margin-top: 0;
 }
+article pre + p > em {
+  position: relative;
+  top: calc(var(--gutter) * -1);
+}
 .code-sample--do,
 .code-sample--dont {
   padding-left: calc(var(--gutter) * 0.666);
