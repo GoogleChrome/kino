@@ -507,7 +507,7 @@ article {
   margin-bottom: calc(var(--gutter) * 3);
   border-bottom: 1px solid var(--separator);
 }
-article > *:not(.width-full) {
+article .video-content {
   max-width: 760px;
   margin-left: auto;
   margin-right: auto;
@@ -573,7 +573,8 @@ h3[id*="example"]{
 }
 article pre,
 .code-sample .code-sample--content {
-  white-space: pre;
+  max-width: 760px;
+  white-space: pre-wrap;
   font-size: 18px;
   font-family: monospace;
   padding: var(--gutter);
