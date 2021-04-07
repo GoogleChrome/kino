@@ -1,6 +1,8 @@
 ---
 title: Streaming Basics
-description: Learn about basic concepts related to streaming and ensure your media can be served using both the DASH and HLS protocols.
+description: |
+  Learn about basic concepts related to streaming and ensure your media can be
+  served using both the DASH and HLS protocols.
 date: April 2nd, 2021
 length: '1:04'
 video-sources:
