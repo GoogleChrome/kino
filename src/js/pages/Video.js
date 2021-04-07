@@ -99,12 +99,24 @@ export default (routerContext) => {
   mainContent.prepend(posterWrapper);
   mainContent.querySelector('.downloader').appendChild(downloader);
 
+  const playButton = mainContent.querySelector('.play');
   const categorySlug = currentVideoData.categories[0];
   const { name, slug } = apiData.categories.find((obj) => obj.slug === categorySlug);
   const localContext = {
     category: `${name}:${slug}`,
   };
-  const playButton = mainContent.querySelector('.play');
+
+  const categoryVideos = restVideoData.filter(
+    (obj) => obj.categories.includes(categorySlug),
+  ).slice(0, 2);
+
+  appendVideoToGallery({
+    ...routerContext,
+    apiData: {
+      videos: categoryVideos,
+      categories: apiData.categories,
+    },
+  }, localContext);
 
   playButton.addEventListener('click', (e) => {
     const videoContainer = e.target.closest('.video-container');
@@ -116,21 +128,4 @@ export default (routerContext) => {
     playerWrapper.appendChild(videoPlayer);
     videoPlayer.play();
   });
-
-  const sameCategoryVideos = restVideoData.filter(
-    (obj) => obj.categories.includes(categorySlug),
-  ).slice(0, 3);
-
-  const galleryApiData = {
-    videos: sameCategoryVideos,
-    categories: apiData.categories,
-  };
-
-  /**
-   * Passing `restVideoData` to avoid duplication of content on the single page.
-   */
-  appendVideoToGallery({
-    ...routerContext,
-    apiData: galleryApiData,
-  }, localContext);
 };
