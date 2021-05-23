@@ -360,7 +360,7 @@ export default () => {
        *
        * Example:
        *
-       * Key: https://storage.googleapis.com/wdm-assets/videos/http-203/http-203-for-loops.mp4
+       * Key: https://storage.googleapis.com/kino-assets/single-video/video.mp4
        * Value: { bytesDownloaded: 58274426, bytesTotal: 58274426, ... }
        *
        * Properties:

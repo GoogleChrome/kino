@@ -18,7 +18,7 @@ export const APP_SHELL_URL = '/';
 /**
  * Media Server Hostname
  */
-export const MEDIA_SERVER_ORIGIN = 'https://storage.googleapis.com/wdm-assets/';
+export const MEDIA_SERVER_ORIGIN = 'https://storage.googleapis.com/kino-assets/';
 
 /**
  * IDB Storage Schema.
