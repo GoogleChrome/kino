@@ -20,7 +20,6 @@ import assetsToCache from './cache';
  * @param {Request}     request    Request object.
  * @param {IDBDatabase} db         IDBDatabase instance.
  * @param {FileMeta}    fileMeta   File meta object.
- *
  * @returns {Response} Response object.
  */
 const getResponseStream = (request, db, fileMeta) => {
@@ -128,7 +127,6 @@ const getResponseStream = (request, db, fileMeta) => {
  * respond with the local file.
  *
  * @param {Event} event The `fetch` event.
- *
  * @returns {Promise<Response>|null} Promise that resolves with a `Response` object.
  */
 const maybeGetVideoResponse = async (event) => {

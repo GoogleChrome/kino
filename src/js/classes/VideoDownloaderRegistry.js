@@ -17,7 +17,6 @@ export default class VideoDownloaderRegistry {
    * Creates a new `VideoDownloader` instance for the given `videoId`.
    *
    * @param {string} videoId   Video ID.
-   *
    * @returns {VideoDownloader} Instantiated VideoDownloader.
    */
   create(videoId) {
@@ -30,7 +29,6 @@ export default class VideoDownloaderRegistry {
    * Returns a previously instantiated VideoDownloader.
    *
    * @param {string} videoId Get the `VideoDownloader` instance for this video id.
-   *
    * @returns {VideoDownloader|null} `VideoDownloader` instance.
    */
   get(videoId) {

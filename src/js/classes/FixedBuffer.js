@@ -44,7 +44,6 @@ export default class {
    *
    * @param {Uint8Array} data        Data to be split by position
    * @param {Array}      offsetData  Bounds of the data view on top of underlying ArrayBuffer.
-   *
    * @returns {Uint8Array} A view on the underlying data buffer.
    */
   crop(data, offsetData) {
@@ -76,7 +75,6 @@ export default class {
    * Clones an `Uint8Array` object.
    *
    * @param {Uint8Array} source Source buffer typed array.
-   *
    * @returns {Uint8Array} Cloned array;
    */
   cloneBuffer(source) {

@@ -8,7 +8,6 @@ import selectRepresentations from '../utils/selectRepresentations';
  * @param {string} chunkURL             URL of the chunk file with MPD variable intact.
  * @param {object} representationObject Representation object.
  * @param {number} chunkIndex           Index of the chunk to be returned.
- *
  * @returns {string} Interpolated chunk URL.
  */
 const interpolateChunkURL = (chunkURL, representationObject, chunkIndex = 0) => {
@@ -32,7 +31,6 @@ const interpolateChunkURL = (chunkURL, representationObject, chunkIndex = 0) => 
  *
  * @param {object} representationObject Representation object.
  * @param {number} index                Chunk index.
- *
  * @returns {string} Interpolated chunk filename.
  */
 const getSegmentByIndex = (representationObject, index) => {
@@ -46,7 +44,6 @@ const getSegmentByIndex = (representationObject, index) => {
  * Returns the initial segment filename.
  *
  * @param {RepresentationObject} representationObject Representation object.
- *
  * @returns {string} Interpolated chunk filename.
  */
 const getInitialSegment = (representationObject) => {
@@ -62,7 +59,6 @@ const getInitialSegment = (representationObject) => {
  * @param {RepresentationObject} representationObject         The representation object.
  * @param {Element}              representationObject.element The <Representation> element.
  * @param {number}               time                         Time in seconds.
- *
  * @returns {number} Chunk index.
  */
 const getSegmentIndexByTime = (representationObject, time) => {
@@ -114,7 +110,6 @@ const getSegmentIndexByTime = (representationObject, time) => {
  * with the representation.
  *
  * @param {Element} representationElement The <Representation> element from MPD.
- *
  * @returns {RepresentationObject} Representation object.
  */
 const representationElementToObject = (representationElement) => {
@@ -170,7 +165,6 @@ export default class {
    * Returns the directory URL of the current manifest.
    *
    * @param {string} manifestSrc URL of the current manifest.
-   *
    * @returns {string} Directory URL of the current manifest.
    */
   getBaseUrl(manifestSrc) {
@@ -196,7 +190,6 @@ export default class {
    * Returns a list of all chunk files referenced in the manifest.
    *
    * @param {Array[]} additionalFileTuples List of tuples in the format [fileId, URL].
-   *
    * @returns {string[]} List of all chunk files referenced in the manifest.
    */
   listAllChunkURLs(additionalFileTuples = [[]]) {
@@ -249,7 +242,6 @@ export default class {
    * @param {string} representationQuery Query representation attrs, e.g. '[mimeType="video/webm"]'
    * @param {string} contentType         Requested content type, e.g. 'video'.
    * @param {string} lang                Requested language.
-   *
    * @returns {RepresentationObject[]} Representation objects.
    */
   queryRepresentations(representationQuery, contentType, lang = null) {

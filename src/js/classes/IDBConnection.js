@@ -13,7 +13,6 @@ const metaAccessorFactory = (abstractedIDB) => ({
 
   /**
    * @param {string} videoId Video ID.
-   *
    * @returns {object} Video meta object.
    */
   async get(videoId) {
@@ -60,7 +59,6 @@ const metaAccessorFactory = (abstractedIDB) => ({
    * Request to add or update video meta in IDB.
    *
    * @param {object} videoMetaData Video meta to be stored.
-   *
    * @returns {Array} Array containing an `IDBTransaction` and `IDBRequest`
    *                  objects for the put operation.
    */
@@ -76,7 +74,6 @@ const dataAccessorFactory = (abstractedIDB) => ({
    * Request to add or update video data in IDB.
    *
    * @param {object} videoData Video data to be stored.
-   *
    * @returns {Array} Array containing an `IDBTransaction` and `IDBRequest`
    *                  objects for the put operation.
    */
@@ -92,7 +89,6 @@ const fileAccessorFactory = (abstractedIDB) => ({
    * Returns meta information for a URL.
    *
    * @param {string} url URL for the requested file.
-   *
    * @returns {Promise<FileMeta|undefined>} File meta information.
    */
   async get(url) {
@@ -115,7 +111,6 @@ const fileAccessorFactory = (abstractedIDB) => ({
    * Returns files associated with a particular video ID.
    *
    * @param {string} videoId Video ID.
-   *
    * @returns {FileMeta[]} File meta entries.
    */
   async getByVideoId(videoId) {
@@ -151,7 +146,6 @@ const fileAccessorFactory = (abstractedIDB) => ({
    * Request to add or update video file meta in IDB.
    *
    * @param {object} fileMeta Video file meta to be stored.
-   *
    * @returns {Array} Array containing an `IDBTransaction` and `IDBRequest`
    *                  objects for the put operation.
    */
@@ -175,7 +169,6 @@ export default () => {
    * to video meta, data and file stores.
    *
    * @param {IDBDatabase} idbConnection Connection to an IDB.
-   *
    * @returns {object} IDB abstraction instance.
    */
   const dbFactory = (idbConnection) => {
@@ -238,7 +231,6 @@ export default () => {
      *
      * @param {string}     id    Video ID.
      * @param {FileMeta[]} files List of files associated with the video.
-     *
      * @returns {Promise} Promise that resolves when the video data is removed.
      */
     abstractedIDB.removeVideo = (id, files) => new Promise((resolve, reject) => {
@@ -298,7 +290,6 @@ export default () => {
 
     /**
      * @see https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB#creating_or_updating_the_version_of_the_database
-     *
      * @param {Event} e Event object.
      */
     dbRequest.onupgradeneeded = (e) => {

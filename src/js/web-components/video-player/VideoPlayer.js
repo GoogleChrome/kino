@@ -226,7 +226,6 @@ export default class extends HTMLElement {
        * Potentially related:
        *
        * @see https://bugs.chromium.org/p/chromium/issues/detail?id=1153364&q=media%20component%3ABlink%3EMedia%3ESession&can=2
-       *
        * @returns {Function} Throttled `timeupdate` handler.
        */
       const getUpdateHandler = () => {

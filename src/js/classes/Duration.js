@@ -7,9 +7,7 @@
  * "PT14M41.6S" -> 881.6
  *
  * @param {string} duration Duration in the ISO 8601 format. Time only.
- *
  * @returns {number} Number of seconds.
- *
  * @see https://en.wikipedia.org/wiki/ISO_8601#Durations
  */
 function iso8601TimeDurationToSeconds(duration) {

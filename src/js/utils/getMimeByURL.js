@@ -2,7 +2,6 @@
  * Heuristic method to get MIME type of a file.
  *
  * @param {string} url File URL.
- *
  * @returns {string} Video MIME type string.
  */
 export default function getMimeByURL(url) {

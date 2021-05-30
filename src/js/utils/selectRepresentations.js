@@ -12,7 +12,6 @@ import {
  *
  * @param {object} parser MPD parser instance.
  * @param {object} opts   Options.
- *
  * @returns {object[]} All representations that the current client is able to play.
  */
 export default (parser, opts = {}) => {
@@ -21,7 +20,6 @@ export default (parser, opts = {}) => {
    * Returns whether the provided representation is playable by the current client.
    *
    * @param {object} representation Representation object returned by parser.queryRepresentations.
-   *
    * @returns {boolean} Is this representation playable by the current client.
    */
   const canPlayFilter = (representation) => {

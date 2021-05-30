@@ -47,7 +47,6 @@ export default class {
    * @param {FileMeta}   fileMeta   File meta entry update to be stored.
    * @param {FileChunk}  fileChunk  File chunk to be stored.
    * @param {boolean}    isDone     Is this the last downloaded chunk?
-   *
    * @returns {Promise} Promise that resolves when the write operations are complete.
    */
   async storeChunk(fileMeta, fileChunk, isDone) {

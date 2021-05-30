@@ -5,7 +5,6 @@ import { SW_CACHE_NAME } from '../constants';
  *
  * @param {VideoDownloaderRegistry} videoDownloaderRegistry Registry.
  * @param {object} videoData Video data.
- *
  * @returns {VideoDownloader} `VideoDownloader` instance.
  */
 export default (videoDownloaderRegistry, videoData) => {

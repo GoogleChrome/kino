@@ -5,7 +5,7 @@ const path = require('path');
  * Iterator to recursively find all files in a given directory.
  *
  * @param {string} dir The directory to iterate over.
- * @returns {any} The next directory iterator or the absolute path to the file.
+ * @yields {string} The next directory iterator or the absolute path to the file.
  */
 async function* getFiles(dir) {
   const items = await fs.promises.readdir(dir, { withFileTypes: true });

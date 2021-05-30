@@ -6,7 +6,6 @@ import { STREAMING_MIME_TYPES, SUPPORTED_STREAMING_MIME_TYPES } from '../constan
  *
  * @param {videoSource}      source  Source information from the API.
  * @param {HTMLVideoElement} videoEl Video element.
- *
  * @returns {videoSourceInfo} Information about the source.
  */
 function getSourceInfo(source, videoEl) {
@@ -31,7 +30,6 @@ function getSourceInfo(source, videoEl) {
  *
  * @param {videoSource[]}    sources Array of video source objects.
  * @param {HTMLVideoElement|null} videoEl Video element.
- *
  * @returns {videoSourceInfo|null} First source that likely is playable by the current client.
  */
 export default (sources, videoEl = null) => {

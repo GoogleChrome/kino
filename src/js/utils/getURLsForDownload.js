@@ -8,7 +8,6 @@ import selectSource from './selectSource';
  *
  * @param {string}   videoId Video ID.
  * @param {object[]} sources Video sources.
- *
  * @returns {Promise<FileMeta[]>} Promise resolving to file meta objects.
  */
 export default async (videoId, sources) => {
