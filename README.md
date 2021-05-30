@@ -14,7 +14,7 @@ Start by creating a new project from the [Firebase Console](https://console.fire
 
 Clone this repository:
 
-    git clone git@github.com:xwp/web-dev-media.git
+    git clone git@github.com:xwp/kino.git
 
 Go to the project folder:
 
