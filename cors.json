@@ -2,6 +2,7 @@
   {
     "origin": [
       "https://kinoweb-dev.web.app",
+      "https://kinoweb-dev--staging-*.web.app",
       "https://kinoweb.dev",
       "http://localhost:5000"
     ],
