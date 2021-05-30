@@ -1,6 +1,6 @@
 **Please note: This app is being developed. There may be bugs, and everything is subject to change.**
 
-# App Name @todo
+# Kino
 
 Description @todo
 
