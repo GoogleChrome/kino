@@ -19,7 +19,9 @@
       "Range"
     ],
     "method": [
-      "GET"
+      "GET",
+      "HEAD",
+      "OPTIONS"
     ],
     "maxAgeSeconds": 3600
   }
