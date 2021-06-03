@@ -6,24 +6,24 @@ description: |
 date: April 2nd, 2021
 length: '1:04'
 video-sources:
-  - src: https://storage.googleapis.com/wdm-assets/media/03/av1.mp4
+  - src: https://storage.googleapis.com/kino-assets/using-webvtt/av1.mp4
     type: video/mp4; codecs="av01.0.04M.08, mp4a.40.2"
-  - src: https://storage.googleapis.com/wdm-assets/media/03/hevc.mp4
+  - src: https://storage.googleapis.com/kino-assets/using-webvtt/hevc.mp4
     type: video/mp4; codecs="hev1.1.6.L93.90,mp4a.40.2"
-  - src: https://storage.googleapis.com/wdm-assets/media/03/vp9.webm
+  - src: https://storage.googleapis.com/kino-assets/using-webvtt/vp9.webm
     type: video/webm
 video-subtitles:
   - default: true
     kind: captions
     label: English
-    src: https://storage.googleapis.com/wdm-assets/media/03/captions/cap-en.vtt
+    src: https://storage.googleapis.com/kino-assets/using-webvtt/cap-en.vtt
     srclang: en
   - default: false
     kind: captions
     label: Česky
-    src: https://storage.googleapis.com/wdm-assets/media/03/captions/cap-cz.vtt
+    src: https://storage.googleapis.com/kino-assets/using-webvtt/cap-cz.vtt
     srclang: cz
-thumbnail: https://storage.googleapis.com/wdm-assets/images/using-webvtt.png
+thumbnail: https://storage.googleapis.com/kino-assets/using-webvtt/thumbnail.png
 ---
 
 ## Introduction

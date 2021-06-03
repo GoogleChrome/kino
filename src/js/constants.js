@@ -1,4 +1,20 @@
 /**
+ * Copyright 2021 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
  * Service Worker Cache Name.
  *
  * Please note that SW_CACHE_FORMAT represents the cache name
@@ -7,7 +23,7 @@
  * There may be adjacent caches used for other purposes and we
  * want to let the SW know which caches it should purge on upgrade.
  */
-export const SW_CACHE_NAME = 'static-assets-v1.0.0-alpha6';
+export const SW_CACHE_NAME = 'static-assets-v1.0.0-beta';
 export const SW_CACHE_FORMAT = /^static-assets-v[a-z0-9.-]+$/;
 
 /**
@@ -18,7 +34,7 @@ export const APP_SHELL_URL = '/';
 /**
  * Media Server Hostname
  */
-export const MEDIA_SERVER_ORIGIN = 'https://storage.googleapis.com/wdm-assets/';
+export const MEDIA_SERVER_ORIGIN = 'https://storage.googleapis.com/kino-assets/';
 
 /**
  * IDB Storage Schema.
@@ -46,12 +62,12 @@ export const IDB_CHUNK_INDEX = 'video-chunk';
  * Default artwork metadata used by Media Session API.
  */
 export const MEDIA_SESSION_DEFAULT_ARTWORK = [
-  { src: '/images/media-session/artwork-96x96.jpg', sizes: '96x96', type: 'image/jpeg' },
-  { src: '/images/media-session/artwork-128x128.jpg', sizes: '128x128', type: 'image/jpeg' },
-  { src: '/images/media-session/artwork-192x192.jpg', sizes: '192x192', type: 'image/jpeg' },
-  { src: '/images/media-session/artwork-256x256.jpg', sizes: '256x256', type: 'image/jpeg' },
-  { src: '/images/media-session/artwork-384x384.jpg', sizes: '384x384', type: 'image/jpeg' },
-  { src: '/images/media-session/artwork-512x512.jpg', sizes: '512x512', type: 'image/jpeg' },
+  { src: '/images/icon-96x96.png', sizes: '96x96', type: 'image/png' },
+  { src: '/images/icon-128x128.png', sizes: '128x128', type: 'image/png' },
+  { src: '/images/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+  { src: '/images/icon-256x256.png', sizes: '256x256', type: 'image/png' },
+  { src: '/images/icon-384x384.png', sizes: '384x384', type: 'image/png' },
+  { src: '/images/icon-512x512.png', sizes: '512x512', type: 'image/png' },
 ];
 
 /**

@@ -6,22 +6,22 @@ description: |
 date: April 2nd, 2021
 length: '1:04'
 video-sources:
-  - src: https://storage.googleapis.com/wdm-assets/media/06/manifest.mpd
+  - src: https://storage.googleapis.com/kino-assets/adaptive-streaming/manifest.mpd
     type: application/dash+xml
-  - src: https://storage.googleapis.com/wdm-assets/media/06/master.m3u8
+  - src: https://storage.googleapis.com/kino-assets/adaptive-streaming/master.m3u8
     type: application/x-mpegURL
 video-subtitles:
   - default: true
     kind: captions
     label: English
-    src: https://storage.googleapis.com/wdm-assets/media/03/captions/cap-en.vtt
+    src: https://storage.googleapis.com/kino-assets/adaptive-streaming/cap-en.vtt
     srclang: en
   - default: false
     kind: captions
     label: Česky
-    src: https://storage.googleapis.com/wdm-assets/media/03/captions/cap-cz.vtt
+    src: https://storage.googleapis.com/kino-assets/adaptive-streaming/cap-cz.vtt
     srclang: cz
-thumbnail: https://storage.googleapis.com/wdm-assets/images/adaptive-bitrates.png
+thumbnail: https://storage.googleapis.com/kino-assets/adaptive-streaming/thumbnail.png
 ---
 
 ## Introduction
@@ -87,4 +87,4 @@ PWA and building more features and writing new content. If you want to contribut
 to the code that runs this site, make a suggestion, request a feature, or just
 want to see how it was built go check out the [source code].
 
-[source code]: https://github.com/xwp/web-dev-media/
+[source code]: https://github.com/xwp/kino/

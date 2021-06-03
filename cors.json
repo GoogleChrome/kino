@@ -1,0 +1,28 @@
+[
+  {
+    "origin": [
+      "https://kinoweb-dev.web.app",
+      "https://kinoweb-dev--staging-5ooakhlz.web.app",
+      "https://kinoweb.dev",
+      "http://localhost:5000"
+    ],
+    "responseHeader": [
+      "Accept-Ranges",
+      "Content-Type",
+      "Content-Length",
+      "Date",
+      "Server",
+      "Transfer-Encoding",
+      "X-GUploader-UploadID",
+      "X-Google-Trace",
+      "Origin",
+      "Range"
+    ],
+    "method": [
+      "GET",
+      "HEAD",
+      "OPTIONS"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]

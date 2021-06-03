@@ -1,3 +1,19 @@
+/**
+ * Copyright 2021 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   STORAGE_SCHEMA,
   IDB_CHUNK_INDEX,
@@ -13,7 +29,6 @@ const metaAccessorFactory = (abstractedIDB) => ({
 
   /**
    * @param {string} videoId Video ID.
-   *
    * @returns {object} Video meta object.
    */
   async get(videoId) {
@@ -60,7 +75,6 @@ const metaAccessorFactory = (abstractedIDB) => ({
    * Request to add or update video meta in IDB.
    *
    * @param {object} videoMetaData Video meta to be stored.
-   *
    * @returns {Array} Array containing an `IDBTransaction` and `IDBRequest`
    *                  objects for the put operation.
    */
@@ -76,7 +90,6 @@ const dataAccessorFactory = (abstractedIDB) => ({
    * Request to add or update video data in IDB.
    *
    * @param {object} videoData Video data to be stored.
-   *
    * @returns {Array} Array containing an `IDBTransaction` and `IDBRequest`
    *                  objects for the put operation.
    */
@@ -92,7 +105,6 @@ const fileAccessorFactory = (abstractedIDB) => ({
    * Returns meta information for a URL.
    *
    * @param {string} url URL for the requested file.
-   *
    * @returns {Promise<FileMeta|undefined>} File meta information.
    */
   async get(url) {
@@ -115,7 +127,6 @@ const fileAccessorFactory = (abstractedIDB) => ({
    * Returns files associated with a particular video ID.
    *
    * @param {string} videoId Video ID.
-   *
    * @returns {FileMeta[]} File meta entries.
    */
   async getByVideoId(videoId) {
@@ -151,7 +162,6 @@ const fileAccessorFactory = (abstractedIDB) => ({
    * Request to add or update video file meta in IDB.
    *
    * @param {object} fileMeta Video file meta to be stored.
-   *
    * @returns {Array} Array containing an `IDBTransaction` and `IDBRequest`
    *                  objects for the put operation.
    */
@@ -175,7 +185,6 @@ export default () => {
    * to video meta, data and file stores.
    *
    * @param {IDBDatabase} idbConnection Connection to an IDB.
-   *
    * @returns {object} IDB abstraction instance.
    */
   const dbFactory = (idbConnection) => {
@@ -238,7 +247,6 @@ export default () => {
      *
      * @param {string}     id    Video ID.
      * @param {FileMeta[]} files List of files associated with the video.
-     *
      * @returns {Promise} Promise that resolves when the video data is removed.
      */
     abstractedIDB.removeVideo = (id, files) => new Promise((resolve, reject) => {
@@ -298,7 +306,6 @@ export default () => {
 
     /**
      * @see https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB#creating_or_updating_the_version_of_the_database
-     *
      * @param {Event} e Event object.
      */
     dbRequest.onupgradeneeded = (e) => {
@@ -360,7 +367,7 @@ export default () => {
        *
        * Example:
        *
-       * Key: https://storage.googleapis.com/wdm-assets/videos/http-203/http-203-for-loops.mp4
+       * Key: https://storage.googleapis.com/kino-assets/single-video/video.mp4
        * Value: { bytesDownloaded: 58274426, bytesTotal: 58274426, ... }
        *
        * Properties:

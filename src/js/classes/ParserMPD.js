@@ -1,3 +1,19 @@
+/**
+ * Copyright 2021 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import '../typedefs';
 import iso8601TimeDurationToSeconds from './Duration';
 import selectRepresentations from '../utils/selectRepresentations';
@@ -8,7 +24,6 @@ import selectRepresentations from '../utils/selectRepresentations';
  * @param {string} chunkURL             URL of the chunk file with MPD variable intact.
  * @param {object} representationObject Representation object.
  * @param {number} chunkIndex           Index of the chunk to be returned.
- *
  * @returns {string} Interpolated chunk URL.
  */
 const interpolateChunkURL = (chunkURL, representationObject, chunkIndex = 0) => {
@@ -32,7 +47,6 @@ const interpolateChunkURL = (chunkURL, representationObject, chunkIndex = 0) => 
  *
  * @param {object} representationObject Representation object.
  * @param {number} index                Chunk index.
- *
  * @returns {string} Interpolated chunk filename.
  */
 const getSegmentByIndex = (representationObject, index) => {
@@ -46,7 +60,6 @@ const getSegmentByIndex = (representationObject, index) => {
  * Returns the initial segment filename.
  *
  * @param {RepresentationObject} representationObject Representation object.
- *
  * @returns {string} Interpolated chunk filename.
  */
 const getInitialSegment = (representationObject) => {
@@ -62,7 +75,6 @@ const getInitialSegment = (representationObject) => {
  * @param {RepresentationObject} representationObject         The representation object.
  * @param {Element}              representationObject.element The <Representation> element.
  * @param {number}               time                         Time in seconds.
- *
  * @returns {number} Chunk index.
  */
 const getSegmentIndexByTime = (representationObject, time) => {
@@ -114,7 +126,6 @@ const getSegmentIndexByTime = (representationObject, time) => {
  * with the representation.
  *
  * @param {Element} representationElement The <Representation> element from MPD.
- *
  * @returns {RepresentationObject} Representation object.
  */
 const representationElementToObject = (representationElement) => {
@@ -170,7 +181,6 @@ export default class {
    * Returns the directory URL of the current manifest.
    *
    * @param {string} manifestSrc URL of the current manifest.
-   *
    * @returns {string} Directory URL of the current manifest.
    */
   getBaseUrl(manifestSrc) {
@@ -196,7 +206,6 @@ export default class {
    * Returns a list of all chunk files referenced in the manifest.
    *
    * @param {Array[]} additionalFileTuples List of tuples in the format [fileId, URL].
-   *
    * @returns {string[]} List of all chunk files referenced in the manifest.
    */
   listAllChunkURLs(additionalFileTuples = [[]]) {
@@ -249,7 +258,6 @@ export default class {
    * @param {string} representationQuery Query representation attrs, e.g. '[mimeType="video/webm"]'
    * @param {string} contentType         Requested content type, e.g. 'video'.
    * @param {string} lang                Requested language.
-   *
    * @returns {RepresentationObject[]} Representation objects.
    */
   queryRepresentations(representationQuery, contentType, lang = null) {

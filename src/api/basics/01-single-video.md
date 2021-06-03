@@ -6,9 +6,9 @@ description: |
 date: April 2nd, 2021
 length: '1:04'
 video-sources:
-  - src: https://storage.googleapis.com/wdm-assets/media/01/video.mp4
+  - src: https://storage.googleapis.com/kino-assets/single-video/video.mp4
     type: video/mp4; codecs="avc1.640032,mp4a.40.2"
-thumbnail: https://storage.googleapis.com/wdm-assets/images/single-video-file.png
+thumbnail: https://storage.googleapis.com/kino-assets/single-video/thumbnail.png
 ---
 
 ## Introduction

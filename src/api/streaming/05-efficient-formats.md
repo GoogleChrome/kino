@@ -6,22 +6,22 @@ description: |
 date: April 2nd, 2021
 length: '1:04'
 video-sources:
-  - src: https://storage.googleapis.com/wdm-assets/media/05/manifest.mpd
+  - src: https://storage.googleapis.com/kino-assets/efficient-formats/manifest.mpd
     type: application/dash+xml
-  - src: https://storage.googleapis.com/wdm-assets/media/05/master.m3u8
+  - src: https://storage.googleapis.com/kino-assets/efficient-formats/master.m3u8
     type: application/x-mpegURL
 video-subtitles:
   - default: true
     kind: captions
     label: English
-    src: https://storage.googleapis.com/wdm-assets/media/03/captions/cap-en.vtt
+    src: https://storage.googleapis.com/kino-assets/efficient-formats/cap-en.vtt
     srclang: en
   - default: false
     kind: captions
     label: Česky
-    src: https://storage.googleapis.com/wdm-assets/media/03/captions/cap-cz.vtt
+    src: https://storage.googleapis.com/kino-assets/efficient-formats/cap-cz.vtt
     srclang: cz
-thumbnail: https://storage.googleapis.com/wdm-assets/images/efficient-formats.png
+thumbnail: https://storage.googleapis.com/kino-assets/efficient-formats/thumbnail.png
 ---
 
 ## Introduction
