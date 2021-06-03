@@ -1,0 +1,42 @@
+:host {
+  display: inline-block;
+}
+input {
+  display: none;
+}
+label {
+  outline: 0;
+  display: block;
+  width: 3rem;
+  height: 2rem;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  background: var(--toggle-background-off);
+  border-radius: 2em;
+  transition: all .4s ease;
+}
+label:after, label:before {
+  position: relative;
+  display: block;
+  content: "";
+  width: 1.75rem;
+  height: 1.75rem;
+  top: 0.125rem;
+  border-radius: 50%;
+  background: #fff;
+  transition: all .2s ease;
+  box-sizing: border-box;
+}
+label:after {
+  left: 0.125rem;
+}
+label:before {
+  display: none;
+}
+input:checked + label:after {
+  left: 1.125rem;
+}
+input:checked + label {
+  background: var(--toggle-background-on);
+}

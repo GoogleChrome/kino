@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  align-items: center;
+}
+
+:host *:focus {
+  border: none;
+  outline-style: dotted;
+  outline-color: var(--accent);
+}
+
+video {
+  width: 100%;
+  height: auto;
+}

@@ -1,0 +1,37 @@
+{
+  "name": "kino",
+  "version": "1.0.0-beta",
+  "description": "A sample video PWA built for web.dev/media",
+  "main": "src/index.js",
+  "author": "Google",
+  "license": "Apache-2.0",
+  "private": true,
+  "scripts": {
+    "cors": "gsutil cors set cors.json gs://kino-assets",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "postinstall": "husky install",
+    "start": "firebase serve --only hosting",
+    "build": "rollup -c",
+    "watch": "chokidar --initial src/** -i src/js/sw/cache.js -c 'rollup -c'"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.14.4",
+    "@babel/eslint-plugin": "^7.13.16",
+    "@babel/preset-env": "^7.14.4",
+    "chokidar-cli": "^2.1.0",
+    "eslint": "^7.27.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-compat": "^3.9.0",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-jsdoc": "^35.0.0",
+    "front-matter": "^4.0.2",
+    "husky": "^6.0.0",
+    "jest": "^27.0.3",
+    "marked": "^2.0.6",
+    "rollup": "^2.50.4",
+    "rollup-plugin-execute": "^1.1.1",
+    "rollup-plugin-import-css": "^2.0.1"
+  }
+}

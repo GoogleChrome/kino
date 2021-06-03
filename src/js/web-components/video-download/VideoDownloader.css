@@ -1,0 +1,260 @@
+@media screen and (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0ms !important;
+  }
+}
+
+:host,
+:host > * {
+    display: none;
+}
+:host {
+  width: 27px;
+  height: 27px;
+  display: none;
+  position: relative;
+}
+:host( [expanded="true"] ) {
+  width: auto;
+  height: auto;
+}
+
+:host( :not( [state="not-initialized"] ) ) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+:host *:focus {
+  border: none;
+  outline-style: dotted;
+  outline-color: var(--accent);
+}
+
+/**
+ * Default button styles.
+ */
+:host > button {
+  cursor: pointer;
+}
+:host( [expanded="true"] ) > button {
+  height: calc(var(--gutter) * 1.5 + 28px);
+  font-weight: 700;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  align-items: center;
+  color: var(--text);
+  background-color: transparent;
+}
+:host( [expanded="true"] ) > button.ready {
+  padding: 0 calc(var(--gutter) * 0.666);
+  color: var(--accent);
+  background-color: var(--accent-background);
+}
+:host( [expanded="true"] ) > button > .tooltip {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+:host( [expanded="true"] ) .icon {
+  margin-right: calc(var(--gutter) * 0.666);
+}
+:host( :not( [expanded="true"] ) ) > button {
+  width: 27px;
+  height: 27px;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  line-height: 0;
+}
+:host( [expanded="true"] ) > .button--contextual {
+  margin-left: calc(var(--gutter) * 0.666);
+  background: transparent;
+}
+:host( :not( [expanded="true"] ) ) > .button--contextual {
+  width: auto;
+  height: auto;
+  transform: translateX(calc(-100% - 28px - 8px));
+  font-size: 12px;
+  line-height: 20px;
+  border-radius: 2px;
+  color: var(--accent);
+  background: var(--accent-background);
+}
+:host( :not( [expanded="true"] ) ) > .button--contextual:hover {
+  color: var(--accent-background);
+  background: var(--accent);
+}
+
+/* Ready button (download icon) */
+:host( [state="ready"] ) button.ready {
+  display: flex;
+}
+:host( [state="ready"] ) button.ready svg path[stroke] {
+  stroke: var(--accent);
+}
+:host( [state="ready"] ) button.ready svg path:not([fill="none"]) {
+  fill: var(--background);
+}
+:host( [state="ready"][expanded="true"] ) button.ready svg path:not([fill="none"]) {
+  fill: var(--accent-background);
+}
+:host( [state="ready"] ) button.ready:hover svg path[stroke] {
+  stroke: var(--background);
+}
+:host( [state="ready"] ) button.ready:hover svg path:not([fill="none"]) {
+  fill: var(--accent);
+}
+:host( [state="ready"][willremove="true"] ) button.ready + .button--contextual {
+  display: inline-block;
+}
+
+
+/* Ready button (downloaded / remove combo icon) */
+:host( [state="done"] ) button.done {
+  display: flex;
+}
+:host( [state="done"] ) button.done svg g.remove {
+  display: none;
+}
+:host( [state="done"] ) button.done svg g.downloaded {
+  display: inline-block;
+}
+:host( [state="done"] ) button.done svg g.downloaded path[stroke] {
+  stroke: var(--icon);
+}
+:host( [state="done"] ) button.done:hover svg g.downloaded {
+  display: none;
+}
+:host( [state="done"] ) button.done:hover svg g.remove {
+  display: inline-block;
+}
+:host( [state="done"] ) button.done svg path:not([fill="none"]) {
+  fill: var(--background);
+}
+:host( [state="done"] ) button.done:hover svg path[stroke] {
+  stroke: var(--background);
+}
+:host( [state="done"] ) button.done:hover svg path:not([fill="none"]) {
+  fill: var(--alarm);
+}
+
+/* Progress icon (downloading state) */
+:host( [state="partial"][downloading="true"] ) button.downloading {
+  display: flex;
+}
+:host( [state="partial"][downloading="true"] ) button.downloading svg {
+  transform: rotate(-90deg);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading svg path[fill] {
+  fill: var(--accent-text);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading svg circle[stroke-dasharray] {
+  stroke: var(--accent-text);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading svg circle:not([stroke-dasharray]) {
+  stroke: var(--accent-background);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading:hover svg path[fill] {
+  fill: var(--accent);
+}
+:host( [state="partial"][downloading="true"] ) button.downloading:hover svg circle[stroke-dasharray] {
+  stroke: var(--accent);
+}
+
+/* Progress icon (paused state) */
+:host( [state="partial"][downloading="false"] ) button.paused {
+  display: flex;
+}
+:host( [state="partial"][downloading="false"] ) button.paused svg {
+  transform: rotate(-90deg);
+}
+:host( [state="partial"][downloading="false"] ) button.paused svg path[fill] {
+  fill: var(--accent-text);
+}
+:host( [state="partial"][downloading="false"] ) button.paused svg circle[stroke-dasharray] {
+  stroke: var(--accent-text);
+}
+:host( [state="partial"][downloading="false"] ) button.paused svg circle:not([stroke-dasharray]) {
+  stroke: var(--accent-background);
+}
+:host( [state="partial"][downloading="false"] ) button.paused:hover svg path[fill] {
+  fill: var(--accent);
+}
+:host( [state="partial"][downloading="false"] ) button.paused:hover svg circle[stroke-dasharray] {
+  stroke: var(--accent);
+}
+:host( [state="partial"][downloading="false"] ) button.paused + .button--contextual {
+  display: inline-block;
+}
+
+/**
+ * Tooltips styling.
+ */
+:host( :not([expanded="true"]) ) .tooltip--message {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  :host( :not([expanded="true"]) ) .tooltip {
+    display: inline-block;
+    position: relative;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  :host( :not([expanded="true"]) ) .tooltip--message {
+    min-width: 100px;
+    max-width: 300px;
+    display: block;
+
+    top: -16px;
+    left: 50%;
+    transform: translate(-50%, -100%);
+
+    padding: calc(var(--gutter) / 2);
+    color: var(--tooltip);
+    background-color: var(--tooltip-background);
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 12px;
+    border-radius: 8px;
+    position: absolute;
+    box-sizing: border-box;
+    white-space: pre;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 200ms ease-in-out 300ms;
+    pointer-events: none;
+  }
+
+  :host( :not([expanded="true"]) ) .tooltip:hover > .tooltip--message {
+    opacity: 1;
+  }
+
+  :host( :not([expanded="true"]) ) .tooltip--arrow {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -12px;
+    width: 24px;
+    height: 12px;
+    overflow: hidden;
+  }
+
+  :host( :not([expanded="true"]) ) .tooltip--arrow::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    left: 50%;
+    transform: translate(-50%,-50%) rotate(45deg);
+    background-color: var(--tooltip-background);
+  }
+}
+
+:host( [expanded="true"] ) .tooltip--message {
+  display: inline-block;
+}

@@ -1,0 +1,73 @@
+/**
+ * Remove animations when the user indicates the preference.
+ *
+ * Also on slow updating devices.
+ */
+ @media screen and (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0ms !important;
+  }
+}
+
+/* Video Card */
+:host {
+  margin-bottom: auto;
+}
+:host(.disabled) {
+  filter: grayscale(1);
+}
+
+:host(.disabled) video-downloader {
+  pointer-events: none;
+}
+
+:host a {
+  display: inline-block;
+  color: var(--accent-text);
+  text-decoration: none;
+}
+
+:host a:hover,
+:host a:active {
+  text-decoration: underline;
+}
+
+:host *:focus {
+  border: none;
+  outline-style: dotted;
+  outline-color: var(--accent);
+}
+
+:host img {
+  border-radius: 8px;
+  display: block;
+  max-width: 100%;
+}
+
+:host h2 {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 32px;
+  margin-right: 40px;
+}
+
+.video-card--content {
+  position: relative;
+}
+
+.video-card--downloader {
+  position: absolute;
+  top: 4px;
+  right: 0;
+}
+
+/* Video Card: Breakpoints */
+@media (min-width: 960px) {
+  .video-card--image-link {
+    transition: transform .2s cubic-bezier(0, 0, .4, 1);
+  }
+
+  .video-card--image-link:hover {
+    transform: scale(1.03);
+  }
+}
