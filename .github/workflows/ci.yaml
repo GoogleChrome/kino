@@ -113,7 +113,7 @@ jobs:
           channelId: staging
 
   deploy-production:
-    if: github.ref == 'refs/heads/main'
+    if: ${{ github.event.pull_request.merged == true }}
     needs: [lint-js]
     name: Deploy Production
     runs-on: ubuntu-latest
