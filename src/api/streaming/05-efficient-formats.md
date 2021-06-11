@@ -41,7 +41,7 @@ Consider a video on demand platform like YouTube. The main bottleneck for
 YouTube is... you, or rather the **available bandwidth** between YouTube
 servers and your device. YouTube rescales your video and aims to stay under
 certain bitrate thresholds for every resolution. It also uses `VP9` as an
-efficient coding format of choice along with standard `H.264`.
+efficient coding format of choice along with `H.264`.
 
 This helps YouTube to deliver **smaller video chunks** to clients that
 support the more efficient coding formats.
@@ -57,9 +57,9 @@ options:
 
 YouTube chose the free `VP9` codec to **progressively enhance** the
 experience in clients that implement it. The 4k resolution videos were only
-available in`VP9`. Safari does not support the `VP9` codec, which had led to
-Safari users being unable to play 4k videos on YouTube but still able to play
-1080p.
+available in`VP9`. Safari previously did not support the `VP9` codec, which 
+led to Safari users being unable to play 4k videos on YouTube but still able
+to play 1080p.
 
 Another options would be to encode your media in several efficient coding
 formats. Safari supports `H.265`, which means that encoding for `VP9` *and*
