@@ -57,7 +57,7 @@ options:
 
 YouTube chose the free `VP9` codec to **progressively enhance** the
 experience in clients that implement it. The 4k resolution videos were only
-available in`VP9`. Safari previously did not support the `VP9` codec, which 
+available in `VP9`. Safari previously did not support the `VP9` codec, which
 led to Safari users being unable to play 4k videos on YouTube but still able
 to play 1080p.
 
