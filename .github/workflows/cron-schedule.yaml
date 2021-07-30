@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Daily
+name: Cron Schedule
 
 on:
   schedule:
-    - cron: '20 6 * * *'
+    - cron: '20 6 * * 1'
 
 jobs:
 
