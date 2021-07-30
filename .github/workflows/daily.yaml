@@ -16,7 +16,7 @@ name: Daily
 
 on:
   schedule:
-    - cron: '30 * * * *'
+    - cron: '20 6 * * *'
 
 jobs:
 
