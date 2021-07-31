@@ -20,6 +20,7 @@
 import Router from './js/classes/Router';
 import VideoDownloaderRegistry from './js/classes/VideoDownloaderRegistry';
 import ConnectionStatus from './js/classes/ConnectionStatus';
+import api from '../public/api.json';
 
 /**
  * Web Components implementation.
@@ -39,6 +40,7 @@ import VideoPage from './js/pages/Video';
 import CategoryPage from './js/pages/Category';
 import DownloadsPage from './js/pages/Downloads';
 import SettingsPage from './js/pages/Settings';
+import ErrorPage from './js/pages/Error';
 
 /**
  * Settings
@@ -118,15 +120,24 @@ const router = new Router({
   videoDownloaderRegistry,
   connectionStatus,
 });
-router.route('^/settings/?', SettingsPage);
-router.route('^/downloads/?', DownloadsPage);
-router.route('^/category/([^/]*)/?', CategoryPage);
 router.route('^/?$', HomePage);
+router.route('^/downloads/$', DownloadsPage);
+router.route('^/settings/$', SettingsPage);
 
 /**
- * Consider all else a single video page.
+ * Add the category pages.
  */
-router.route('.*', VideoPage);
+api.categories.forEach((category) => router.route(`^/category/${category.slug}/$`, CategoryPage));
+
+/**
+ * Add the video pages.
+ */
+api.videos.forEach((video) => router.route(`^/${video.id}/$`, VideoPage));
+
+/**
+ * Consider all else an error.
+ */
+router.route('.*', ErrorPage);
 
 /**
  * Register Service Worker.

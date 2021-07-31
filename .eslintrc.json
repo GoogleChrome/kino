@@ -32,6 +32,13 @@
           "src/js/utils/generateApi.js"
         ]
       }
+    ],
+    "import/no-unresolved": [
+      "error", {
+        "ignore": [
+          "../public/api.json"
+        ]
+      }
     ]
   }
 }

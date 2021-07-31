@@ -17,6 +17,7 @@
 import css from 'rollup-plugin-import-css';
 import generateApi from './src/js/utils/generateApi.js';
 import generateAssetsToCache from './src/js/utils/generateAssetsToCache';
+import json from '@rollup/plugin-json';
 
 async function setupApi() {
   try {
@@ -35,6 +36,8 @@ export default [
       format: 'cjs',
     },
     plugins: [
+      setupApi(),
+      json(),
       css(),
     ],
   },
