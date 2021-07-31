@@ -36,6 +36,7 @@ export default [
       format: 'cjs',
     },
     plugins: [
+      setupApi(),
       json(),
       css(),
     ],
