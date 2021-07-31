@@ -20,18 +20,20 @@
 export default (routerContext) => {
   const {
     mainContent,
+    path,
   } = routerContext;
 
   mainContent.innerHTML = `
     <style>
-      .button {
-        color: var(--accent);
+      ins {
+        color: var(--accent-text);
+        font-weight: normal;
       }
     </style>
     <div class="container">
       <header class="page-header">
-        <h1>Not Found</h1>
-        <p>Looks like something went wrong. Try returning to the <a data-use-router href="/" class="button">home</a> page.</p>
+        <h1>404. <ins>That’s an error.</ins></h1>
+        <p>The requested URL <code>${path}</code> was not found on this server. <br><ins>That’s all we know.</ins></p>
       </header>
     </div>
   `;
