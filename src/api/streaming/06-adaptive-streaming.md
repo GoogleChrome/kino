@@ -87,4 +87,4 @@ PWA and building more features and writing new content. If you want to contribut
 to the code that runs this site, make a suggestion, request a feature, or just
 want to see how it was built go check out the [source code].
 
-[source code]: https://github.com/xwp/kino/
+[source code]: https://github.com/GoogleChrome/kino/
