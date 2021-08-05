@@ -83,19 +83,22 @@ const generateApiData = async () => {
 };
 
 /**
- * Generates the JSON API.
+ * Generates the public JSON API.
  *
- * @returns {object} The API object.
+ * @returns {object} The plugin configuration.
  */
-export default async function generateApi() {
-  const start = Date.now();
-  const apiData = await generateApiData();
-  const apiDataJSON = JSON.stringify(apiData, undefined, 2);
+export default function generateApi() {
+  return {
+    name: 'generate-api',
+    buildStart: async () => {
+      const start = Date.now();
+      const apiData = await generateApiData();
+      const apiDataJSON = JSON.stringify(apiData, undefined, 2);
 
-  fs.writeFile(apiDestFile, apiDataJSON, { encoding: 'utf-8' }, () => {
-    const time = Date.now() - start;
-    process.stdout.write(`\x1b[32mcreated \x1b[1m${apiDestFile}\x1b[22m in \x1b[1m${time}ms\x1b[22m\x1b[89m\n`);
-  });
-
-  return apiData;
+      fs.writeFile(apiDestFile, apiDataJSON, { encoding: 'utf-8' }, () => {
+        const time = Date.now() - start;
+        process.stdout.write(`\x1b[32mcreated \x1b[1m${apiDestFile}\x1b[22m in \x1b[1m${time}ms\x1b[22m\x1b[89m\n`);
+      });
+    },
+  };
 }
