@@ -26,7 +26,8 @@ export default (routerContext) => {
     <div class="container">
       <header class="page-header">
         <h1>Bye bye buffering, hello video!</h1>
-        <p>All our content is available on the web, which means you can get access to it whenever you want it. What's more, if your browser supports the latest technologies, you can save videos to view whenever you're offline!</p>
+        <p>This is a sample Video on demand (VOD) app to demonstrate media functionality in the context of a Progressive Web App (PWA). All the content on this website is available offline when your browser supports the latest technologies, which means you can stream Videos downloaded to your device whenever you want.</p>
+        <p>It’s <strong>important</strong> to note that a single Video from the Google Chrome Developers <a href="https://www.youtube.com/channel/UCnUYZLuoy1rq1aVMwx4aTzw">YouTube channel</a> is being used to demonstrate the PWA’s capabilities. The main takeaway is the use case described in each article and not the Video content itself.</p>
       </header>
     </div>
   `;

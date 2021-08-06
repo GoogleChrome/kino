@@ -23,7 +23,7 @@
  * There may be adjacent caches used for other purposes and we
  * want to let the SW know which caches it should purge on upgrade.
  */
-export const SW_CACHE_NAME = 'static-assets-v1.0.0-beta2';
+export const SW_CACHE_NAME = 'static-assets-v1.0.0-beta3';
 export const SW_CACHE_FORMAT = /^static-assets-v[a-z0-9.-]+$/;
 
 /**
