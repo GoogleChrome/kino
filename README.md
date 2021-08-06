@@ -2,7 +2,7 @@
 
 # Kino
 
-This is a sample media (VOD) app to demonstrate media functionality in the context of a Progressive Web App.
+This is a sample Video on demand (VOD) app to demonstrate media functionality in the context of a Progressive Web App (PWA).
 
 ## Running the site locally
 
