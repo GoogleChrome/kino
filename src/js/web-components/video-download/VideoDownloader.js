@@ -295,7 +295,7 @@ export default class VideoDownloader extends HTMLElement {
         <span class="willremove">
           <button class="undo-remove" title="Undo deletion">Undo</button>
         </span>
-        <button class="ready">
+        <button class="ready" aria-label="Make available offline">
           <div class="tooltip">
             <svg class="icon icon--download" viewBox="0 0 27 27" width="27" height="27" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
               <path d="M7.304 25.416h11.56c4.026 0 6.552-2.852 6.552-6.888V7.638c0-4.036-2.512-6.888-6.552-6.888H7.304C3.265.75.752 3.602.752 7.638v10.89c0 4.036 2.514 6.888 6.554 6.888z" fill="" stroke="" stroke-width="1.5"/>
