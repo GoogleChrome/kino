@@ -36,7 +36,7 @@ information.
 
 ### Basic code example
 
-```
+```html
 <video controls>
   <source src="av1.mp4" type="video/mp4; codecs=\"av01.0.05M.08\"">
   <source src="hevc.mp4" type="video/mp4; codecs=\"hvc1\"">
@@ -79,7 +79,7 @@ interval definitions. Another handy feature is the ability to style individual
 cues using CSS. Perhaps you want to use a yellow text color, and a
 semi-transparent background for all captions.
 
-```
+```html
 <style>
   ::cue {
     color: yellow;

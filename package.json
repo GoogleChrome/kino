@@ -28,6 +28,7 @@
     "eslint-plugin-jest": "^24.3.6",
     "eslint-plugin-jsdoc": "^35.0.0",
     "front-matter": "^4.0.2",
+    "highlight.js": "^11.2.0",
     "husky": "^6.0.0",
     "jest": "^27.0.3",
     "marked": "^2.0.6",

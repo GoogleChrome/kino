@@ -62,7 +62,7 @@ native [support for HLS] playback, browsers generally [don't support native DASH
 stream playback. This means often it's not enough to simply point the `<source>`
 in the `<video>` element to a manifest file.
 
-```
+```html
 <video controls>
   <source src="manifest.mpd" type="application/dash+xml">
 </video>
@@ -94,7 +94,7 @@ it play back whatever media data is pumped into the buffers attached to the
 
 ### Basic code example
 
-```
+```js
 const videoEl = document.querySelector('video');
 const mediaSource = new MediaSource();
 
