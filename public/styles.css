@@ -393,6 +393,10 @@ h4,
   max-width: calc(1200px + var(--gutter) * 2);
   margin: 0 auto;
   border-top: 1px solid var(--separator);
+  opacity: 0;
+}
+.site-footer.visible {
+  opacity: 1;
 }
 .site-footer .site-footer--content {
   color: var(--footer-text);
