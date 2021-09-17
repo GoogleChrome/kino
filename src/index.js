@@ -68,6 +68,11 @@ const dakrModeChangeHandler = (isDarkMode) => {
   } else {
     document.documentElement.classList.remove('dark-mode');
   }
+  const metaThemeColorElement = document.querySelector('meta[name="theme-color"]');
+  const currentThemeColor = getComputedStyle(document.documentElement).getPropertyValue('--background').trim();
+  if (currentThemeColor) {
+    metaThemeColorElement.setAttribute('content', currentThemeColor);
+  }
 };
 window.addEventListener('setting-change', (e) => {
   if (e.detail?.setting === SETTING_KEY_DARK_MODE) dakrModeChangeHandler(e.detail.value);
