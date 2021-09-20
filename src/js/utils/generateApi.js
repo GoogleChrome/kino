@@ -22,9 +22,17 @@ const fs = require('fs');
 const path = require('path');
 const frontMatter = require('front-matter');
 const marked = require('marked');
+const hljs = require('highlight.js');
 
 const apiSrcPath = 'src/api/';
 const apiDestFile = 'public/api.json';
+
+marked.setOptions({
+  highlight: (code, lang) => {
+    const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+    return hljs.highlight(code, { language }).value;
+  },
+});
 
 /**
  * Iterator to recursively find all files in a given directory.
