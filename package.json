@@ -20,6 +20,7 @@
     "@babel/eslint-plugin": "^7.13.16",
     "@babel/preset-env": "^7.14.4",
     "@rollup/plugin-json": "^4.1.0",
+    "ansi-regex": ">=5.0.1",
     "chokidar-cli": "^2.1.0",
     "eslint": "^7.27.0",
     "eslint-config-airbnb-base": "^14.2.1",
