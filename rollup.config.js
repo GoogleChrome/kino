@@ -18,6 +18,9 @@ import css from 'rollup-plugin-import-css';
 import generateApi from './src/js/utils/generateApi.js';
 import generateCache from './src/js/utils/generateCache';
 import json from '@rollup/plugin-json';
+import { terser } from 'rollup-plugin-terser';
+
+const isWatch = process.env.npm_lifecycle_event === 'watch';
 
 export default [
   {
@@ -30,6 +33,7 @@ export default [
       generateApi(),
       json(),
       css(),
+      isWatch ? {} : terser(),
     ],
   },
   {
@@ -40,6 +44,7 @@ export default [
     },
     plugins: [
       generateCache(),
+      isWatch ? {} : terser(),
     ],
   },
 ];

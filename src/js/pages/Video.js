@@ -78,7 +78,7 @@ export default (routerContext) => {
       <div class="video-container width-full">
         <div class="video-container--image">
           ${videoImageHTML}
-          <button class="play">
+          <button class="play" aria-label="Play video">
             <svg width="112" height="112" viewBox="0 0 112 112" fill="none" xmlns="http://www.w3.org/2000/svg">
               <g filter="url(#filter0_d)">
                 <rect x="24" y="20.4863" width="64" height="64" rx="32" fill="white"/>

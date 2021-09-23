@@ -78,6 +78,7 @@ export default class Router {
 
     this.context.apiData = apiData;
     this.context.mainContent = document.querySelector('main');
+    this.context.footer = document.querySelector('footer');
     this.context.navigate = this.navigate.bind(this);
 
     this.renderPage(window.location.href);
@@ -121,8 +122,10 @@ export default class Router {
     window.scrollTo(0, 0);
     this.context.path = targetUrl.pathname;
     this.context.mainContent.innerHTML = '';
+    this.context.footer.classList.toggle('visible', false);
     this.currentPage = targetUrl;
     foundRoute.callback(this.context);
+    this.context.footer.classList.toggle('visible', true);
   }
 
   /**

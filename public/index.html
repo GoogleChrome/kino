@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <title>Kino</title>
+  <meta name="description" content="A sample video on demand (VOD) app to demonstrate media functionality in the context of a Progressive Web App.">
   <link rel="manifest" href="/manifest.json" />
   <link rel="shortcut icon" href="/images/favicon.ico">
   <link href=/images/favicon-32x32.png rel=icon sizes=32x32 type=image/png>
@@ -10,13 +11,16 @@
   <link href=/images/safari-pinned-tab.svg rel=mask-icon color=#141216>
   <link rel="stylesheet" href="/styles.css">
   <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link rel="preconnect" href="https://storage.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,700&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#141216">
 </head>
 <body>
 
 <header class="site-header" role="navigation">
-  <button class="site-header--hamburger-btn">
+  <button class="site-header--hamburger-btn" aria-label="Toggle menu">
     <svg class="site-header--hamburger-btn__open" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g stroke="var(--text)">
         <path d="M10 12H21.8182" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
@@ -98,7 +102,7 @@
             </clipPath>
           </defs>
         </svg>
-        <a target="_blank" href="https://github.com/GoogleChrome/kino/">See the source code</a>
+        <a target="_blank" rel="noopener" href="https://github.com/GoogleChrome/kino/">See the source code</a>
       </p>
     </div>
   </div>
