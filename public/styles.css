@@ -583,57 +583,62 @@ article pre,
   overflow-y: auto;
 }
 .video-container {
-  --play-button-size: 112px;
-  --aspect-ratio-16-9-padding: 56.25%;
-
+  position: relative;
   border-radius: 8px;
   max-width: 1200px;
   margin: 0 auto;
   overflow: hidden;
+  aspect-ratio: 16 / 9;
 }
-.video-container--image {
-  height: 0;
-  padding-bottom: var(--aspect-ratio-16-9-padding);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-items: center;
-  flex-flow: column nowrap;
+.video-container--overlay {
+  display: none;
 }
-.video-container--image picture img,
-.video-container--image > img {
+.has-overlay .video-container--overlay {
+  position: absolute;
   width: 100%;
-  height: auto;
-
-  /*
-   * Centers the button without using absolute positioning.
-   *
-   * This helps to avoid stacking issues and clashes with fixed navigation.
-   */
-  margin-bottom: calc(-1 * (var(--aspect-ratio-16-9-padding) / 2) - (var(--play-button-size) / 2));
+  height: 100%;
+  inset: 0;
+  display: grid;
+  place-items: center center;
 }
-.video-container .play {
+.has-overlay .video-container--overlay > * {
+  grid-column: 1;
+  grid-row: 1;
+}
+.has-overlay .video-container--overlay button {
   color: #000;
-  background: transparent;
-  border-radius: 50%;
-  width: var(--play-button-size);
-  height: var(--play-button-size);
-  padding: 0;
+  position: relative;
+  z-index: 100;
   border: none;
   cursor: pointer;
+}
+button.action--play {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  padding: 0;
+  background: #fff;
+  box-shadow: 0 0 30px rgba(0, 0, 0, .5);
+}
+button.action--unmute {
+  display: inline-grid;
+  grid-template-rows: auto auto;
+  grid-template-columns: fit-content(20vw);
+  gap: 8px;
+  padding: 16px 32px;
+  background: rgba(255, 255, 255, .75);
+  border-radius: 10%;
+  font-weight: 600;
 }
 .video-container .video-container--player {
   display: none;
   height: 720px;
 }
-.video-container.has-player .video-container--image {
-  display: none;
-}
 .video-container.has-player .video-container--player {
   display: block;
   height: auto;
 }
-.video--disabled .video-container--image,
+.video--disabled .video-container--overlay,
 .video--disabled video-downloader {
   filter: grayscale(1);
   pointer-events: none;

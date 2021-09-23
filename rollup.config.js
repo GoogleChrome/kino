@@ -15,9 +15,10 @@
  */
 
 import css from 'rollup-plugin-import-css';
-import generateApi from './src/js/utils/generateApi.js';
-import generateCache from './src/js/utils/generateCache';
+import svg from 'rollup-plugin-svg';
 import json from '@rollup/plugin-json';
+import generateApi from './src/js/utils/generateApi';
+import generateCache from './src/js/utils/generateCache';
 
 export default [
   {
@@ -30,6 +31,7 @@ export default [
       generateApi(),
       json(),
       css(),
+      svg(),
     ],
   },
   {
