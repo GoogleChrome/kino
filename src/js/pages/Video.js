@@ -65,12 +65,12 @@ const setupDownloader = (videoData, { videoDownloaderRegistry }) => {
 /**
  * Returns the video poster markup.
  *
- * @param {object} videoData Video data.
+ * @param {object}         videoData           Video data.
+ * @param {string}         videoData.title     Video title.
+ * @param {(string|Array)} videoData.thumbnail Video thumbnail, either a string or an array.
  * @returns {string} String containing an <img> or <picture> element.
  */
-const getPosterMarkup = (videoData) => {
-  const { title, thumbnail } = videoData;
-
+const getPosterMarkup = ({ title, thumbnail }) => {
   if (!Array.isArray(thumbnail)) {
     return `<img src="${thumbnail}" width="1200" height="675" alt="${title}">`;
   }
@@ -161,7 +161,7 @@ export default (routerContext) => {
   };
 
   /**
-   * Renders the video poster.
+   * Renders an overlay layer with a button, optionally also adding any custom markup.
    *
    * @param {string}            options               Render options.
    * @param {string}            options.markup        Default markup to be rendered as an overlay.
@@ -182,7 +182,7 @@ export default (routerContext) => {
   };
 
   /**
-   * Sets up the manual play button overlay.
+   * Sets up the manual play button.
    */
   const setupManualPlayButton = () => {
     renderOverlay({
@@ -199,7 +199,7 @@ export default (routerContext) => {
   };
 
   /**
-   * Sets up the unmute button overlay.
+   * Sets up the unmute button.
    *
    * @param {VideoPlayer} videoPlayer Video player instance.
    */
