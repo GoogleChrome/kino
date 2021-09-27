@@ -39,7 +39,7 @@ one to play.
 
 ### Basic code example
 
-```
+```html
 <video>
   <source src="av1.mp4" type="video/mp4; codecs=\"av01.0.04M.08\"">
   <source src="hevc.mp4" type="video/mp4; codecs=\"hvc1\"">

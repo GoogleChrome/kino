@@ -27,7 +27,7 @@ video and `AAC` audio.
 
 ### Basic code example
 
-```
+```html
 <video controls>
   <source src="video.mp4" type="video/mp4">
 </video>

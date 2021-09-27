@@ -19,6 +19,9 @@ import svg from 'rollup-plugin-svg';
 import json from '@rollup/plugin-json';
 import generateApi from './src/js/utils/generateApi';
 import generateCache from './src/js/utils/generateCache';
+import { terser } from 'rollup-plugin-terser';
+
+const isWatch = process.env.npm_lifecycle_event === 'watch';
 
 export default [
   {
@@ -32,6 +35,7 @@ export default [
       json(),
       css(),
       svg(),
+      isWatch ? {} : terser(),
     ],
   },
   {
@@ -42,6 +46,7 @@ export default [
     },
     plugins: [
       generateCache(),
+      isWatch ? {} : terser(),
     ],
   },
 ];

@@ -1,14 +1,25 @@
 {
   "hosting": {
-    "public": "public",
-    "rewrites": [{
+    "headers": [{
       "source": "**",
-      "destination": "/index.html"
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "script-src 'self'; object-src 'none'; base-uri 'none'"
+        }
+      ]
     }],
+    "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
   }
 }

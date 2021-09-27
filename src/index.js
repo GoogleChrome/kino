@@ -62,17 +62,22 @@ customElements.define('offline-toggle-button', OfflineToggleButton);
  * Forced dark mode logic.
  */
 const darkModeForced = loadSetting(SETTING_KEY_DARK_MODE) || false;
-const dakrModeChangeHandler = (isDarkMode) => {
+const darkModeChangeHandler = (isDarkMode) => {
   if (isDarkMode) {
     document.documentElement.classList.add('dark-mode');
   } else {
     document.documentElement.classList.remove('dark-mode');
   }
+  const metaThemeColorElement = document.querySelector('meta[name="theme-color"]');
+  const currentThemeColor = getComputedStyle(document.documentElement).getPropertyValue('--background').trim();
+  if (currentThemeColor) {
+    metaThemeColorElement.setAttribute('content', currentThemeColor);
+  }
 };
 window.addEventListener('setting-change', (e) => {
-  if (e.detail?.setting === SETTING_KEY_DARK_MODE) dakrModeChangeHandler(e.detail.value);
+  if (e.detail?.setting === SETTING_KEY_DARK_MODE) darkModeChangeHandler(e.detail.value);
 });
-dakrModeChangeHandler(darkModeForced);
+darkModeChangeHandler(darkModeForced);
 
 /**
  * Tracks the connection status of the application and broadcasts
