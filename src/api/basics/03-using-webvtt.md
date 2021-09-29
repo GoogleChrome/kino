@@ -24,6 +24,25 @@ video-subtitles:
     src: https://storage.googleapis.com/kino-assets/using-webvtt/cap-cz.vtt
     srclang: cz
 thumbnail: https://storage.googleapis.com/kino-assets/using-webvtt/thumbnail.png
+media-session-artwork:
+  - sizes: 96x96
+    src: https://storage.googleapis.com/kino-assets/using-webvtt/artwork-96x96.png
+    type: image/png
+  - sizes: 128x128
+    src: https://storage.googleapis.com/kino-assets/using-webvtt/artwork-128x128.png
+    type: image/png
+  - sizes: 192x192
+    src: https://storage.googleapis.com/kino-assets/using-webvtt/artwork-192x192.png
+    type: image/png
+  - sizes: 256x256
+    src: https://storage.googleapis.com/kino-assets/using-webvtt/artwork-256x256.png
+    type: image/png
+  - sizes: 384x384
+    src: https://storage.googleapis.com/kino-assets/using-webvtt/artwork-384x384.png
+    type: image/png
+  - sizes: 512x512
+    src: https://storage.googleapis.com/kino-assets/using-webvtt/artwork-512x512.png
+    type: image/png
 ---
 
 ## Introduction

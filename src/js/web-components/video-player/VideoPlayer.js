@@ -159,7 +159,7 @@ export default class extends HTMLElement {
         title: this.internal.videoData.title || '',
         artist: this.internal.videoData.artist || '',
         album: this.internal.videoData.album || '',
-        artwork: MEDIA_SESSION_DEFAULT_ARTWORK,
+        artwork: this.internal.videoData['media-session-artwork'] || MEDIA_SESSION_DEFAULT_ARTWORK,
       });
 
       /**
