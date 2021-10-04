@@ -21,6 +21,8 @@ import DownloadManager from '../../classes/DownloadManager';
 import StorageManager from '../../classes/StorageManager';
 import getURLsForDownload from '../../utils/getURLsForDownload';
 
+import { MEDIA_SESSION_DEFAULT_ARTWORK } from '../../constants';
+
 export default class VideoDownloader extends HTMLElement {
   static get observedAttributes() {
     return ['state', 'progress', 'downloading', 'willremove'];
@@ -187,7 +189,7 @@ export default class VideoDownloader extends HTMLElement {
    * @returns {string[]} URLs.
    */
   getMediaSessionArtworkUrls() {
-    const artworkObjects = this.internal.videoData['media-session-artwork'] || [];
+    const artworkObjects = this.internal.videoData['media-session-artwork'] || MEDIA_SESSION_DEFAULT_ARTWORK;
     const artworkUrls = artworkObjects.map((artworkObject) => artworkObject.src);
 
     return artworkUrls;
