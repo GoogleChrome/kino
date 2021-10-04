@@ -201,7 +201,12 @@ export default class VideoDownloader extends HTMLElement {
   async saveToCache(urls) {
     try {
       const cache = await caches.open(this.internal.cacheName);
-      await cache.addAll(urls);
+
+      urls.forEach(async (url) => {
+        if (!await cache.match(url)) {
+          await cache.add(url);
+        }
+      });
     } catch (error) {
       if (error.name === 'QuotaExceededError') {
         /**
