@@ -69,9 +69,6 @@ export default function generateCache() {
         } else if (Object.prototype.toString.call(video.thumbnail) === '[object String]') {
           assetsToCache.push(video.thumbnail);
         }
-        if (Array.isArray(video['media-session-artwork'])) {
-          video['media-session-artwork'].forEach((artworkObject) => assetsToCache.push(artworkObject.src));
-        }
       });
 
       const data = `/*

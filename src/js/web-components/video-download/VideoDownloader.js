@@ -181,6 +181,19 @@ export default class VideoDownloader extends HTMLElement {
   }
 
   /**
+   * Returns the artwork images URLs used by Media Session API
+   * to render the media popup / notification.
+   *
+   * @returns {string[]} URLs.
+   */
+  getMediaSessionArtworkUrls() {
+    const artworkObjects = this.internal.videoData['media-session-artwork'] || [];
+    const artworkUrls = artworkObjects.map((artworkObject) => artworkObject.src);
+
+    return artworkUrls;
+  }
+
+  /**
    * Saves assets to the specified cache using Cache API.
    *
    * @param {string[]} urls Array of URLs to be saved to the cache.
@@ -203,14 +216,22 @@ export default class VideoDownloader extends HTMLElement {
 
   /**
    * Downloads the current video and its assets to the cache and IDB.
+   *
+   * @param {object}  opts Download options.
+   * @param {boolean} opts.assetsOnly  Whether to cache only video assets: poster images,
+   *                                   subtitles and Media Session API artowrk.
    */
-  async download() {
+  async download(opts = {}) {
     const posterURLs = this.getPosterURLs();
     const subtitlesURLs = this.getSubtitlesUrls();
+    const mediaSessionArtworkURLs = this.getMediaSessionArtworkUrls();
 
-    this.downloading = true;
-    this.saveToCache([...posterURLs, ...subtitlesURLs]);
-    this.runIDBDownloads();
+    this.saveToCache([...posterURLs, ...subtitlesURLs, ...mediaSessionArtworkURLs]);
+
+    if (!opts.assetsOnly) {
+      this.downloading = true;
+      this.runIDBDownloads();
+    }
   }
 
   /**
