@@ -12,6 +12,7 @@
   --icon: #F7F7F8;
   --footer-text: #5a585b;
   --accent-background: #12292B;
+  --accent-background-alpha: #12292BCC;
   --accent: #00C9DB;
   --accent-text: #fff;
   --separator: #3D3B3F;
@@ -56,6 +57,7 @@
     --icon: #858287;
     --footer-text: #5a585b;
     --accent-background: #ECEFFF;
+    --accent-background-alpha: #ECEFFFCC;
     --accent: #3740FF;
     --accent-text: #000;
     --separator: #E6E4E7;
@@ -646,7 +648,8 @@ article pre,
   grid-row: 1;
 }
 .has-overlay .video-container--overlay button {
-  color: #000;
+  color: var(--accent);
+  background: var(--accent-background-alpha);
   position: relative;
   z-index: 100;
   border: none;
@@ -661,14 +664,17 @@ button.action--play {
   box-shadow: 0 0 30px rgba(0, 0, 0, .5);
 }
 button.action--unmute {
-  display: inline-grid;
+  display: grid;
   grid-template-rows: auto auto;
-  grid-template-columns: fit-content(20vw);
-  gap: 8px;
-  padding: 16px 32px;
-  background: rgba(255, 255, 255, .75);
-  border-radius: 10%;
+  justify-items: center;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 8px;
+  font-size: 16px;
   font-weight: 600;
+}
+button.action--unmute path {
+  stroke: var(--accent);
 }
 .video-container .video-container--player {
   display: none;

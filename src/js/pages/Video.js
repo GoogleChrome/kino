@@ -231,10 +231,11 @@ export default (routerContext) => {
       // If auto playback fails, mute the video and retry.
       videoPlayer.mute();
       videoPlayer.play()
-        .then(() => setupUnmuteButton(videoPlayer))
-        .catch(setupManualPlayButton);
+        .then(() => setupUnmuteButton(videoPlayer)) // Can play muted, display unmute button.
+        .catch(setupManualPlayButton); // Can't play automatically at all, setup manual play button.
     };
 
+    // Attempt autoplay.
     attachAndPlay().catch(errHandler);
   }
 
