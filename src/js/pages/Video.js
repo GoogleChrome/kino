@@ -151,7 +151,7 @@ export default (routerContext) => {
    */
   const attachAndPlay = () => {
     const playerWrapper = containerEl.querySelector('.video-container--player');
-    const videoPlayer = new VideoPlayer();
+    const videoPlayer = new VideoPlayer(downloader);
 
     containerEl.classList.add('has-player');
     videoPlayer.render(currentVideoData);

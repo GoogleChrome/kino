@@ -22,11 +22,16 @@ import selectSource from '../../utils/selectSource';
 import { MEDIA_SESSION_DEFAULT_ARTWORK } from '../../constants';
 
 export default class extends HTMLElement {
-  constructor() {
+  /**
+   * @param {VideoDownloader} downloader Video downloader associated with the current video.
+   */
+  constructor(downloader) {
     super();
 
-    this.internal = {};
-    this.internal.root = this.attachShadow({ mode: 'open' });
+    this.internal = {
+      downloader,
+      root: this.attachShadow({ mode: 'open' }),
+    };
   }
 
   /**
@@ -181,7 +186,7 @@ export default class extends HTMLElement {
         title: this.internal.videoData.title || '',
         artist: this.internal.videoData.artist || '',
         album: this.internal.videoData.album || '',
-        artwork: MEDIA_SESSION_DEFAULT_ARTWORK,
+        artwork: this.internal.videoData['media-session-artwork'] || MEDIA_SESSION_DEFAULT_ARTWORK,
       });
 
       /**
@@ -312,6 +317,11 @@ export default class extends HTMLElement {
       const resolvePlayIntent = async () => {
         try {
           await this.videoElement.play();
+
+          this.internal.downloader.download({
+            assetsOnly: true,
+          });
+
           resolve(this);
         } catch (_) {
           reject(this);

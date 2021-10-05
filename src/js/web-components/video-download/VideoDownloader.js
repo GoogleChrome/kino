@@ -21,6 +21,8 @@ import DownloadManager from '../../classes/DownloadManager';
 import StorageManager from '../../classes/StorageManager';
 import getURLsForDownload from '../../utils/getURLsForDownload';
 
+import { MEDIA_SESSION_DEFAULT_ARTWORK } from '../../constants';
+
 export default class VideoDownloader extends HTMLElement {
   static get observedAttributes() {
     return ['state', 'progress', 'downloading', 'willremove'];
@@ -181,6 +183,19 @@ export default class VideoDownloader extends HTMLElement {
   }
 
   /**
+   * Returns the artwork images URLs used by Media Session API
+   * to render the media popup / notification.
+   *
+   * @returns {string[]} URLs.
+   */
+  getMediaSessionArtworkUrls() {
+    const artworkObjects = this.internal.videoData['media-session-artwork'] || MEDIA_SESSION_DEFAULT_ARTWORK;
+    const artworkUrls = artworkObjects.map((artworkObject) => artworkObject.src);
+
+    return artworkUrls;
+  }
+
+  /**
    * Saves assets to the specified cache using Cache API.
    *
    * @param {string[]} urls Array of URLs to be saved to the cache.
@@ -188,7 +203,12 @@ export default class VideoDownloader extends HTMLElement {
   async saveToCache(urls) {
     try {
       const cache = await caches.open(this.internal.cacheName);
-      await cache.addAll(urls);
+
+      urls.forEach(async (url) => {
+        if (!await cache.match(url)) {
+          await cache.add(url);
+        }
+      });
     } catch (error) {
       if (error.name === 'QuotaExceededError') {
         /**
@@ -203,14 +223,22 @@ export default class VideoDownloader extends HTMLElement {
 
   /**
    * Downloads the current video and its assets to the cache and IDB.
+   *
+   * @param {object}  opts Download options.
+   * @param {boolean} opts.assetsOnly  Whether to cache only video assets: poster images,
+   *                                   subtitles and Media Session API artowrk.
    */
-  async download() {
+  async download(opts = {}) {
     const posterURLs = this.getPosterURLs();
     const subtitlesURLs = this.getSubtitlesUrls();
+    const mediaSessionArtworkURLs = this.getMediaSessionArtworkUrls();
 
-    this.downloading = true;
-    this.saveToCache([...posterURLs, ...subtitlesURLs]);
-    this.runIDBDownloads();
+    this.saveToCache([...posterURLs, ...subtitlesURLs, ...mediaSessionArtworkURLs]);
+
+    if (!opts.assetsOnly) {
+      this.downloading = true;
+      this.runIDBDownloads();
+    }
   }
 
   /**
