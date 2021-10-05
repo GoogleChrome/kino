@@ -28,55 +28,181 @@ autoplay: true
 
 ## Introduction
 
-The simplest way of embedding a video on the web is using the HTML Video
-element (`<video>`). However, every browser supports a different set of video
-formats. Picking the right format will ensure your video has the highest
-possible browser compatibility and is going to play in almost every situation.
+Sometimes the video is not just a _part_ of your web page content. Sometimes it
+is _the_ content and your users expect it to start playing automatically
+as soon as possible.
 
-## Choosing the right format
+There are two main ways of accomplishing this autoplay behavior:
 
-Browsers usually support multiple video formats, but there is a limited overlap
-in their capabilities. If you only want to encode your videos in a single
-format, the safest choice is to use an [MP4 container] encapsulating `H.264`
-video and `AAC` audio.
+1. Using the `<video autoplay>` attribute.
+2. Using JavaScript.
 
-### Basic code example
+Let's take a look at the benefits and limitations of each.
+
+## Using the `autoplay` attribute
+
+The better known and simpler way of instructing browsers to automatically play
+a video is using the `autoplay` attribute.
+
+```html
+<video controls autoplay>
+  <source src="video.mp4" type="video/mp4">
+</video>
+```
+
+However, browsers might not honor the attribute for various reasons, likely
+because it contains sound. Automatic playback of videos with sound often leads
+to poor user experience and browsers nowadays use multiple signals to determine
+if playback with sound should be allowed.
+
+To improve your chances of browsers starting the playback, you can choose to
+play the video muted.
+
+```html
+<!-- Browsers will usually allow autoplay when
+     the `muted` attribute is also present. -->
+<video controls autoplay muted>
+  <source src="video.mp4" type="video/mp4">
+</video>
+```
+
+**Note:** Unless you provide your own UI for the video controls, make sure the
+to also use the `controls` attribute to let the browser render the default video
+controls.
+
+## Using JavaScript
+
+In JavaScript the `<video>` element contains a `play()` method that can be used
+to attempt to manually start playback as soon as possible.
 
 ```html
 <video controls>
   <source src="video.mp4" type="video/mp4">
 </video>
+<script>
+  const videoElement = document.querySelector('video');
+  videoElement.play();
+</script>
 ```
 
-This simple approach is enough to get you up and running. Your video will now
-play in all major web browsers. Notice the `controls` attribute that instructs
-browsers to allow users to control video playback, which includes volume,
-seeking, selecting captions, pause/resume playback etc.
+Similarly to the `autoplay` attribute, browsers may choose to not play the
+video in this situation, especially if it contains sound and is not muted.
 
-A single video source is simple to maintain, but it gives rise to some
-challenges. Users of your site are going to use different classes of devices
-to watch the video. A high resolution video is going to look great on desktop,
-but likely will take a long time to load on slower cellular networks.
+One useful benefit of calling the `play()` method is that it returns a Promise
+that resolves when playback starts and rejects when it won't start for any
+reason. This gives you a chance to respond.
 
-Take the video at the top of this page as an example, which has a `1280×720`
-resolution using the `H.264` codec with an effective bit rate of `1503 kb/s`.
-It looks decent on desktop while being small enough to not cause stuttering on
-good quality 3G networks. The video is clear, however, it's not a perfect fit
-for either use case and is why you should probably provide multiple video
-sources with a bitrate targeting the needs of your users.
+One good strategy is to mute the video and re-attempt the playback. Then, if
+that fails, render a custom play button or not do anything and let the user
+to use video controls rendered by the browser.
 
-### Example FFmpeg command
+```html
+<video controls>
+  <source src="video.mp4" type="video/mp4">
+</video>
+<script>
+  const videoElement = document.querySelector('video');
 
+  videoElement.play()
+    .catch(() => {
+      // Mute video and retry playback.
+      videoElement.muted = true;
+      videoElement.play()
+        .catch(() => {
+          // Can't autoplay with sound or muted.
+        })
+   })
+
+   /**
+    * Note: In older browsers the `play()` method may not
+    *       return a Promise. If you need to support
+    *       pre-2019 browsers, you could do:
+    *
+    * Promise.resolve(videoElement.play())
+    *   .catch(() => {
+    *     // Mute and try playing again.
+    *   })
+    *
+    * ... to wrap the non-Promise return values as Promises.
+</script>
 ```
-ffmpeg -i source.mp4 -b:v 1350k -c:v libx264 -c:a copy -filter:v "scale=1280:-1" -preset veryslow video.mp4
+
+### Unmute button
+
+Refresh this page and you'll likely notice the video now plays muted and there
+is a "Tap to unmute" button rendered over it.
+
+That's a custom element styled and positioned to render over the video. When
+the button is clicked, simple JavaScript runs and removes the `muted` attribute
+from the video and it continues playing with sound.
+
+This strategy combines the best of both worlds. Users are not going to get
+startled by sudden loud playback while the action necessary to achieve playback
+with sound is handily available.
+
+```html
+<section>
+  <video controls>
+    <source src="video.mp4" type="video/mp4">
+  </video>
+  <button>🔊</button>
+</section>
+
+<style>
+  /* Only basic layout, no fancy styling. */
+  section {
+    display: inline-block;
+    position: relative;
+  }
+  button {
+    font-size: 80px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+</style>
+
+<script>
+  const videoElement = document.querySelector('video');
+  const unmuteButton = document.querySelector('button');
+
+  videoElement.play()
+    .catch(() => {
+      // Mute video and retry playback.
+      videoElement.muted = true;
+      videoElement.play()
+        .then(() => {
+          // When the unmute button is clicked,
+          // unmute video and remove the button.
+          unmuteButton.addEventListener('click', () => {
+            videoElement.muted = false;
+            unmuteButton.remove();
+          });
+        })
+        .catch(() => {
+          // Can't autoplay with sound or muted.
+        })
+   })
+</script>
 ```
+
+## Engagement signals
+
+Browsers use various heuristics to determine whether automatic playback with
+sound is expected by the user or not. These heuristics differ between browsers,
+but here a few example use cases where autoplay with sound is likely:
+
+* When the newly loaded page is a result of internal navigation initiated by
+  the user, e.g. click, tap etc.
+* When the user has installed the PWA or added the site to their home screen.
+* When user engagement signals are strong, e.g. on video sites where the user
+  regularly watches the content.
+
+Find more in-depth information at the [Chrome Developers website].
 
 ## What's Next?
 
-Advanced codecs like `VP9` and `HEVC` generally produce smaller file sizes,
-which improves the visual quality and/or experience on slower networks. Next,
-we'll learn when and how to specify [multiple sources] within the HTML5
-`<video>` element.
+TBD
 
-[MP4 container]: https://caniuse.com/mpeg4
-[multiple sources]: /multiple-sources/
+[Chrome Developers website]: https://developer.chrome.com/blog/autoplay/
