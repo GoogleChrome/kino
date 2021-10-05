@@ -22,11 +22,16 @@ import selectSource from '../../utils/selectSource';
 import { MEDIA_SESSION_DEFAULT_ARTWORK } from '../../constants';
 
 export default class extends HTMLElement {
-  constructor() {
+  /**
+   * @param {VideoDownloader} downloader Video downloader associated with the current video.
+   */
+  constructor(downloader) {
     super();
 
-    this.internal = {};
-    this.internal.root = this.attachShadow({ mode: 'open' });
+    this.internal = {
+      downloader,
+      root: this.attachShadow({ mode: 'open' }),
+    };
   }
 
   /**
@@ -159,7 +164,7 @@ export default class extends HTMLElement {
         title: this.internal.videoData.title || '',
         artist: this.internal.videoData.artist || '',
         album: this.internal.videoData.album || '',
-        artwork: MEDIA_SESSION_DEFAULT_ARTWORK,
+        artwork: this.internal.videoData['media-session-artwork'] || MEDIA_SESSION_DEFAULT_ARTWORK,
       });
 
       /**
@@ -283,10 +288,15 @@ export default class extends HTMLElement {
    */
   play() {
     const HAVE_NOTHING = 0;
+
     if (this.videoElement.readyState === HAVE_NOTHING) {
       this.videoElement.addEventListener('loadeddata', this.videoElement.play, { once: true });
     } else {
       this.videoElement.play();
     }
+
+    this.internal.downloader.download({
+      assetsOnly: true,
+    });
   }
 }

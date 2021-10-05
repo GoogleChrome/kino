@@ -138,7 +138,7 @@ export default (routerContext) => {
   playButton.addEventListener('click', (e) => {
     const videoContainer = e.target.closest('.video-container');
     const playerWrapper = videoContainer.querySelector('.video-container--player');
-    const videoPlayer = new VideoPlayer();
+    const videoPlayer = new VideoPlayer(downloader);
 
     videoContainer.classList.add('has-player');
     videoPlayer.render(currentVideoData);
