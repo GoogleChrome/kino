@@ -56,8 +56,6 @@ export default (routerContext) => {
   }
   downloader.setAttribute('expanded', 'true');
 
-  const disabled = (connectionStatus.status === 'offline' && downloader.state !== 'done');
-
   let videoImageHTML;
 
   if (Array.isArray(thumbnail)) {
@@ -72,9 +70,21 @@ export default (routerContext) => {
 
   const [videoMinutes, videoSeconds] = currentVideoData.length.split(':');
 
+  /**
+   * Returns whether the current video is available for playback.
+   *
+   * @param {object} downloaderOrState             Downloader instance or state object.
+   * @param {string} downloaderOrState.state       Downloader state string, e.g. "done".
+   * @param {boolean} downloaderOrState.willremove Downloader willremove flag.
+   * @returns {boolean} Whether video is available for playback from any source (network or IDB).
+   */
+  const isVideoAvailable = (downloaderOrState) => connectionStatus.status !== 'offline' // We're are not offline...
+      || downloaderOrState.state === 'done' // ... or we have the video downloaded
+      || downloaderOrState.willremove === true; // ... or we're about to remove it, but haven't yet.
+
   mainContent.innerHTML = `
   <div class="container">
-    <article${disabled ? ' class="video--disabled"' : ''}>
+    <article class="video-article ${isVideoAvailable(downloader) ? '' : 'video--disabled'}">
       <div class="video-container width-full">
         <div class="video-container--image">
           ${videoImageHTML}
@@ -114,6 +124,16 @@ export default (routerContext) => {
 `;
   mainContent.prepend(posterWrapper);
   mainContent.querySelector('.downloader').appendChild(downloader);
+
+  downloader.subscribe((oldState, newState) => {
+    const articleEl = mainContent.querySelector('.video-article');
+
+    if (isVideoAvailable(newState)) {
+      articleEl.classList.remove('video--disabled');
+    } else {
+      articleEl.classList.add('video--disabled');
+    }
+  });
 
   const playButton = mainContent.querySelector('.play');
   const categorySlug = currentVideoData.categories[0];
