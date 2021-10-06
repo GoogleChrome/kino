@@ -1,7 +1,7 @@
 ---
 title: Autoplay
 description: |
-  Make your videos start playback automatically.
+  Learn how to start video playback automatically and employ autoplay strategies that don't lead to degraded user experience.
 date: Septembed 22nd, 2021
 length: '1:04'
 video-sources:
