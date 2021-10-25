@@ -190,7 +190,7 @@ export default (routerContext) => {
         markup: playIcon,
         action: 'play',
         callback: async () => {
-          await attachAndPlay();
+          attachAndPlay();
           clearOverlay();
         },
       }),
