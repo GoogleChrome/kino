@@ -70,7 +70,6 @@ export default class extends HTMLElement {
    * Mutes the video.
    */
   mute() {
-    this.videoElement.setAttribute('muted', '');
     this.videoElement.muted = true;
   }
 
@@ -78,7 +77,6 @@ export default class extends HTMLElement {
    * Unmutes the video.
    */
   unmute() {
-    this.videoElement.removeAttribute('muted');
     this.videoElement.muted = false;
   }
 
