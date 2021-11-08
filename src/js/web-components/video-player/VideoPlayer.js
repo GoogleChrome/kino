@@ -306,7 +306,10 @@ export default class extends HTMLElement {
    * it's possible we're initializing MSE and we can't really
    * use the `play` method if the source is going to change.
    *
-   * @returns {Promise} Promise indicating whether the playback started.
+   * @returns {Promise<this>} Promise indicating whether the playback started.
+   *                          Returns the current `VideoPlayer` instance, which
+   *                          allows outside code to respond to success or failure
+   *                          adequately, e.g. by muting the video and retrying.
    */
   play() {
     const HAVE_NOTHING = 0;
