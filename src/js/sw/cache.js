@@ -43,5 +43,5 @@ export default [
   'https://storage.googleapis.com/kino-assets/streaming-basics/thumbnail.png',
   'https://storage.googleapis.com/kino-assets/efficient-formats/thumbnail.png',
   'https://storage.googleapis.com/kino-assets/adaptive-streaming/thumbnail.png',
-  'https://storage.googleapis.com/kino-assets/using-webvtt/thumbnail.png',
+  'https://storage.googleapis.com/kino-assets/autoplay/thumbnail.png',
 ];

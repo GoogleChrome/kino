@@ -5,24 +5,41 @@ description: |
 date: Septembed 22nd, 2021
 length: '1:04'
 video-sources:
-  - src: https://storage.googleapis.com/kino-assets/using-webvtt/av1.mp4
-    type: video/mp4; codecs="av01.0.04M.08, mp4a.40.2"
-  - src: https://storage.googleapis.com/kino-assets/using-webvtt/hevc.mp4
-    type: video/mp4; codecs="hev1.1.6.L93.90,mp4a.40.2"
-  - src: https://storage.googleapis.com/kino-assets/using-webvtt/vp9.webm
-    type: video/webm
+  - src: https://storage.googleapis.com/kino-assets/autoplay/manifest.mpd
+    type: application/dash+xml
+  - src: https://storage.googleapis.com/kino-assets/autoplay/master.m3u8
+    type: application/x-mpegURL
 video-subtitles:
   - default: true
     kind: captions
     label: English
-    src: https://storage.googleapis.com/kino-assets/using-webvtt/cap-en.vtt
+    src: https://storage.googleapis.com/kino-assets/autoplay/cap-en.vtt
     srclang: en
   - default: false
     kind: captions
     label: Česky
-    src: https://storage.googleapis.com/kino-assets/using-webvtt/cap-cz.vtt
+    src: https://storage.googleapis.com/kino-assets/autoplay/cap-cz.vtt
     srclang: cz
-thumbnail: https://storage.googleapis.com/kino-assets/using-webvtt/thumbnail.png
+thumbnail: https://storage.googleapis.com/kino-assets/autoplay/thumbnail.png
+media-session-artwork:
+  - sizes: 96x96
+    src: https://storage.googleapis.com/kino-assets/autoplay/artwork-96x96.png
+    type: image/png
+  - sizes: 128x128
+    src: https://storage.googleapis.com/kino-assets/autoplay/artwork-128x128.png
+    type: image/png
+  - sizes: 192x192
+    src: https://storage.googleapis.com/kino-assets/autoplay/artwork-192x192.png
+    type: image/png
+  - sizes: 256x256
+    src: https://storage.googleapis.com/kino-assets/autoplay/artwork-256x256.png
+    type: image/png
+  - sizes: 384x384
+    src: https://storage.googleapis.com/kino-assets/autoplay/artwork-384x384.png
+    type: image/png
+  - sizes: 512x512
+    src: https://storage.googleapis.com/kino-assets/autoplay/artwork-512x512.png
+    type: image/png
 autoplay: true
 ---
 
