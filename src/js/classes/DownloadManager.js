@@ -28,6 +28,8 @@ import FixedBuffer from './FixedBuffer';
  * Utils.
  */
 import getMimeByURL from '../utils/getMimeByURL';
+import getFileMetaForDownload from '../utils/getFileMetaForDownload';
+import rewriteURL from '../utils/rewriteURL';
 
 /**
  * The DownloadManager is responsible for downloading videos from the network.
@@ -45,21 +47,54 @@ export default class DownloadManager {
   /**
    * Instantiates the download manager.
    *
-   * @param {VideoDownloader} videoDownloader The associated video downloader object.
+   * @param {string} videoId Video ID of the media to be downloaded.
    */
-  constructor(videoDownloader) {
-    this.files = videoDownloader.internal.files || [];
+  constructor(videoId) {
+    this.videoId = videoId;
     this.paused = false;
     this.cancelled = false;
 
-    this.internal = {
-      videoDownloader,
-    };
+    /** @type {Response[]} */
+    this.responses = [];
 
-    this.onflush = () => {};
+    /** @type {DownloadFlushHandler[]} */
+    this.flushHandlers = [];
 
-    this.maybePrepareNextFile();
+    /** @type {DownloadTransformer} */
+    this.transformers = [];
+
     this.bufferSetup();
+  }
+
+  /**
+   * Flushes the downloaded data to any handlers.
+   *
+   * @param {FileMeta}  fileMeta  File meta.
+   * @param {FileChunk} fileChunk File chunk.
+   * @param {boolean}   isDone    Is this the last file chunk.
+   */
+  flush(fileMeta, fileChunk, isDone) {
+    this.flushHandlers.forEach((handler) => {
+      handler(fileMeta, fileChunk, isDone);
+    });
+  }
+
+  /**
+   * Attaches a handler to receive downloaded data.
+   *
+   * @param {DownloadFlushHandler} flushHandler Flush handler.
+   */
+  attachFlushHandler(flushHandler) {
+    this.flushHandlers.push(flushHandler);
+  }
+
+  /**
+   * Attaches a download data transformer.
+   *
+   * @param {DownloadTransformer} transformer Download data transformer.
+   */
+  attachTransformer(transformer) {
+    this.transformers.push(transformer);
   }
 
   /**
@@ -79,7 +114,7 @@ export default class DownloadManager {
    */
   bufferSetup() {
     /**
-     * IDB put operations have a lot of overhead, so it's impractical for us to store
+     * IDB put operations have a lot of overhead, so it's impractical for us to
      * a data chunk every time our reader has more data, because those chunks
      * usually are pretty small and generate thousands of IDB data entries.
      *
@@ -115,28 +150,52 @@ export default class DownloadManager {
       fileMeta.done = true;
     }
     this.maybePrepareNextFile();
-    this.onflush(fileMeta, fileChunk, this.done);
+    this.flush(fileMeta, fileChunk, this.done);
   }
 
   /**
    * Downloads the first file that is not fully downloaded.
    */
   async downloadFile() {
-    const { bytesDownloaded, url, downloadUrl } = this.currentFileMeta;
-    const fetchOpts = {};
+    const { bytesDownloaded, url } = this.currentFileMeta;
 
-    if (bytesDownloaded) {
-      fetchOpts.headers = {
-        Range: `bytes=${bytesDownloaded}-`,
-      };
+    // Attempts to find an existing response object for the current URL
+    // before fetching the file from the network.
+    let response = this.responses.reduce(
+      (prev, current) => (current.url === url ? current : prev),
+      null,
+    );
+
+    /**
+     * Some URLs we want to download have their offline versions.
+     *
+     * If the current URL is one of those, we want to make sure not to
+     * use any existing response for the original URL.
+     */
+    const rewrittenUrl = rewriteURL(this.videoId, url, 'online', 'offline');
+
+    if (!response || url !== rewrittenUrl) {
+      const fetchOpts = {};
+
+      if (bytesDownloaded) {
+        fetchOpts.headers = {
+          Range: `bytes=${bytesDownloaded}-`,
+        };
+      }
+
+      response = await fetch(rewrittenUrl, fetchOpts);
     }
 
-    const response = await fetch(downloadUrl, fetchOpts);
     const reader = response.body.getReader();
     const mimeType = response.headers.get('Content-Type') || getMimeByURL(url);
     const fileLength = response.headers.has('Content-Range')
       ? Number(response.headers.get('Content-Range').replace(/^[^/]\/(.*)$/, '$1'))
       : Number(response.headers.get('Content-Length'));
+
+    // If this is a full response, throw away any bytes downloaded earlier.
+    if (!response.headers.has('Content-Range')) {
+      this.currentFileMeta.bytesDownloaded = 0;
+    }
 
     this.currentFileMeta.mimeType = mimeType;
     this.currentFileMeta.bytesTotal = fileLength > 0 ? fileLength : null;
@@ -169,9 +228,17 @@ export default class DownloadManager {
 
   /**
    * Starts downloading files.
+   *
+   * @param {Response[]} [responses] Already prepared responses for (some of) the donwloaded
+   *                                 files, e.g. produced by Background Fetch API.
+   * @param {string[]} [urls]        Optional list of URLs to be downloaded.
    */
-  async run() {
+  async run(responses = [], urls = null) {
     this.paused = false;
+    this.responses = responses;
+    this.files = await getFileMetaForDownload(this.videoId, urls);
+
+    this.maybePrepareNextFile();
     while (!this.done && !this.paused && !this.cancelled && this.currentFileMeta) {
       /* eslint-disable-next-line no-await-in-loop */
       await this.downloadFile();

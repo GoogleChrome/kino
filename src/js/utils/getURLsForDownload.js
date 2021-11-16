@@ -17,73 +17,48 @@
 import '../typedefs';
 import ParserMPD from '../classes/ParserMPD';
 import selectSource from './selectSource';
+import getVideoSources from './getVideoSources';
+import rewriteURL from './rewriteURL';
 
 /**
  * Returns a list of URLs that need to be downloaded in order to allow
  * offline playback of this resource on this device.
  *
- * @param {string}   videoId Video ID.
- * @param {object[]} sources Video sources.
- * @returns {Promise<FileMeta[]>} Promise resolving to file meta objects.
+ * @param {string} videoId      Video ID.
+ * @returns {Promise<string[]>} List of URLs associated with the given `videoId`.
  */
-export default async (videoId, sources) => {
-  let URLTuples = [];
-  const selectedSource = selectSource(sources);
+export default async (videoId) => {
+  const videoSources = getVideoSources(videoId);
+  const selectedSource = selectSource(videoSources);
+
+  if (selectedSource === null) {
+    return [];
+  }
+
+  let urls = [];
 
   /**
    * If this is a streamed video, we need to read the manifest
    * first and generate a list of files to be downloaded.
    */
   if (selectedSource?.canPlayTypeMSE) {
-    const response = await fetch(selectedSource.src);
+    const offlineManifestUrl = rewriteURL(videoId, selectedSource.src, 'online', 'offline');
+
+    /**
+     * Use the offline version of the manifest to make sure we only line up
+     * a subset of all available media data for download.
+     *
+     * We don't want to download video files in all possible resolutions and formats.
+     * Instead the offline manifest only contain one manually selected representation.
+     */
+    const response = await fetch(offlineManifestUrl);
     const responseText = await response.text();
     const parser = new ParserMPD(responseText, selectedSource.src);
 
-    /**
-     * This removes all but one audio and video representations from the manifest.
-     */
-    const offlineGenerated = parser.prepareForOffline();
-    if (offlineGenerated) {
-      /**
-       * The manifest data has been changed in memory. We need to persist the changes.
-       * Generating a data URI gives us a stable faux-URL that can reliably be used in
-       * place of a real URL and even stored in the database for later usage.
-       *
-       * Note: the offline manifest file is pretty small in size (several kBs max),
-       *       making it a good candidate for a data URI.
-       */
-      const offlineManifestDataURI = parser.toDataURI();
-
-      /**
-       * For most files, the `url` and `downloadUrl` are the same thing – see
-       * `listAllChunkURLs` source code.
-       *
-       * The only exception are the manifest files, where the `downloadUrl` is a separate data URI,
-       * whereas the `url` is the original URL of the manifest.
-       *
-       * This allows us to intercept requests for the original manifest file, but serve our
-       * updated version of the manifest.
-       */
-      const manifestTuple = [selectedSource.src, offlineManifestDataURI];
-
-      URLTuples = parser.listAllChunkURLs([manifestTuple]);
-    } else {
-      return [];
-    }
+    urls.push(selectedSource.src);
+    urls = [...parser.listAllChunkURLs(), ...urls];
   } else {
-    URLTuples = [[selectedSource.src, selectedSource.src]];
+    urls.push(selectedSource.src);
   }
-
-  const fileMeta = URLTuples.map(
-    ([url, downloadUrl]) => ({
-      url,
-      downloadUrl,
-      videoId,
-      bytesDownloaded: 0,
-      bytesTotal: null,
-      done: false,
-    }),
-  );
-
-  return fileMeta;
+  return urls;
 };

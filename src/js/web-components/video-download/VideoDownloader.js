@@ -19,9 +19,9 @@ import styles from './VideoDownloader.css';
 import getIDBConnection from '../../classes/IDBConnection';
 import DownloadManager from '../../classes/DownloadManager';
 import StorageManager from '../../classes/StorageManager';
-import getURLsForDownload from '../../utils/getURLsForDownload';
-
+import getFileMetaForDownload from '../../utils/getFileMetaForDownload';
 import { MEDIA_SESSION_DEFAULT_ARTWORK } from '../../constants';
+import BackgroundFetch from '../../classes/BackgroundFetch';
 
 export default class VideoDownloader extends HTMLElement {
   static get observedAttributes() {
@@ -131,25 +131,12 @@ export default class VideoDownloader extends HTMLElement {
     };
 
     const videoId = this.getId();
-    const sources = this.internal.videoData['video-sources'] || [];
 
-    getURLsForDownload(videoId, sources).then(async (files) => {
+    getFileMetaForDownload(videoId).then(async (fileMeta) => {
       const db = await getIDBConnection();
-      const dbFiles = await db.file.getByVideoId(videoId);
-      const dbFilesUrlTuples = dbFiles.map((fileMeta) => [fileMeta.url, fileMeta]);
-      const dbFilesByUrl = Object.fromEntries(dbFilesUrlTuples);
-
-      /**
-       * If we have an entry for this file in the database, use it. Otherwise
-       * fall back to the freshly generated FileMeta object.
-       */
-      const filesWithStateUpdatedFromDb = files.map(
-        (fileMeta) => (dbFilesByUrl[fileMeta.url] ? dbFilesByUrl[fileMeta.url] : fileMeta),
-      );
-
       const videoMeta = await db.meta.get(videoId);
       this.setMeta(videoMeta);
-      this.internal.files = filesWithStateUpdatedFromDb;
+      this.internal.files = fileMeta;
 
       this.render();
     });
@@ -237,8 +224,32 @@ export default class VideoDownloader extends HTMLElement {
 
     if (!opts.assetsOnly) {
       this.downloading = true;
-      this.runIDBDownloads();
+      this.state = 'partial';
+
+      if (
+        'BackgroundFetchManager' in window
+         && 'serviceWorker' in navigator
+      ) {
+        this.downloadUsingBackgroundFetch();
+      } else {
+        this.downloadSynchronously();
+      }
     }
+  }
+
+  downloadUsingBackgroundFetch() {
+    const bgFetch = new BackgroundFetch();
+
+    bgFetch.onprogress = (progress) => {
+      this.progress = progress;
+    };
+    bgFetch.ondone = () => {
+      this.progress = 100;
+      this.downloading = false;
+      this.state = 'done';
+    };
+
+    bgFetch.start(this.internal.videoData);
   }
 
   /**
@@ -271,9 +282,11 @@ export default class VideoDownloader extends HTMLElement {
    * Takes a list of video URLs, downloads the video using a stream reader
    * and invokes `storeVideoChunk` to store individual video chunks in IndexedDB.
    */
-  async runIDBDownloads() {
-    this.downloadManager = new DownloadManager(this);
-    this.storageManager = new StorageManager(this);
+  async downloadSynchronously() {
+    this.downloadManager = new DownloadManager(this.getId());
+    this.storageManager = new StorageManager(this.getId(), {
+      videoDownloader: this,
+    });
 
     this.storageManager.onprogress = (progress) => {
       this.progress = progress;
@@ -305,9 +318,8 @@ export default class VideoDownloader extends HTMLElement {
      * to make sure all chunks are sent to the `storeChunk` method of the `StoreManager`.
      */
     const boundStoreChunkHandler = this.storageManager.storeChunk.bind(this.storageManager);
-    this.downloadManager.onflush = boundStoreChunkHandler;
+    this.downloadManager.attachFlushHandler(boundStoreChunkHandler);
 
-    this.state = 'partial';
     this.downloadManager.run();
   }
 

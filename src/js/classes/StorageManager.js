@@ -29,18 +29,18 @@ export default class {
   /**
    * Instantiates the storage manager.
    *
-   * @param {VideoDownloader} videoDownloader The associated video downloader object.
+   * @param {string}          videoId Video ID to identify stored data.
+   * @param {object}          opts    Optional settings.
+   * @param {VideoDownloader} opts.videoDownloader Video downloader instance.
    */
-  constructor(videoDownloader) {
+  constructor(videoId, opts = {}) {
     this.done = false;
+    this.videoId = videoId;
+    this.videoDownloader = opts.videoDownloader || null;
 
     this.onerror = () => {};
     this.onprogress = () => {};
     this.ondone = () => {};
-
-    this.internal = {
-      videoDownloader,
-    };
   }
 
   /**
@@ -71,7 +71,7 @@ export default class {
     const db = await getIDBConnection();
     const videoMeta = {
       done: isDone,
-      videoId: this.internal.videoDownloader.getId(),
+      videoId: this.videoId,
       timestamp: Date.now(),
     };
     const txAbortHandler = (e) => {
@@ -125,8 +125,10 @@ export default class {
     return new Promise((resolve, reject) => {
       Promise.all([metaWritePromise, dataWritePromise, fileWritePromise])
         .then(() => {
-          const percentage = this.internal.videoDownloader.getProgress();
-          this.onprogress(percentage);
+          if (this.videoDownloader) {
+            const percentage = this.videoDownloader.getProgress();
+            this.onprogress(percentage);
+          }
 
           if (isDone) {
             this.done = true;
