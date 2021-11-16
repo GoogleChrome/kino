@@ -140,9 +140,3 @@
  * @param {boolean}   isDone    Is this the last downloaded piece?
  * @returns {void}
  */
-
-/**
- * @callback DownloadTransformer
- * @param {Response} response Response object.
- * @returns {Response}
- */

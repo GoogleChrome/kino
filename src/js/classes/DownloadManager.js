@@ -60,9 +60,6 @@ export default class DownloadManager {
     /** @type {DownloadFlushHandler[]} */
     this.flushHandlers = [];
 
-    /** @type {DownloadTransformer} */
-    this.transformers = [];
-
     this.bufferSetup();
   }
 
@@ -86,15 +83,6 @@ export default class DownloadManager {
    */
   attachFlushHandler(flushHandler) {
     this.flushHandlers.push(flushHandler);
-  }
-
-  /**
-   * Attaches a download data transformer.
-   *
-   * @param {DownloadTransformer} transformer Download data transformer.
-   */
-  attachTransformer(transformer) {
-    this.transformers.push(transformer);
   }
 
   /**
