@@ -1,6 +1,6 @@
 {
   "name": "kino",
-  "version": "1.0.0-beta4",
+  "version": "1.0.0-beta5",
   "description": "A sample offline streaming video PWA built for web.dev/media",
   "main": "src/index.js",
   "author": "Google",

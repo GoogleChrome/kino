@@ -171,7 +171,13 @@ export default class DownloadManager {
         };
       }
 
-      response = await fetch(rewrittenUrl, fetchOpts);
+      try {
+        response = await fetch(rewrittenUrl, fetchOpts);
+      } catch (e) {
+        this.warning(`Pausing the download of ${rewrittenUrl} due to network error.`);
+        this.forcePause();
+        return;
+      }
     }
 
     const reader = response.body.getReader();
@@ -190,8 +196,13 @@ export default class DownloadManager {
 
     let dataChunk;
     do {
-      /* eslint-disable-next-line no-await-in-loop */
-      dataChunk = await reader.read();
+      try {
+        /* eslint-disable-next-line no-await-in-loop */
+        dataChunk = await reader.read();
+      } catch (e) {
+        this.warning(`Pausing the download of ${rewrittenUrl} due to network error.`);
+        this.forcePause();
+      }
 
       if (!dataChunk.done) this.buffer.add(dataChunk.value);
     } while (dataChunk && !dataChunk.done && !this.paused);
@@ -205,6 +216,26 @@ export default class DownloadManager {
    */
   pause() {
     this.paused = true;
+  }
+
+  /**
+   * Pauses the current download and forces the associated
+   * `VideoDownloader` instance to render the paused UI, too.
+   */
+  forcePause() {
+    this.pause();
+    this.internal.videoDownloader.downloading = false;
+  }
+
+  /**
+   * Handle a warning message.
+   *
+   * @todo Update to expose the warning to the user.
+   * @param {string} message Error message.
+   */
+  warning(message) {
+    /* eslint-disable-next-line no-console */
+    console.warn(message);
   }
 
   /**
