@@ -15,6 +15,7 @@
  */
 
 import '../typedefs';
+import getProgress from '../utils/getProgress';
 import getIDBConnection from './IDBConnection';
 
 /**
@@ -29,14 +30,14 @@ export default class {
   /**
    * Instantiates the storage manager.
    *
-   * @param {string}          videoId Video ID to identify stored data.
-   * @param {object}          opts    Optional settings.
-   * @param {VideoDownloader} opts.videoDownloader Video downloader instance.
+   * @param {string}     videoId       Video ID to identify stored data.
+   * @param {object}     opts          Optional settings.
+   * @param {FileMeta[]} opts.fileMeta File meta objects to observe progress for.
    */
   constructor(videoId, opts = {}) {
     this.done = false;
     this.videoId = videoId;
-    this.videoDownloader = opts.videoDownloader || null;
+    this.fileMeta = opts.fileMeta || [];
 
     this.onerror = () => {};
     this.onprogress = () => {};
@@ -125,9 +126,8 @@ export default class {
     return new Promise((resolve, reject) => {
       Promise.all([metaWritePromise, dataWritePromise, fileWritePromise])
         .then(() => {
-          if (this.videoDownloader) {
-            const percentage = this.videoDownloader.getProgress();
-            this.onprogress(percentage);
+          if (this.fileMeta.length > 0) {
+            this.onprogress(getProgress(this.fileMeta));
           }
 
           if (isDone) {

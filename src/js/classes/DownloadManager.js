@@ -60,6 +60,8 @@ export default class DownloadManager {
     /** @type {DownloadFlushHandler[]} */
     this.flushHandlers = [];
 
+    this.onfilemeta = () => {};
+
     this.bufferSetup();
   }
 
@@ -246,18 +248,30 @@ export default class DownloadManager {
   }
 
   /**
+   * Generates a list of URLs to be downloaded and turns them into
+   * a list of FileMeta objects that track download properties
+   * for each of the files.
+   *
+   * @param {string[]} [urls]       Optional list of URLs to be downloaded.
+   * @returns {Promise<FileMeta[]>} Promise resolving with FileMeta objects prepared for download.
+   */
+  async prepareFileMeta(urls = null) {
+    this.files = await getFileMetaForDownload(this.videoId, urls);
+    return this.files;
+  }
+
+  /**
    * Starts downloading files.
    *
    * @param {Response[]} [responses] Already prepared responses for (some of) the donwloaded
    *                                 files, e.g. produced by Background Fetch API.
-   * @param {string[]} [urls]        Optional list of URLs to be downloaded.
    */
-  async run(responses = [], urls = null) {
+  async run(responses = []) {
     this.paused = false;
     this.responses = responses;
-    this.files = await getFileMetaForDownload(this.videoId, urls);
 
     this.maybePrepareNextFile();
+
     while (!this.done && !this.paused && !this.cancelled && this.currentFileMeta) {
       /* eslint-disable-next-line no-await-in-loop */
       await this.downloadFile();

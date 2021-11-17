@@ -256,6 +256,7 @@ const bgFetchHandler = async (e) => {
     const storageManager = new StorageManager(bgFetch.videoId);
     const boundStoreChunkHandler = storageManager.storeChunk.bind(storageManager);
 
+    await downloadManager.prepareFileMeta(urls);
     downloadManager.attachFlushHandler(boundStoreChunkHandler);
     downloadManager.attachFlushHandler((fileMeta, fileChunk, isDone) => {
       // If we have a message channel open, signal back to the UI when we're done.
@@ -265,7 +266,7 @@ const bgFetchHandler = async (e) => {
     });
 
     // Start the download, i.e. pump binary data out of the response objects.
-    downloadManager.run(responses, urls);
+    downloadManager.run(responses);
   }
 };
 self.addEventListener('backgroundfetchsuccess', bgFetchHandler);

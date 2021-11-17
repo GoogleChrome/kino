@@ -19,9 +19,10 @@ import styles from './VideoDownloader.css';
 import getIDBConnection from '../../classes/IDBConnection';
 import DownloadManager from '../../classes/DownloadManager';
 import StorageManager from '../../classes/StorageManager';
-import getFileMetaForDownload from '../../utils/getFileMetaForDownload';
-import { MEDIA_SESSION_DEFAULT_ARTWORK } from '../../constants';
+import { MEDIA_SESSION_DEFAULT_ARTWORK, SETTING_KEY_BG_FETCH_API } from '../../constants';
 import BackgroundFetch from '../../classes/BackgroundFetch';
+import { loadSetting } from '../../utils/settings';
+import getProgress from '../../utils/getProgress';
 
 export default class VideoDownloader extends HTMLElement {
   /**
@@ -38,7 +39,14 @@ export default class VideoDownloader extends HTMLElement {
       connectionStatus,
       changeCallbacks: [],
       root: this.attachShadow({ mode: 'open' }),
+      files: [],
     };
+
+    /** @type {DownloadManager} */
+    this.downloadManager = null;
+
+    /** @type {StorageManager} */
+    this.storageManager = null;
   }
 
   /**
@@ -138,7 +146,7 @@ export default class VideoDownloader extends HTMLElement {
    * @param {object} videoData   Video data coming from the API.
    * @param {string} cacheName Cache name.
    */
-  init(videoData, cacheName = 'v1') {
+  async init(videoData, cacheName = 'v1') {
     this.internal = {
       ...this.internal,
       videoData,
@@ -147,15 +155,18 @@ export default class VideoDownloader extends HTMLElement {
     };
 
     const videoId = this.getId();
+    const db = await getIDBConnection();
+    const videoMeta = await db.meta.get(videoId);
 
-    getFileMetaForDownload(videoId).then(async (fileMeta) => {
-      const db = await getIDBConnection();
-      const videoMeta = await db.meta.get(videoId);
-      this.setMeta(videoMeta);
-      this.internal.files = fileMeta;
+    this.downloadManager = new DownloadManager(this.getId());
+    this.internal.files = await this.downloadManager.prepareFileMeta();
 
-      this.render();
+    this.storageManager = new StorageManager(this.getId(), {
+      fileMeta: this.internal.files,
     });
+
+    this.setMeta(videoMeta);
+    this.render();
   }
 
   /**
@@ -243,8 +254,9 @@ export default class VideoDownloader extends HTMLElement {
       this.state = 'partial';
 
       if (
-        'BackgroundFetchManager' in window
-         && 'serviceWorker' in navigator
+        loadSetting(SETTING_KEY_BG_FETCH_API)
+        && 'BackgroundFetchManager' in window
+        && 'serviceWorker' in navigator
       ) {
         this.downloadUsingBackgroundFetch();
       } else {
@@ -269,44 +281,14 @@ export default class VideoDownloader extends HTMLElement {
   }
 
   /**
-   * Returns the total download progress for the video.
-   *
-   * @returns {number} Percentage progress for the video in the range 0–100.
-   */
-  getProgress() {
-    const pieceValue = 1 / this.internal.files.length;
-    const percentageProgress = this.internal.files.reduce(
-      (percentage, fileMeta) => {
-        if (fileMeta.done) {
-          percentage += pieceValue;
-        } else if (fileMeta.bytesDownloaded === 0 || !fileMeta.bytesTotal) {
-          percentage += 0;
-        } else {
-          const percentageOfCurrent = fileMeta.bytesDownloaded / fileMeta.bytesTotal;
-          percentage += percentageOfCurrent * pieceValue;
-        }
-        return percentage;
-      },
-      0,
-    );
-    const clampedPercents = Math.max(0, Math.min(percentageProgress, 1));
-
-    return clampedPercents;
-  }
-
-  /**
    * Takes a list of video URLs, downloads the video using a stream reader
    * and invokes `storeVideoChunk` to store individual video chunks in IndexedDB.
    */
   async downloadSynchronously() {
-    this.downloadManager = new DownloadManager(this.getId());
-    this.storageManager = new StorageManager(this.getId(), {
-      videoDownloader: this,
-    });
-
     this.storageManager.onprogress = (progress) => {
       this.progress = progress;
     };
+
     this.storageManager.onerror = (error) => {
       if (this.downloading && error.name === 'QuotaExceededError') {
         /**
@@ -499,7 +481,7 @@ export default class VideoDownloader extends HTMLElement {
    */
   async setDownloadState() {
     const videoMeta = this.getMeta();
-    const downloadProgress = this.getProgress();
+    const downloadProgress = getProgress(this.internal.files);
 
     if (videoMeta.done) {
       this.state = 'done';

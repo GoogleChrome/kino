@@ -51,12 +51,17 @@ export default async (videoId) => {
      * We don't want to download video files in all possible resolutions and formats.
      * Instead the offline manifest only contain one manually selected representation.
      */
-    const response = await fetch(offlineManifestUrl);
-    const responseText = await response.text();
-    const parser = new ParserMPD(responseText, selectedSource.src);
+    try {
+      const response = await fetch(offlineManifestUrl);
+      const responseText = await response.text();
+      const parser = new ParserMPD(responseText, selectedSource.src);
 
-    urls.push(selectedSource.src);
-    urls = [...parser.listAllChunkURLs(), ...urls];
+      urls.push(selectedSource.src);
+      urls = [...parser.listAllChunkURLs(), ...urls];
+    } catch (e) {
+      /* eslint-disable-next-line no-console */
+      console.error('Error fetching and parsing the offline MPD manifest.', e);
+    }
   } else {
     urls.push(selectedSource.src);
   }
