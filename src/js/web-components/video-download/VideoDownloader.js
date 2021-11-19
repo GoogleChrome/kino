@@ -29,7 +29,7 @@ export default class VideoDownloader extends HTMLElement {
    * @type {string[]}
    */
   static get observedAttributes() {
-    return ['state', 'progress', 'downloading', 'willremove'];
+    return ['state', 'progress', 'downloading', 'willremove', 'nocontrols'];
   }
 
   constructor({ connectionStatus }) {
@@ -108,6 +108,14 @@ export default class VideoDownloader extends HTMLElement {
     this.setAttribute('willremove', willremove);
   }
 
+  get nocontrols() {
+    return this.getAttribute('nocontrols') === 'true';
+  }
+
+  set nocontrols(nocontrols) {
+    this.setAttribute('nocontrols', nocontrols);
+  }
+
   /**
    * Observed attributes callbacks.
    *
@@ -125,6 +133,7 @@ export default class VideoDownloader extends HTMLElement {
     const currentState = {
       state: this.state,
       willremove: this.willremove,
+      nocontrols: this.nocontrols,
     };
 
     if (Object.keys(currentState).includes(name)) {
@@ -258,6 +267,7 @@ export default class VideoDownloader extends HTMLElement {
         && 'BackgroundFetchManager' in window
         && 'serviceWorker' in navigator
       ) {
+        this.nocontrols = true; // Browser will handle the download UI.
         this.downloadUsingBackgroundFetch();
       } else {
         this.downloadSynchronously();
