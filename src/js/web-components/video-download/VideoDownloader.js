@@ -24,6 +24,9 @@ import getURLsForDownload from '../../utils/getURLsForDownload';
 import { MEDIA_SESSION_DEFAULT_ARTWORK } from '../../constants';
 
 export default class VideoDownloader extends HTMLElement {
+  /**
+   * @type {string[]}
+   */
   static get observedAttributes() {
     return ['state', 'progress', 'downloading', 'willremove'];
   }
@@ -55,12 +58,7 @@ export default class VideoDownloader extends HTMLElement {
   }
 
   set state(state) {
-    const oldState = this.state;
     this.setAttribute('state', state);
-
-    this.internal.changeCallbacks.forEach(
-      (callback) => callback(oldState, state),
-    );
   }
 
   /**
@@ -113,6 +111,24 @@ export default class VideoDownloader extends HTMLElement {
     if (name === 'progress') {
       const percentageAsDashOffset = 82 - (82 * value);
       this.internal.root.host.style.setProperty('--progress', percentageAsDashOffset);
+    }
+
+    // Broadcast changes in several internal properties.
+    const currentState = {
+      state: this.state,
+      willremove: this.willremove,
+    };
+
+    if (Object.keys(currentState).includes(name)) {
+      const typecastBooleans = (val) => (['false', 'true'].includes(val) ? val === 'true' : val);
+      const oldState = {
+        ...currentState,
+        [name]: typecastBooleans(old),
+      };
+
+      this.internal.changeCallbacks.forEach(
+        (callback) => callback(oldState, currentState),
+      );
     }
   }
 
@@ -405,14 +421,12 @@ export default class VideoDownloader extends HTMLElement {
         await this.removeFromIDB();
         window.removeEventListener('beforeunload', this.unloadHandler);
       }, 5000);
-    } else if (e.target.classList.contains('action--undo')) {
-      if (this.willremove === true) {
-        if (this.removalTimeout) {
-          this.state = 'done';
-          this.willremove = false;
-          clearTimeout(this.removalTimeout);
-          window.removeEventListener('beforeunload', this.unloadHandler);
-        }
+    } else if (this.willremove === true) {
+      if (this.removalTimeout) {
+        this.state = 'done';
+        this.willremove = false;
+        clearTimeout(this.removalTimeout);
+        window.removeEventListener('beforeunload', this.unloadHandler);
       }
     } else if (e.target.classList.contains('action--cancel')) {
       this.removeFromIDB();
@@ -483,6 +497,7 @@ export default class VideoDownloader extends HTMLElement {
     } else {
       this.state = 'ready';
     }
+
     this.downloading = false;
   }
 
