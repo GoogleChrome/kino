@@ -46,14 +46,14 @@ export default class BackgroundFetch {
 
       // eslint-disable-next-line compat/compat
       navigator.serviceWorker.ready.then(async (swReg) => {
-        this.maybeAbort(swReg);
+        await this.maybeAbort(swReg);
 
         /** @type {BackgroundFetchRegistration} */
         const bgFetch = await swReg.backgroundFetch.fetch(
           this.id,
           urls,
           {
-            title: videoData.title,
+            title: `Downloading "${videoData.title}" video`,
             icons: videoData['media-session-artwork'] || {},
             downloadTotal,
           },
@@ -75,9 +75,20 @@ export default class BackgroundFetch {
           }
         };
 
-        navigator.serviceWorker.controller.postMessage({
-          type: 'channel-port',
-        }, [messageChannel.port2]);
+        const swController = navigator.serviceWorker.controller;
+
+        /**
+         * Need to guard the `postMessage` logic below, because
+         * `navigator.serviceWorker.controller` will be `null`
+         * when a force-refresh request is made.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/controller
+         */
+        if (swController) {
+          navigator.serviceWorker.controller.postMessage({
+            type: 'channel-port',
+          }, [messageChannel.port2]);
+        }
       });
     });
   }

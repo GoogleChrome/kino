@@ -221,31 +221,46 @@ self.addEventListener('install', precacheAssets);
 self.addEventListener('activate', clearOldCaches);
 self.addEventListener('fetch', fetchHandler);
 
-/** @type {MessagePort} */
-let messageChannelPort;
+if ('BackgroundFetchManager' in self) {
+  /**
+   * When Background Fetch API is used to download a file
+   * for offline viewing, Channel Messaging API is used
+   * to signal that a video is fully saved to IDB back
+   * to the UI.
+   *
+   * Because the operation is initiated from the UI, the
+   * `MessageChannel` instance is created there and one of
+   * the newly created channel ports is then sent to the
+   * service worker and stored in this variable.
+   *
+   * @type {MessagePort}
+   */
+  let messageChannelPort;
 
-self.addEventListener(
-  'message',
-  (event) => {
-    if (event.data.type === 'channel-port') {
-      [messageChannelPort] = event.ports;
+  self.addEventListener(
+    'message',
+    (event) => {
+      if (event.data.type === 'channel-port') {
+        [messageChannelPort] = event.ports;
+      }
+    },
+  );
+
+  const bgFetchHandler = async (e) => {
+    /** @type {BackgroundFetchRegistration} */
+    const bgFetchRegistration = e.registration;
+    const records = await bgFetchRegistration.matchAll();
+    const urls = records.map((record) => record.request.url);
+
+    if (urls.length === 0) {
+      return;
     }
-  },
-);
 
-const bgFetchHandler = async (e) => {
-  /** @type {BackgroundFetchRegistration} */
-  const bgFetchRegistration = e.registration;
-  const bgFetch = new BackgroundFetch();
-
-  bgFetch.fromRegistration(bgFetchRegistration);
-
-  const records = await bgFetchRegistration.matchAll();
-  const urls = records.map((record) => record.request.url);
-
-  if (urls.length > 0) {
     const responsePromises = records.map((record) => record.responseReady);
     const responses = await Promise.all(responsePromises);
+    const bgFetch = new BackgroundFetch();
+
+    bgFetch.fromRegistration(bgFetchRegistration);
 
     /**
      * The `DownloadManager` reads binary data from passed response objects
@@ -267,6 +282,6 @@ const bgFetchHandler = async (e) => {
 
     // Start the download, i.e. pump binary data out of the response objects.
     downloadManager.run(responses);
-  }
-};
-self.addEventListener('backgroundfetchsuccess', bgFetchHandler);
+  };
+  self.addEventListener('backgroundfetchsuccess', bgFetchHandler);
+}
