@@ -97,6 +97,15 @@ export default class extends HTMLElement {
     this.videoElement.addEventListener('error', this.handleVideoError.bind(this), true);
 
     /**
+     * @todo Temporary. Remove when we figure out the UI.
+     */
+    const pipButton = this.createPiPButton();
+
+    if (pipButton) {
+      this.internal.root.appendChild(pipButton);
+    }
+
+    /**
      * Set up Media Session API integration.
      */
     this.internal.mediaSessionIsInit = false;
@@ -298,5 +307,46 @@ export default class extends HTMLElement {
     this.internal.downloader.download({
       assetsOnly: true,
     });
+  }
+
+  /**
+   * Returns a button that controls the PiP functionality.
+   *
+   * @returns {HTMLButtonElement|null} Button element or null when PiP not supported.
+   */
+  createPiPButton() {
+    if (!('pictureInPictureEnabled' in document)) {
+      return null;
+    }
+
+    const pipButton = document.createElement('button');
+    const setPipButton = () => {
+      pipButton.disabled = (this.videoElement.readyState === 0)
+        || !document.pictureInPictureEnabled
+        || this.videoElement.disablePictureInPicture;
+    };
+
+    pipButton.innerText = 'PiP';
+    pipButton.addEventListener('click', async () => {
+      pipButton.disabled = true;
+      try {
+        if (this !== document.pictureInPictureElement) {
+          await this.videoElement.requestPictureInPicture();
+        } else {
+          await document.exitPictureInPicture();
+        }
+      } catch (error) {
+        /* eslint-disable-next-line no-console */
+        console.error(error);
+      } finally {
+        pipButton.disabled = false;
+      }
+    });
+
+    this.videoElement.addEventListener('loadedmetadata', setPipButton);
+    this.videoElement.addEventListener('emptied', setPipButton);
+    setPipButton();
+
+    return pipButton;
   }
 }

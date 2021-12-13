@@ -1,12 +1,23 @@
 :host {
   display: flex;
   align-items: center;
+  position: relative;
 }
 
 :host *:focus {
   border: none;
   outline-style: dotted;
   outline-color: var(--accent);
+}
+
+:host button {
+  background: white;
+  color: black;
+  display: block;
+  padding: 1em;
+  position: absolute;
+  top: 1em;
+  right: 1em;
 }
 
 video {
