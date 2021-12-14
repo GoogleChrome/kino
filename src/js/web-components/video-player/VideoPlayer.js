@@ -67,6 +67,20 @@ export default class extends HTMLElement {
   }
 
   /**
+   * Mutes the video.
+   */
+  mute() {
+    this.videoElement.muted = true;
+  }
+
+  /**
+   * Unmutes the video.
+   */
+  unmute() {
+    this.videoElement.muted = false;
+  }
+
+  /**
    * Renders the component.
    *
    * @param {object} videoData Video data.
@@ -82,7 +96,10 @@ export default class extends HTMLElement {
       : videoData.thumbnail;
 
     const markup = `<style>${styles}</style>
-    <video ${videoData.thumbnail ? `poster="${thumbnailUrl}"` : ''} controls crossorigin="anonymous">
+    <video
+      ${videoData.thumbnail ? `poster="${thumbnailUrl}"` : ''}
+      controls crossorigin="anonymous"
+    >
       ${this.getSourceHTML()}
       ${this.getTracksHTML()}
     </video>
@@ -93,6 +110,9 @@ export default class extends HTMLElement {
     }
     this.internal.root.innerHTML = markup;
 
+    /**
+     * @type {HTMLMediaElement}
+     */
     this.videoElement = this.internal.root.querySelector('video');
     this.videoElement.addEventListener('error', this.handleVideoError.bind(this), true);
 
@@ -285,18 +305,35 @@ export default class extends HTMLElement {
    * indicates no data has been fetched at all. In those cases
    * it's possible we're initializing MSE and we can't really
    * use the `play` method if the source is going to change.
+   *
+   * @returns {Promise<this>} Promise indicating whether the playback started.
+   *                          Returns the current `VideoPlayer` instance, which
+   *                          allows outside code to respond to success or failure
+   *                          adequately, e.g. by muting the video and retrying.
    */
   play() {
     const HAVE_NOTHING = 0;
 
-    if (this.videoElement.readyState === HAVE_NOTHING) {
-      this.videoElement.addEventListener('loadeddata', this.videoElement.play, { once: true });
-    } else {
-      this.videoElement.play();
-    }
+    return new Promise((resolve, reject) => {
+      const resolvePlayIntent = async () => {
+        try {
+          await this.videoElement.play();
 
-    this.internal.downloader.download({
-      assetsOnly: true,
+          this.internal.downloader.download({
+            assetsOnly: true,
+          });
+
+          resolve(this);
+        } catch (_) {
+          reject(this);
+        }
+      };
+
+      if (this.videoElement.readyState === HAVE_NOTHING) {
+        this.videoElement.addEventListener('loadeddata', resolvePlayIntent, { once: true });
+      } else {
+        resolvePlayIntent();
+      }
     });
   }
 }
