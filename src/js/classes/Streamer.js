@@ -33,7 +33,7 @@ export default class {
       media: {
         baseURL: '/',
         streamTypes: [],
-        representations: selectRepresentations(parser, opts),
+        representations: [],
         lastRepresentationsIds: {},
         lastRepresentationSwitch: 0,
         duration: this.parser.duration,
@@ -54,8 +54,6 @@ export default class {
       },
     };
 
-    // Iterate which stream types we have separate representations for.
-    this.stream.media.streamTypes = Object.keys(this.stream.media.representations);
     this.stream.media.baseURL = parser.baseURL;
 
     /**
@@ -97,9 +95,21 @@ export default class {
   }
 
   /**
+   * Figures out which representations are best to be used on a current device.
+   */
+  async initializeRepresentations() {
+    this.stream.media.representations = await selectRepresentations(this.parser, this.opts);
+
+    // Iterate which stream types we have separate representations for.
+    this.stream.media.streamTypes = Object.keys(this.stream.media.representations);
+  }
+
+  /**
    * Initializes all the differents parts of the stream.
    */
   async initializeStream() {
+    await this.initializeRepresentations();
+
     /**
      * Create and attach a `MediaSource` element.
      *

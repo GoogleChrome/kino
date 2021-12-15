@@ -646,6 +646,8 @@ article pre,
 .has-overlay .video-container--overlay > * {
   grid-column: 1;
   grid-row: 1;
+  max-width: 100%;
+  height: auto;
 }
 .has-overlay .video-container--overlay button {
   color: var(--accent);
