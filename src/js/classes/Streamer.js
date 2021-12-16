@@ -19,11 +19,33 @@ import selectRepresentations from '../utils/selectRepresentations';
 import getRepresentationMimeString from '../utils/getRepresentationMimeString';
 
 /**
+ * What maximum percentage of total frames are OK to be dropped for us to still
+ * consider the playback experience acceptable?
+ */
+const HEALTHY_PERCENTAGE_OF_DROPPED_FRAMES = 0;
+
+/**
+ * How many samples of dropped frames percentages do we consider when determining
+ * whether the playback experience is acceptable or not.
+ */
+const DROPPED_FRAMES_PERCENTAGE_SAMPLE_SIZE = 3;
+
+/**
+ * How often should the video quality metrics be sampled in miliseconds.
+ */
+const VIDEO_QUALITY_SAMPLING_RATE = 1000;
+
+/**
  * Streams raw media data to the <video> element through a MediaSource container.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Media_Source_Extensions_API
  */
 export default class {
+  /**
+   * @param {HTMLVideoElement} videoEl Video element.
+   * @param {ParserMPD}        parser  MPD parser instance.
+   * @param {object}           opts    Options.
+   */
   constructor(videoEl, parser, opts = {}) {
     this.videoEl = videoEl;
     this.parser = parser;
@@ -51,6 +73,15 @@ export default class {
       downlink: {
         value: null,
         entries: [],
+      },
+      videoQuality: {
+        last: {
+          totalFrames: 0,
+          droppedFrames: 0,
+        },
+        droppedPercentages: [],
+        intervalId: null,
+        enforcedBandwidthSmallerThan: Number.MAX_SAFE_INTEGER,
       },
     };
 
@@ -178,6 +209,15 @@ export default class {
       this.unthrottleBuffer();
       this.bufferAhead();
     });
+
+    // Sample when media is playing back.
+    this.videoEl.addEventListener('play', this.startVideoQualitySampling.bind(this));
+
+    // Don't sample when media stalls for any reason.
+    this.videoEl.addEventListener('ended', this.stopVideoQualitySampling.bind(this));
+    this.videoEl.addEventListener('emptied', this.stopVideoQualitySampling.bind(this));
+    this.videoEl.addEventListener('pause', this.stopVideoQualitySampling.bind(this));
+    this.videoEl.addEventListener('waiting', this.stopVideoQualitySampling.bind(this));
   }
 
   /**
@@ -218,11 +258,40 @@ export default class {
     const lastSwitchedBefore = Date.now() - this.stream.media.lastRepresentationSwitch;
     const lockRepresentationFor = 5000;
 
-    if (lastSwitchedBefore < lockRepresentationFor) {
-      const lastVideoRepId = this.stream.media.lastRepresentationsIds.video;
-      representations.video = this.stream.media.representations.video.find(
-        (videoObj) => videoObj.id === lastVideoRepId,
+    const lastVideoRepId = this.stream.media.lastRepresentationsIds.video;
+    const lastVideoRepresentation = this.stream.media.representations.video.find(
+      (videoObj) => videoObj.id === lastVideoRepId,
+    );
+
+    const droppedPercentageMin = this.stream.videoQuality.droppedPercentages.length > 0
+      ? Math.min(...this.stream.videoQuality.droppedPercentages)
+      : 0;
+
+    /**
+     * Playback is healthy when the percentage of dropped frames is not constantly
+     * higher than our threshold.
+     *
+     * We also consider the playback healthy if we don't have enough `videoQuality` data yet.
+     */
+    const isPlaybackHealthy = (
+      droppedPercentageMin <= HEALTHY_PERCENTAGE_OF_DROPPED_FRAMES
+      || this.stream.videoQuality.droppedPercentages.length < DROPPED_FRAMES_PERCENTAGE_SAMPLE_SIZE
+    );
+
+    /**
+     * If the playback is not healthy, enforce the next representation bandwidth
+     * to be smaller than the current one and clear video quality data.
+     */
+    if (!isPlaybackHealthy && lastVideoRepresentation) {
+      this.stream.videoQuality.enforcedBandwidthSmallerThan = parseInt(
+        lastVideoRepresentation.bandwidth,
+        10,
       );
+      this.stream.videoQuality.droppedPercentages = [];
+    }
+
+    if (lastSwitchedBefore < lockRepresentationFor) {
+      representations.video = lastVideoRepresentation;
       return representations;
     }
 
@@ -233,11 +302,36 @@ export default class {
       usedBandwidth += parseInt(representations.audio.bandwidth || 200000, 10);
     }
 
+    let candidateVideoRepresentations = this.stream.media.representations.video.filter(
+      (representation) => (
+        parseInt(
+          representation.bandwidth,
+          10,
+        ) < this.stream.videoQuality.enforcedBandwidthSmallerThan
+      ),
+    );
+
+    /**
+     * If no video representations fit the allowed bandwidth, we need to only pick
+     * the one with the smallest bitrate.
+     */
+    if (candidateVideoRepresentations.length === 0) {
+      candidateVideoRepresentations = [
+        this.stream.media.representations.video.reduce(
+          (carry, representation) => (
+            parseInt(carry.bandwidth, 10) < parseInt(representation.bandwidth, 10)
+              ? carry
+              : representation
+          ),
+        ),
+      ];
+    }
+
     /**
      * From all video representations, pick the best quality one that
      * still fits the available bandwidth.
      */
-    representations.video = this.stream.media.representations.video.reduce(
+    representations.video = candidateVideoRepresentations.reduce(
       (previous, current) => {
         const currentBandwidth = parseInt(current.bandwidth, 10);
         const previousBandwidth = parseInt(previous.bandwidth, 10);
@@ -251,8 +345,8 @@ export default class {
         if (previousDoesntFitDownlink && currentIsLessData) return current;
         return previous;
       },
-      this.stream.media.representations.video[0],
     );
+
     return representations;
   }
 
@@ -548,5 +642,69 @@ export default class {
         (fileObj) => buffer.enqueueFile(fileObj),
       );
     });
+  }
+
+  /**
+   * Starts video quality sampling using the Video Playback Quality API.
+   *
+   * @returns {void}
+   */
+  startVideoQualitySampling() {
+    if (this.stream.videoQuality.intervalId) return;
+    this.stream.videoQuality.intervalId = setInterval(
+      this.sampleVideoQuality.bind(this), VIDEO_QUALITY_SAMPLING_RATE,
+    );
+  }
+
+  /**
+   * Stop video quality sampling using the Video Playback Quality API.
+   *
+   * @returns {void}
+   */
+  stopVideoQualitySampling() {
+    if (!this.stream.videoQuality.intervalId) return;
+    clearInterval(this.stream.videoQuality.intervalId);
+    this.stream.videoQuality.intervalId = null;
+  }
+
+  /**
+   * Check the video playback quality metrics provided by Video Playback Quality API
+   * and store the current numbers.
+   */
+  sampleVideoQuality() {
+    const vq = this.videoEl.getVideoPlaybackQuality();
+
+    /**
+     * In case the internal counter used by `getVideoPlaybackQuality` resets
+     * for any reason, we need to makes sure our latest numbers are never
+     * higher than what we're returned.
+     */
+    const droppedFramesSinceLastSample = (
+      vq.droppedVideoFrames >= this.stream.videoQuality.last.droppedFrames
+    )
+      ? vq.droppedVideoFrames - this.stream.videoQuality.last.droppedFrames
+      : vq.droppedVideoFrames;
+
+    const totalFramesSinceLastSample = (
+      vq.totalVideoFrames >= this.stream.videoQuality.last.totalFrames
+    )
+      ? vq.totalVideoFrames - this.stream.videoQuality.last.totalFrames
+      : vq.totalVideoFrames;
+
+    this.stream.videoQuality.last = {
+      droppedFrames: vq.droppedVideoFrames,
+      totalFrames: vq.totalVideoFrames,
+    };
+
+    if (totalFramesSinceLastSample > 0) {
+      this.stream.videoQuality.droppedPercentages.push(
+        (droppedFramesSinceLastSample) / totalFramesSinceLastSample,
+      );
+    }
+
+    const droppedPercentagesCount = this.stream.videoQuality.droppedPercentages.length;
+    if (droppedPercentagesCount > DROPPED_FRAMES_PERCENTAGE_SAMPLE_SIZE) {
+      this.stream.videoQuality.droppedPercentages.shift();
+    }
   }
 }
