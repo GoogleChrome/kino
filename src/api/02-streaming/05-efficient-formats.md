@@ -10,9 +10,6 @@ video-sources:
     type: application/dash+xml
   - src: https://storage.googleapis.com/kino-assets/efficient-formats/master.m3u8
     type: application/x-mpegURL
-url-rewrites:
-  - online: https://storage.googleapis.com/kino-assets/efficient-formats/manifest.mpd
-    offline: https://storage.googleapis.com/kino-assets/efficient-formats/manifest-offline.mpd
 video-subtitles:
   - default: true
     kind: captions

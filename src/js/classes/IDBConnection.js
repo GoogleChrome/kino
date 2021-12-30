@@ -207,10 +207,8 @@ export default () => {
        * has changed.
        */
       dispatchDataChangedEvent() {
-        if (typeof window !== 'undefined') {
-          const changeEvent = new Event(IDB_DATA_CHANGED_EVENT);
-          window.dispatchEvent(changeEvent);
-        }
+        const changeEvent = new Event(IDB_DATA_CHANGED_EVENT);
+        window.dispatchEvent(changeEvent);
       }
 
       unwrap() {
@@ -224,8 +222,6 @@ export default () => {
 
     /**
      * Removes all entries from the database used for video storage.
-     *
-     * Doesn't clear the Background Fetch API cache.
      *
      * @returns {Promise} Promise that resolves when the DB is deleted.
      */
@@ -379,8 +375,11 @@ export default () => {
        * - bytesDownloaded (number)  How many bytes of data is already downloaded.
        * - bytesTotal      (number)  Total size of the file in bytes.
        * - done            (boolean) Whether the file is fully downloaded.
+       * - downloadUrl     (string)  The URL used by the application to download file data.
        * - mimeType        (string)  File MIME type.
-       * - url             (string)  The remote URL.
+       * - url             (string)  The remote URL representing the file. Can be different from
+       *                             `downloadUrl` in some cases, e.g. when we alter the DASH
+       *                             manifest to only contain a single video and audio source.
        * - videoId         (string)  Video ID this file is assigned to.
        */
       const fileOS = db.createObjectStore(

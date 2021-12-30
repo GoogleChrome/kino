@@ -45,9 +45,7 @@ export default [
       format: 'cjs',
     },
     plugins: [
-      generateApi(),
       generateCache(),
-      json(),
       isWatch ? {} : terser(),
     ],
   },

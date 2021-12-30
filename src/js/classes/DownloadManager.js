@@ -28,8 +28,6 @@ import FixedBuffer from './FixedBuffer';
  * Utils.
  */
 import getMimeByURL from '../utils/getMimeByURL';
-import getFileMetaForDownload from '../utils/getFileMetaForDownload';
-import rewriteURL from '../utils/rewriteURL';
 
 /**
  * The DownloadManager is responsible for downloading videos from the network.
@@ -47,44 +45,21 @@ export default class DownloadManager {
   /**
    * Instantiates the download manager.
    *
-   * @param {string} videoId Video ID of the media to be downloaded.
+   * @param {VideoDownloader} videoDownloader The associated video downloader object.
    */
-  constructor(videoId) {
-    this.videoId = videoId;
+  constructor(videoDownloader) {
+    this.files = videoDownloader.internal.files || [];
     this.paused = false;
     this.cancelled = false;
 
-    /** @type {Response[]} */
-    this.responses = [];
+    this.internal = {
+      videoDownloader,
+    };
 
-    /** @type {DownloadFlushHandler[]} */
-    this.flushHandlers = [];
+    this.onflush = () => {};
 
-    this.onfilemeta = () => {};
-
+    this.maybePrepareNextFile();
     this.bufferSetup();
-  }
-
-  /**
-   * Flushes the downloaded data to any handlers.
-   *
-   * @param {FileMeta}  fileMeta  File meta.
-   * @param {FileChunk} fileChunk File chunk.
-   * @param {boolean}   isDone    Is this the last file chunk.
-   */
-  flush(fileMeta, fileChunk, isDone) {
-    this.flushHandlers.forEach((handler) => {
-      handler(fileMeta, fileChunk, isDone);
-    });
-  }
-
-  /**
-   * Attaches a handler to receive downloaded data.
-   *
-   * @param {DownloadFlushHandler} flushHandler Flush handler.
-   */
-  attachFlushHandler(flushHandler) {
-    this.flushHandlers.push(flushHandler);
   }
 
   /**
@@ -104,7 +79,7 @@ export default class DownloadManager {
    */
   bufferSetup() {
     /**
-     * IDB put operations have a lot of overhead, so it's impractical for us to
+     * IDB put operations have a lot of overhead, so it's impractical for us to store
      * a data chunk every time our reader has more data, because those chunks
      * usually are pretty small and generate thousands of IDB data entries.
      *
@@ -140,46 +115,29 @@ export default class DownloadManager {
       fileMeta.done = true;
     }
     this.maybePrepareNextFile();
-    this.flush(fileMeta, fileChunk, this.done);
+    this.onflush(fileMeta, fileChunk, this.done);
   }
 
   /**
    * Downloads the first file that is not fully downloaded.
    */
   async downloadFile() {
-    const { bytesDownloaded, url } = this.currentFileMeta;
+    const { bytesDownloaded, url, downloadUrl } = this.currentFileMeta;
+    const fetchOpts = {};
 
-    // Attempts to find an existing response object for the current URL
-    // before fetching the file from the network.
-    let response = this.responses.reduce(
-      (prev, current) => (current.url === url ? current : prev),
-      null,
-    );
+    if (bytesDownloaded) {
+      fetchOpts.headers = {
+        Range: `bytes=${bytesDownloaded}-`,
+      };
+    }
 
-    /**
-     * Some URLs we want to download have their offline versions.
-     *
-     * If the current URL is one of those, we want to make sure not to
-     * use any existing response for the original URL.
-     */
-    const rewrittenUrl = rewriteURL(this.videoId, url, 'online', 'offline');
-
-    if (!response || url !== rewrittenUrl) {
-      const fetchOpts = {};
-
-      if (bytesDownloaded) {
-        fetchOpts.headers = {
-          Range: `bytes=${bytesDownloaded}-`,
-        };
-      }
-
-      try {
-        response = await fetch(rewrittenUrl, fetchOpts);
-      } catch (e) {
-        this.warning(`Pausing the download of ${rewrittenUrl} due to network error.`);
-        this.forcePause();
-        return;
-      }
+    let response;
+    try {
+      response = await fetch(downloadUrl, fetchOpts);
+    } catch (e) {
+      this.warning(`Pausing the download of ${downloadUrl} due to network error.`);
+      this.forcePause();
+      return;
     }
 
     const reader = response.body.getReader();
@@ -187,11 +145,6 @@ export default class DownloadManager {
     const fileLength = response.headers.has('Content-Range')
       ? Number(response.headers.get('Content-Range').replace(/^[^/]\/(.*)$/, '$1'))
       : Number(response.headers.get('Content-Length'));
-
-    // If this is a full response, throw away any bytes downloaded earlier.
-    if (!response.headers.has('Content-Range')) {
-      this.currentFileMeta.bytesDownloaded = 0;
-    }
 
     this.currentFileMeta.mimeType = mimeType;
     this.currentFileMeta.bytesTotal = fileLength > 0 ? fileLength : null;
@@ -202,7 +155,7 @@ export default class DownloadManager {
         /* eslint-disable-next-line no-await-in-loop */
         dataChunk = await reader.read();
       } catch (e) {
-        this.warning(`Pausing the download of ${rewrittenUrl} due to network error.`);
+        this.warning(`Pausing the download of ${downloadUrl} due to network error.`);
         this.forcePause();
       }
 
@@ -248,30 +201,10 @@ export default class DownloadManager {
   }
 
   /**
-   * Generates a list of URLs to be downloaded and turns them into
-   * a list of FileMeta objects that track download properties
-   * for each of the files.
-   *
-   * @param {string[]} [urls]       Optional list of URLs to be downloaded.
-   * @returns {Promise<FileMeta[]>} Promise resolving with FileMeta objects prepared for download.
-   */
-  async prepareFileMeta(urls = null) {
-    this.files = await getFileMetaForDownload(this.videoId, urls);
-    return this.files;
-  }
-
-  /**
    * Starts downloading files.
-   *
-   * @param {Response[]} [responses] Already prepared responses for (some of) the donwloaded
-   *                                 files, e.g. produced by Background Fetch API.
    */
-  async run(responses = []) {
+  async run() {
     this.paused = false;
-    this.responses = responses;
-
-    this.maybePrepareNextFile();
-
     while (!this.done && !this.paused && !this.cancelled && this.currentFileMeta) {
       /* eslint-disable-next-line no-await-in-loop */
       await this.downloadFile();

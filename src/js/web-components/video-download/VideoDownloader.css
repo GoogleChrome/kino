@@ -164,15 +164,6 @@
   stroke: var(--accent);
 }
 
-/* Removes button interactivity when controls are disabled */
-:host( [state="partial"][downloading="true"] ) button.downloading {
-  pointer-events: none;
-}
-:host( [state="partial"][downloading="true"][nocontrols="true"] ) button.downloading svg path[fill] {
-  display: none;
-}
-
-
 /* Progress icon (paused state) */
 :host( [state="partial"][downloading="false"] ) button.paused {
   display: flex;

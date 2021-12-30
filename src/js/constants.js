@@ -119,7 +119,6 @@ export const ALL_STREAM_TYPES = ['audio', 'video'];
  */
 export const SETTING_KEY_TOGGLE_OFFLINE = 'toggle-offline';
 export const SETTING_KEY_DARK_MODE = 'dark-mode';
-export const SETTING_KEY_BG_FETCH_API = 'allow-bg-fetch-api';
 
 /**
  * Event name signalling that data in IDB has changes.
