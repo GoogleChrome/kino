@@ -19,7 +19,10 @@ import Streamer from '../../classes/Streamer';
 import ParserMPD from '../../classes/ParserMPD';
 import selectSource from '../../utils/selectSource';
 
-import { MEDIA_SESSION_DEFAULT_ARTWORK } from '../../constants';
+import {
+  MEDIA_SESSION_DEFAULT_ARTWORK,
+  PIP_CLASSNAME,
+} from '../../constants';
 
 export default class extends HTMLElement {
   /**
@@ -86,6 +89,11 @@ export default class extends HTMLElement {
       ${this.getSourceHTML()}
       ${this.getTracksHTML()}
     </video>
+    <div class="floating-buttons"></div>
+    <div class="pip-overlay">
+      <svg viewBox="0 0 129 128" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M108.5 48V16a8.001 8.001 0 0 0-8-8h-84a8 8 0 0 0-8 8v68a8 8 0 0 0 8 8h20" stroke="var(--icon)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M52.5 112V72a8 8 0 0 1 8-8h52a8 8 0 0 1 8 8v40a8 8 0 0 1-8 8h-52a8 8 0 0 1-8-8Z" stroke="var(--icon)" stroke-width="3" stroke-miterlimit="10" stroke-linecap="square"/></svg>
+      This video is playing in picture in picture
+    </div>
     `;
 
     while (this.internal.root.firstChild) {
@@ -96,13 +104,11 @@ export default class extends HTMLElement {
     this.videoElement = this.internal.root.querySelector('video');
     this.videoElement.addEventListener('error', this.handleVideoError.bind(this), true);
 
-    /**
-     * @todo Temporary. Remove when we figure out the UI.
-     */
     const pipButton = this.createPiPButton();
+    const floatingButtonsBar = this.internal.root.querySelector('.floating-buttons');
 
     if (pipButton) {
-      this.internal.root.appendChild(pipButton);
+      floatingButtonsBar.appendChild(pipButton);
     }
 
     /**
@@ -326,7 +332,9 @@ export default class extends HTMLElement {
         || this.videoElement.disablePictureInPicture;
     };
 
-    pipButton.innerText = 'PiP';
+    pipButton.setAttribute('aria-label', 'Toggle picture in picture');
+    pipButton.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.25 15L20.25 21C20.25 21.3978 20.092 21.7794 19.8107 22.0607C19.5294 22.342 19.1478 22.5 18.75 22.5L3 22.5C2.60218 22.5 2.22064 22.342 1.93934 22.0607C1.65804 21.7794 1.5 21.3978 1.5 21L1.5 8.25C1.5 7.85217 1.65804 7.47064 1.93934 7.18934C2.22064 6.90803 2.60218 6.75 3 6.75L6.75 6.75" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.75 3L9.75 10.5C9.75 11.3284 10.4216 12 11.25 12L21 12C21.8284 12 22.5 11.3284 22.5 10.5L22.5 3C22.5 2.17157 21.8284 1.5 21 1.5L11.25 1.5C10.4216 1.5 9.75 2.17157 9.75 3Z" stroke="var(--accent)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="square"/><path d="M9 18.75V15H5.25" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.25 18.75L9 15" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
     pipButton.addEventListener('click', async () => {
       pipButton.disabled = true;
       try {
@@ -345,6 +353,9 @@ export default class extends HTMLElement {
 
     this.videoElement.addEventListener('loadedmetadata', setPipButton);
     this.videoElement.addEventListener('emptied', setPipButton);
+    this.videoElement.addEventListener('enterpictureinpicture', () => this.classList.add(PIP_CLASSNAME));
+    this.videoElement.addEventListener('leavepictureinpicture', () => this.classList.remove(PIP_CLASSNAME));
+
     setPipButton();
 
     return pipButton;
