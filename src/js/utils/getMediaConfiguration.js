@@ -27,7 +27,7 @@ export function getMediaConfigurationVideo(representation) {
   }
 
   return {
-    type: 'file',
+    type: 'media-source',
     video: {
       contentType: getRepresentationMimeString(representation),
       width: parseInt(representation.width, 10),
@@ -65,7 +65,7 @@ export function getMediaConfigurationAudio(representation) {
   }
 
   return {
-    type: 'file',
+    type: 'media-source',
     audio: {
       contentType: getRepresentationMimeString(representation),
       bitrate: parseInt(representation.bandwidth, 10),
