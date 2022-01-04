@@ -111,6 +111,31 @@ export default class extends HTMLElement {
       floatingButtonsBar.appendChild(pipButton);
     }
 
+    this.initializeCast().then((castButton) => {
+      floatingButtonsBar.appendChild(castButton);
+
+      window.cast.framework.CastContext.getInstance().addEventListener(
+        window.cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
+        (e) => {
+          if (e.sessionState === 'SESSION_STARTED') {
+            const castSession = window.cast.framework.CastContext.getInstance().getCurrentSession();
+            const mediaInfo = new window.chrome.cast.media.MediaInfo(
+              this.internal.selectedSource.src,
+              this.internal.selectedSource.type,
+            );
+            const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
+
+            /* eslint-disable */
+            castSession.loadMedia(request).then(
+              () => console.log('Load succeeded'),
+              (errorCode) => console.log(`Error code: ${errorCode}`),
+            );
+            /* eslint-enable */
+          }
+        },
+      );
+    });
+
     /**
      * Set up Media Session API integration.
      */
@@ -359,5 +384,34 @@ export default class extends HTMLElement {
     setPipButton();
 
     return pipButton;
+  }
+
+  /**
+   * Initializes Google Cast Web Sender and returns a promise resolving
+   * with a cast button.
+   *
+   * @returns {Promise<HTMLElement>} Custom <google-cast-launcher> element.
+   */
+  initializeCast() {
+    return new Promise((resolve) => {
+      const initCastApi = () => {
+        window.cast.framework.CastContext.getInstance().setOptions({
+          receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+        });
+
+        resolve(document.createElement('google-cast-launcher'));
+      };
+
+      window.__onGCastApiAvailable = (isAvailable) => {
+        if (isAvailable) {
+          initCastApi();
+        }
+      };
+
+      const scriptEl = document.createElement('script');
+      scriptEl.type = 'text/javascript';
+      scriptEl.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';
+      document.head.appendChild(scriptEl);
+    });
   }
 }

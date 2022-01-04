@@ -27,7 +27,7 @@
   }
 }
 
-:host .floating-buttons button {
+:host .floating-buttons > * {
   border-radius: 8px;
   background-color: var(--accent-background);
   width: 48px;
