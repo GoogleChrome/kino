@@ -9,19 +9,14 @@ export default async function getDecodingInfo(configuration) {
     return navigator.mediaCapabilities.decodingInfo(configuration);
   }
 
-  // If we can't use the Media Capabilities API, try using `canPlayType`.
-  try {
-    const videoEl = document.createElement('video');
-    const typeString = configuration.audio.contentType || configuration.video.contentType;
-    const canPlay = videoEl.canPlayType(typeString);
-
+  // If we can't use the Media Capabilities API, try using `MediaSource.isTypeSupported`.
+  if (MediaSource && MediaSource.isTypeSupported) {
+    const contentType = configuration.video?.contentType || configuration.audio?.contentType;
     return {
-      supported: canPlay === 'probably' || canPlay === 'maybe',
+      supported: MediaSource.isTypeSupported(contentType),
       smooth: false,
       powerEfficient: false,
     };
-  } catch (error) {
-    // Fail quietly.
   }
 
   // Very unlikely any agent would reach this point, but
