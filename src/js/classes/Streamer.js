@@ -676,7 +676,7 @@ export default class {
 
     /**
      * In case the internal counter used by `getVideoPlaybackQuality` resets
-     * for any reason, we need to makes sure our latest numbers are never
+     * for any reason, we need to make sure our latest numbers are never
      * higher than what we're returned.
      */
     const droppedFramesSinceLastSample = (
