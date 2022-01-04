@@ -324,6 +324,8 @@ export default class extends HTMLElement {
     if (!('pictureInPictureEnabled' in document)) {
       return null;
     }
+    const ENTER_PIP_SVG = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.25 15L20.25 21C20.25 21.3978 20.092 21.7794 19.8107 22.0607C19.5294 22.342 19.1478 22.5 18.75 22.5L3 22.5C2.60218 22.5 2.22064 22.342 1.93934 22.0607C1.65804 21.7794 1.5 21.3978 1.5 21L1.5 8.25C1.5 7.85217 1.65804 7.47064 1.93934 7.18934C2.22064 6.90803 2.60218 6.75 3 6.75L6.75 6.75" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.75 3L9.75 10.5C9.75 11.3284 10.4216 12 11.25 12L21 12C21.8284 12 22.5 11.3284 22.5 10.5L22.5 3C22.5 2.17157 21.8284 1.5 21 1.5L11.25 1.5C10.4216 1.5 9.75 2.17157 9.75 3Z" stroke="var(--accent)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="square"/><path d="M9 18.75V15H5.25" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.25 18.75L9 15" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const LEAVE_PIP_SVG = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.25 9V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v12.75a1.5 1.5 0 0 0 1.5 1.5h3.75" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.25 9V5.25H9M9 9 5.25 5.25" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.75 21v-7.5a1.5 1.5 0 0 1 1.5-1.5H21a1.5 1.5 0 0 1 1.5 1.5V21a1.5 1.5 0 0 1-1.5 1.5h-9.75a1.5 1.5 0 0 1-1.5-1.5Z" stroke="var(--accent)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="square"/></svg>';
 
     const pipButton = document.createElement('button');
     const setPipButton = () => {
@@ -333,7 +335,7 @@ export default class extends HTMLElement {
     };
 
     pipButton.setAttribute('aria-label', 'Toggle picture in picture');
-    pipButton.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.25 15L20.25 21C20.25 21.3978 20.092 21.7794 19.8107 22.0607C19.5294 22.342 19.1478 22.5 18.75 22.5L3 22.5C2.60218 22.5 2.22064 22.342 1.93934 22.0607C1.65804 21.7794 1.5 21.3978 1.5 21L1.5 8.25C1.5 7.85217 1.65804 7.47064 1.93934 7.18934C2.22064 6.90803 2.60218 6.75 3 6.75L6.75 6.75" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.75 3L9.75 10.5C9.75 11.3284 10.4216 12 11.25 12L21 12C21.8284 12 22.5 11.3284 22.5 10.5L22.5 3C22.5 2.17157 21.8284 1.5 21 1.5L11.25 1.5C10.4216 1.5 9.75 2.17157 9.75 3Z" stroke="var(--accent)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="square"/><path d="M9 18.75V15H5.25" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.25 18.75L9 15" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    pipButton.innerHTML = ENTER_PIP_SVG;
 
     pipButton.addEventListener('click', async () => {
       pipButton.disabled = true;
@@ -353,8 +355,14 @@ export default class extends HTMLElement {
 
     this.videoElement.addEventListener('loadedmetadata', setPipButton);
     this.videoElement.addEventListener('emptied', setPipButton);
-    this.videoElement.addEventListener('enterpictureinpicture', () => this.classList.add(PIP_CLASSNAME));
-    this.videoElement.addEventListener('leavepictureinpicture', () => this.classList.remove(PIP_CLASSNAME));
+    this.videoElement.addEventListener('enterpictureinpicture', () => {
+      pipButton.innerHTML = LEAVE_PIP_SVG;
+      this.classList.add(PIP_CLASSNAME);
+    });
+    this.videoElement.addEventListener('leavepictureinpicture', () => {
+      pipButton.innerHTML = ENTER_PIP_SVG;
+      this.classList.remove(PIP_CLASSNAME);
+    });
 
     setPipButton();
 
