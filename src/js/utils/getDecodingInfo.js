@@ -1,29 +1,39 @@
 /**
  * Returns decoding info for a given media configuration.
  *
- * @param {MediaDecodingConfiguration} configuration Media configuration.
+ * @param {MediaDecodingConfiguration} mediaConfig Media configuration.
  * @returns {Promise<MediaCapabilitiesInfo>} Media decoding information.
  */
-export default async function getDecodingInfo(configuration) {
-  if (navigator.mediaCapabilities) {
-    return navigator.mediaCapabilities.decodingInfo(configuration);
-  }
+export default async function getDecodingInfo(mediaConfig) {
+  const promise = new Promise((resolve, reject) => {
+    if (!('mediaCapabilities' in navigator)) {
+      return reject('MediaCapabilities API not available');
+    }
+    if (!('decodingInfo' in navigator.mediaCapabilities)) {
+      return reject('Decoding Info not available');
+    }
 
-  // If we can't use the Media Capabilities API, try using `MediaSource.isTypeSupported`.
-  if (MediaSource && MediaSource.isTypeSupported) {
-    const contentType = configuration.video?.contentType || configuration.audio?.contentType;
-    return {
-      supported: MediaSource.isTypeSupported(contentType),
-      smooth: false,
-      powerEfficient: false,
+    // eslint-disable-next-line compat/compat
+    return resolve(navigator.mediaCapabilities.decodingInfo(mediaConfig));
+  });
+
+  return promise.catch(() => {
+    const fallbackResult = {
+      supported: false,
+      smooth: false, // always false
+      powerEfficient: false, // always false
     };
-  }
 
-  // Very unlikely any agent would reach this point, but
-  // if all fails, pretend we support the source.
-  return {
-    supported: true,
-    smooth: false,
-    powerEfficient: false,
-  };
+    if ('video' in mediaConfig) {
+      fallbackResult.supported = MediaSource.isTypeSupported(mediaConfig.video.contentType);
+      if (!fallbackResult.supported) {
+        return fallbackResult;
+      }
+    }
+
+    if ('audio' in mediaConfig) {
+      fallbackResult.supported = MediaSource.isTypeSupported(mediaConfig.audio.contentType);
+    }
+    return fallbackResult;
+  });
 }
