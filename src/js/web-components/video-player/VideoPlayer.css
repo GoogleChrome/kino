@@ -38,12 +38,19 @@
   border: none;
 }
 
+button google-cast-launcher {
+  height: 24px;
+  width: auto;
+  --connected-color: var(--accent);
+}
+
 video {
   width: 100%;
   height: auto;
 }
 
-.pip-overlay {
+.pip-overlay,
+.cast-overlay {
   display: none;
   position: absolute;
   inset: 0;
@@ -53,20 +60,33 @@ video {
   font-size: clamp(12px, 4vw, 24px);
 }
 
-.pip-overlay svg {
+.pip-overlay svg,
+.cast-overlay svg {
   align-self: end;
   width: clamp(40px, 20vw, 128px);
   height: auto;
 }
 
-:host(.picture-in-picture) .pip-overlay {
+:host(.picture-in-picture) .pip-overlay,
+:host(.cast) .cast-overlay {
   display: grid;
   justify-items: center;
   row-gap: 16px;
 }
 
+.cast-overlay .cast-target {
+  display: none;
+}
+
+:host(.cast-has-target) .cast-overlay .cast-target {
+  display: inline;
+}
+
 @media (min-width: 720px) {
   :host(.picture-in-picture) .pip-overlay {
+    row-gap: 32px;
+  }
+  :host(.cast) .cast-overlay {
     row-gap: 32px;
   }
 }

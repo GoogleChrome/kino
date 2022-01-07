@@ -20,6 +20,9 @@ import ParserMPD from '../../classes/ParserMPD';
 import selectSource from '../../utils/selectSource';
 
 import {
+  CAST_CLASSNAME,
+  CAST_HAS_TARGET_NAME,
+  CAST_TARGET_NAME,
   MEDIA_SESSION_DEFAULT_ARTWORK,
   PIP_CLASSNAME,
 } from '../../constants';
@@ -92,7 +95,11 @@ export default class extends HTMLElement {
     <div class="floating-buttons"></div>
     <div class="pip-overlay">
       <svg viewBox="0 0 129 128" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M108.5 48V16a8.001 8.001 0 0 0-8-8h-84a8 8 0 0 0-8 8v68a8 8 0 0 0 8 8h20" stroke="var(--icon)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M52.5 112V72a8 8 0 0 1 8-8h52a8 8 0 0 1 8 8v40a8 8 0 0 1-8 8h-52a8 8 0 0 1-8-8Z" stroke="var(--icon)" stroke-width="3" stroke-miterlimit="10" stroke-linecap="square"/></svg>
-      This video is playing in picture in picture
+      <p>This video is playing in picture in picture</p>
+    </div>
+    <div class="cast-overlay">
+      <svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-miterlimit="10"><path d="M34.133 107.201c0-13.253-10.747-24-24-24M53.333 107.2c0-23.861-19.339-43.2-43.2-43.2" fill="none" stroke="var(--icon)" stroke-width="8"/><path d="M10.133 112.001a4.8 4.8 0 1 0 0-9.6 4.8 4.8 0 0 0 0 9.6Z" fill="var(--icon)" fill-rule="nonzero"/><path d="M5.333 49.778V32c0-5.891 4.776-10.667 10.667-10.667h96c5.891 0 10.667 4.776 10.667 10.667v64c0 5.891-4.776 10.667-10.667 10.667H72.381" fill="none" stroke="var(--icon)" stroke-width="8"/></svg>
+      <p>This video is being cast<span class="cast-target"> to <span class="cast-target-name"></span></span></p>
     </div>
     `;
 
@@ -117,20 +124,36 @@ export default class extends HTMLElement {
       window.cast.framework.CastContext.getInstance().addEventListener(
         window.cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
         (e) => {
-          if (e.sessionState === 'SESSION_STARTED') {
+          if (e.sessionState === 'SESSION_STARTED' || e.sessionState === 'SESSION_RESUMED') {
             const castSession = window.cast.framework.CastContext.getInstance().getCurrentSession();
             const mediaInfo = new window.chrome.cast.media.MediaInfo(
               this.internal.selectedSource.src,
               this.internal.selectedSource.type,
             );
+            const metadata = new window.chrome.cast.media.GenericMediaMetadata();
+
+            metadata.title = videoData.title;
+            mediaInfo.metadata = metadata;
+
             const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
 
-            /* eslint-disable */
             castSession.loadMedia(request).then(
-              () => console.log('Load succeeded'),
-              (errorCode) => console.log(`Error code: ${errorCode}`),
+              () => {
+                const targetName = castSession.getCastDevice().friendlyName;
+
+                if (targetName) {
+                  this.internal.root.querySelector(`.${CAST_TARGET_NAME}`).innerText = targetName;
+                  this.classList.add(CAST_HAS_TARGET_NAME);
+                }
+                this.classList.add(CAST_CLASSNAME);
+              },
+              /* eslint-disable-next-line no-console */
+              (errorCode) => console.error(`[Google Cast] Error code: ${errorCode}`),
             );
-            /* eslint-enable */
+          }
+
+          if (e.sessionState === 'SESSION_ENDED') {
+            this.classList.remove(CAST_CLASSNAME);
           }
         },
       );
@@ -399,7 +422,13 @@ export default class extends HTMLElement {
           receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
         });
 
-        resolve(document.createElement('google-cast-launcher'));
+        const castButton = document.createElement('button');
+        const castCustomElement = document.createElement('google-cast-launcher');
+
+        castButton.setAttribute('aria-label', 'Cast to Google Cast');
+        castButton.appendChild(castCustomElement);
+
+        resolve(castButton);
       };
 
       window.__onGCastApiAvailable = (isAvailable) => {

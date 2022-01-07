@@ -129,3 +129,10 @@ export const IDB_DATA_CHANGED_EVENT = 'idb-data-changed';
  * Picture in picture.
  */
 export const PIP_CLASSNAME = 'picture-in-picture';
+
+/**
+ * Casting.
+ */
+export const CAST_CLASSNAME = 'cast';
+export const CAST_HAS_TARGET_NAME = 'cast-has-target';
+export const CAST_TARGET_NAME = 'cast-target-name';
