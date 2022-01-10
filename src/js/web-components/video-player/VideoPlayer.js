@@ -99,7 +99,7 @@ export default class extends HTMLElement {
     </div>
     <div class="cast-overlay">
       <svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-miterlimit="10"><path d="M34.133 107.201c0-13.253-10.747-24-24-24M53.333 107.2c0-23.861-19.339-43.2-43.2-43.2" fill="none" stroke="var(--icon)" stroke-width="8"/><path d="M10.133 112.001a4.8 4.8 0 1 0 0-9.6 4.8 4.8 0 0 0 0 9.6Z" fill="var(--icon)" fill-rule="nonzero"/><path d="M5.333 49.778V32c0-5.891 4.776-10.667 10.667-10.667h96c5.891 0 10.667 4.776 10.667 10.667v64c0 5.891-4.776 10.667-10.667 10.667H72.381" fill="none" stroke="var(--icon)" stroke-width="8"/></svg>
-      <p>This video is being cast<span class="cast-target"> to <span class="cast-target-name"></span></span></p>
+      <p>Casting<span class="cast-target"> to <span class="cast-target-name"></span></span></p>
     </div>
     `;
 
@@ -118,7 +118,7 @@ export default class extends HTMLElement {
       floatingButtonsBar.appendChild(pipButton);
     }
 
-    this.initializeCast().then((castButton) => {
+    window.kinoInitGoogleCast().then((castButton) => {
       floatingButtonsBar.appendChild(castButton);
 
       window.cast.framework.CastContext.getInstance().addEventListener(
@@ -130,9 +130,11 @@ export default class extends HTMLElement {
               this.internal.selectedSource.src,
               this.internal.selectedSource.type,
             );
+            const videoThumbnail = new window.chrome.cast.Image(this.internal.videoData.thumbnail);
             const metadata = new window.chrome.cast.media.GenericMediaMetadata();
 
             metadata.title = videoData.title;
+            metadata.images = [videoThumbnail];
             mediaInfo.metadata = metadata;
 
             const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
@@ -407,40 +409,5 @@ export default class extends HTMLElement {
     setPipButton();
 
     return pipButton;
-  }
-
-  /**
-   * Initializes Google Cast Web Sender and returns a promise resolving
-   * with a cast button.
-   *
-   * @returns {Promise<HTMLElement>} Custom <google-cast-launcher> element.
-   */
-  initializeCast() {
-    return new Promise((resolve) => {
-      const initCastApi = () => {
-        window.cast.framework.CastContext.getInstance().setOptions({
-          receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-        });
-
-        const castButton = document.createElement('button');
-        const castCustomElement = document.createElement('google-cast-launcher');
-
-        castButton.setAttribute('aria-label', 'Cast to Google Cast');
-        castButton.appendChild(castCustomElement);
-
-        resolve(castButton);
-      };
-
-      window.__onGCastApiAvailable = (isAvailable) => {
-        if (isAvailable) {
-          initCastApi();
-        }
-      };
-
-      const scriptEl = document.createElement('script');
-      scriptEl.type = 'text/javascript';
-      scriptEl.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';
-      document.head.appendChild(scriptEl);
-    });
   }
 }
