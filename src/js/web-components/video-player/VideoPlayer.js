@@ -148,14 +148,8 @@ export default class extends HTMLElement {
             }
 
             const targetName = castSession.getCastDevice().friendlyName;
-
-            if (targetName) {
-              this.internal.root.querySelector(`.${CAST_TARGET_NAME}`).innerText = targetName;
-              this.classList.add(CAST_HAS_TARGET_NAME);
-            } else {
-              this.classList.remove(CAST_HAS_TARGET_NAME);
-            }
-
+            this.internal.root.querySelector(`.${CAST_TARGET_NAME}`).innerText = targetName;
+            this.classList.toggle(CAST_HAS_TARGET_NAME, targetName);
             this.classList.add(CAST_CLASSNAME);
           }
 
