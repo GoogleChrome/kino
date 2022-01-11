@@ -123,7 +123,7 @@ export default class extends HTMLElement {
 
       window.cast.framework.CastContext.getInstance().addEventListener(
         window.cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
-        (e) => {
+        async (e) => {
           if (e.sessionState === 'SESSION_STARTED' || e.sessionState === 'SESSION_RESUMED') {
             const castSession = window.cast.framework.CastContext.getInstance().getCurrentSession();
             const mediaInfo = new window.chrome.cast.media.MediaInfo(
@@ -139,19 +139,24 @@ export default class extends HTMLElement {
 
             const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
 
-            castSession.loadMedia(request).then(
-              () => {
-                const targetName = castSession.getCastDevice().friendlyName;
-
-                if (targetName) {
-                  this.internal.root.querySelector(`.${CAST_TARGET_NAME}`).innerText = targetName;
-                  this.classList.add(CAST_HAS_TARGET_NAME);
-                }
-                this.classList.add(CAST_CLASSNAME);
-              },
+            try {
+              await castSession.loadMedia(request);
+            } catch (error) {
               /* eslint-disable-next-line no-console */
-              (errorCode) => console.error(`[Google Cast] Error code: ${errorCode}`),
-            );
+              console.error(`[Google Cast] Error code: ${error}`);
+              return;
+            }
+
+            const targetName = castSession.getCastDevice().friendlyName;
+
+            if (targetName) {
+              this.internal.root.querySelector(`.${CAST_TARGET_NAME}`).innerText = targetName;
+              this.classList.add(CAST_HAS_TARGET_NAME);
+            } else {
+              this.classList.remove(CAST_HAS_TARGET_NAME);
+            }
+
+            this.classList.add(CAST_CLASSNAME);
           }
 
           if (e.sessionState === 'SESSION_ENDED') {
