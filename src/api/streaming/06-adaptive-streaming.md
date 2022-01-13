@@ -8,6 +8,7 @@ length: '1:04'
 video-sources:
   - src: https://storage.googleapis.com/kino-assets/adaptive-streaming/manifest.mpd
     type: application/dash+xml
+    cast: true
   - src: https://storage.googleapis.com/kino-assets/adaptive-streaming/master.m3u8
     type: application/x-mpegURL
 video-subtitles:

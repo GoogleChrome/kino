@@ -125,10 +125,18 @@ export default class extends HTMLElement {
         window.cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
         async (e) => {
           if (e.sessionState === 'SESSION_STARTED' || e.sessionState === 'SESSION_RESUMED') {
+            const castableSources = this.internal.videoData['video-sources'].filter((source) => source.cast === true) || [];
+
+            if (!castableSources) {
+              /* eslint-disable-next-line no-console */
+              console.error('[Google Cast] The media has no source suitable for casting.');
+              return;
+            }
+
             const castSession = window.cast.framework.CastContext.getInstance().getCurrentSession();
             const mediaInfo = new window.chrome.cast.media.MediaInfo(
-              this.internal.selectedSource.src,
-              this.internal.selectedSource.type,
+              castableSources[0].src,
+              castableSources[0].type,
             );
             const videoThumbnail = new window.chrome.cast.Image(this.internal.videoData.thumbnail);
             const metadata = new window.chrome.cast.media.GenericMediaMetadata();
