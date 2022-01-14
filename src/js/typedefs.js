@@ -22,8 +22,7 @@
 
 /**
  * @typedef  {object}      FileMeta
- * @property {string}      url             The original resource URL.
- * @property {string}      downloadUrl     Rewritten resource URL.
+ * @property {string}      url             Resource URL.
  * @property {string}      videoId         Identifier for the video this file is associated with.
  * @property {string}      mimeType        File MIME type.
  * @property {number}      bytesDownloaded Total bytes downloaded of the resources.
@@ -91,4 +90,53 @@
  * @property {string}      path        Current URL path.
  * @property {VideoDownloaderRegistry} VideoDownloaderRegistry Storage for `videoDownload`
  *                                                             instances reuse.
+ */
+
+/* eslint-disable max-len */
+/**
+ * @typedef  {object} BackgroundFetchRecord
+ * @property {Request} request Request.
+ * @property {Promise<Response>} responseReady Returns a promise that resolves with a Response.
+ */
+
+/**
+ * @callback BgFetchMatch
+ * @param {Request} request The Request for which you are attempting to find records.
+ * @param {object}  options An object that sets options for the match operation.
+ * @returns {BackgroundFetchRecord} Background fetch record.
+ */
+
+/**
+ * @callback BgFetchAbort
+ * @returns {Promise<boolean>} Whether the background fetch was successfully aborted.
+ */
+
+/**
+ * @callback BgFetchMatchAll
+ * @param {Request} request The Request for which you are attempting to find records.
+ * @param {object}  options An object that sets options for the match operation.
+ * @returns {Promise<BackgroundFetchRecord[]>} Promise that resolves with an array of BackgroundFetchRecord objects.
+ */
+
+/**
+ * @typedef  {object} BackgroundFetchRegistration
+ * @property {string} id containing the background fetch's ID.
+ * @property {number} uploadTotal containing the total number of bytes to be uploaded.
+ * @property {number} uploaded containing the size in bytes successfully sent, initially 0.
+ * @property {number} downloadTotal containing the total size in bytes of this download.
+ * @property {number} downloaded containing the size in bytes that has been downloaded, initially 0.
+ * @property {""|"aborted"|"bad-status"|"fetch-error"|"quota-exceeded"|"download-total-exceeded"} failureReason Failure reason.
+ * @property {boolean} recordsAvailable indicating whether the recordsAvailable flag is set.
+ * @property {BgFetchMatch} match Returns a single BackgroundFetchRecord object which is the first match for the arguments.
+ * @property {BgFetchMatchAll} matchAll Returns a Promise that resolves with an array of BackgroundFetchRecord objects containing requests and responses.
+ * @property {BgFetchAbort} abort Aborts the background fetch. Returns a Promise that resolves with true if the fetch was successfully aborted.
+ */
+/* eslint-enable max-len */
+
+/**
+ * @callback DownloadFlushHandler
+ * @param {FileMeta}  fileMeta  File meta.
+ * @param {FileChunk} fileChunk File chunk.
+ * @param {boolean}   isDone    Is this the last downloaded piece?
+ * @returns {void}
  */

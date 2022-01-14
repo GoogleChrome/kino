@@ -15,6 +15,7 @@
  */
 
 import '../typedefs';
+import getProgress from '../utils/getProgress';
 import getIDBConnection from './IDBConnection';
 
 /**
@@ -29,18 +30,18 @@ export default class {
   /**
    * Instantiates the storage manager.
    *
-   * @param {VideoDownloader} videoDownloader The associated video downloader object.
+   * @param {string}     videoId       Video ID to identify stored data.
+   * @param {object}     opts          Optional settings.
+   * @param {FileMeta[]} opts.fileMeta File meta objects to observe progress for.
    */
-  constructor(videoDownloader) {
+  constructor(videoId, opts = {}) {
     this.done = false;
+    this.videoId = videoId;
+    this.fileMeta = opts.fileMeta || [];
 
     this.onerror = () => {};
     this.onprogress = () => {};
     this.ondone = () => {};
-
-    this.internal = {
-      videoDownloader,
-    };
   }
 
   /**
@@ -71,7 +72,7 @@ export default class {
     const db = await getIDBConnection();
     const videoMeta = {
       done: isDone,
-      videoId: this.internal.videoDownloader.getId(),
+      videoId: this.videoId,
       timestamp: Date.now(),
     };
     const txAbortHandler = (e) => {
@@ -125,8 +126,9 @@ export default class {
     return new Promise((resolve, reject) => {
       Promise.all([metaWritePromise, dataWritePromise, fileWritePromise])
         .then(() => {
-          const percentage = this.internal.videoDownloader.getProgress();
-          this.onprogress(percentage);
+          if (this.fileMeta.length > 0) {
+            this.onprogress(getProgress(this.fileMeta));
+          }
 
           if (isDone) {
             this.done = true;
