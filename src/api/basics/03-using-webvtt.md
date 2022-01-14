@@ -23,7 +23,7 @@ video-subtitles:
     kind: captions
     label: Česky
     src: https://storage.googleapis.com/kino-assets/using-webvtt/cap-cz.vtt
-    srclang: cz
+    srclang: cs
 thumbnail: https://storage.googleapis.com/kino-assets/using-webvtt/thumbnail.png
 media-session-artwork:
   - sizes: 96x96

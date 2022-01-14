@@ -145,6 +145,30 @@ export default class extends HTMLElement {
             metadata.images = [videoThumbnail];
             mediaInfo.metadata = metadata;
 
+            const subtitles = this.internal.videoData['video-subtitles'] || [];
+            const defaultSubtitles = subtitles.find((subtitle) => subtitle.default);
+
+            /**
+             * AFAICT the Default Media Receiver doesn't implement any UI to
+             * select the subtitle track.
+             *
+             * We only add the subtitle track if there is a default one.
+             */
+            if (defaultSubtitles) {
+              const defaultSubtitlesTrack = new window.chrome.cast.media.Track(
+                1,
+                window.chrome.cast.media.TrackType.TEXT,
+              );
+
+              defaultSubtitlesTrack.trackContentId = defaultSubtitles.src;
+              defaultSubtitlesTrack.subtype = window.chrome.cast.media.TextTrackType.SUBTITLES;
+              defaultSubtitlesTrack.name = defaultSubtitles.label;
+              defaultSubtitlesTrack.language = defaultSubtitles.srclang;
+              defaultSubtitlesTrack.trackContentType = 'text/vtt';
+
+              mediaInfo.tracks = [defaultSubtitlesTrack];
+            }
+
             const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
 
             try {
