@@ -1,6 +1,7 @@
 :host {
   display: flex;
   align-items: center;
+  position: relative;
 }
 
 :host *:focus {
@@ -9,7 +10,63 @@
   outline-color: var(--accent);
 }
 
+:host .floating-buttons {
+  display: grid;
+  grid-auto-flow: column;
+  column-gap: 16px;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+}
+
+@media (min-width: 720px) {
+  :host .floating-buttons {
+    top: 32px;
+    right: 32px;
+  }
+}
+
+:host .floating-buttons button {
+  border-radius: 8px;
+  background-color: var(--accent-background);
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border: none;
+}
+
 video {
   width: 100%;
   height: auto;
+}
+
+.pip-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background-color: var(--code-background);
+  color: var(--icon);
+  z-index: 1;
+  font-size: clamp(12px, 4vw, 24px);
+}
+
+.pip-overlay svg {
+  align-self: end;
+  width: clamp(40px, 20vw, 128px);
+  height: auto;
+}
+
+:host(.picture-in-picture) .pip-overlay {
+  display: grid;
+  justify-items: center;
+  row-gap: 16px;
+}
+
+@media (min-width: 720px) {
+  :host(.picture-in-picture) .pip-overlay {
+    row-gap: 32px;
+  }
 }

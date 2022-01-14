@@ -125,3 +125,8 @@ export const SETTING_KEY_BG_FETCH_API = 'allow-bg-fetch-api';
  * Event name signalling that data in IDB has changes.
  */
 export const IDB_DATA_CHANGED_EVENT = 'idb-data-changed';
+
+/**
+ * Picture in picture.
+ */
+export const PIP_CLASSNAME = 'picture-in-picture';
