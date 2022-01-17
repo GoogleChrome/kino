@@ -125,7 +125,7 @@ export default class extends HTMLElement {
         window.cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
         async (e) => {
           if (e.sessionState === 'SESSION_STARTED' || e.sessionState === 'SESSION_RESUMED') {
-            const castableSources = this.internal.videoData['video-sources'].filter((source) => source.cast === true) || [];
+            const castableSources = this.internal.videoData['video-sources'].filter((source) => source.cast === true);
 
             if (!castableSources) {
               /* eslint-disable-next-line no-console */
@@ -142,9 +142,14 @@ export default class extends HTMLElement {
             const metadata = new window.chrome.cast.media.GenericMediaMetadata();
 
             metadata.title = videoData.title;
+
+            /**
+             * @todo Add the Media Session artwork and define image dimensions explicitly.
+             */
             metadata.images = [videoThumbnail];
             mediaInfo.metadata = metadata;
 
+            /** @type {Array} */
             const subtitles = this.internal.videoData['video-subtitles'] || [];
             const defaultSubtitles = subtitles.find((subtitle) => subtitle.default);
 
