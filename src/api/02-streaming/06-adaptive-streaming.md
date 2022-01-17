@@ -11,6 +11,9 @@ video-sources:
     cast: true
   - src: https://storage.googleapis.com/kino-assets/adaptive-streaming/master.m3u8
     type: application/x-mpegURL
+url-rewrites:
+  - online: https://storage.googleapis.com/kino-assets/adaptive-streaming/manifest.mpd
+    offline: https://storage.googleapis.com/kino-assets/adaptive-streaming/manifest-offline.mpd
 video-subtitles:
   - default: true
     kind: captions
