@@ -17,7 +17,7 @@
   position: absolute;
   top: 16px;
   right: 16px;
-  z-index: 2;
+  z-index: auto; /* In order to not interfere with the mobile slide out menu. */
 }
 
 @media (min-width: 720px) {
