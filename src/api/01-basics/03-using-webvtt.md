@@ -22,7 +22,7 @@ video-subtitles:
   - default: false
     kind: captions
     label: Česky
-    src: https://storage.googleapis.com/kino-assets/using-webvtt/cap-cz.vtt
+    src: https://storage.googleapis.com/kino-assets/using-webvtt/cap-cs.vtt
     srclang: cs
 thumbnail: https://storage.googleapis.com/kino-assets/using-webvtt/thumbnail.png
 media-session-artwork:

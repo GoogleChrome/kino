@@ -23,7 +23,7 @@ video-subtitles:
   - default: false
     kind: captions
     label: Česky
-    src: https://storage.googleapis.com/kino-assets/adaptive-streaming/cap-cz.vtt
+    src: https://storage.googleapis.com/kino-assets/adaptive-streaming/cap-cs.vtt
     srclang: cs
 thumbnail: https://storage.googleapis.com/kino-assets/adaptive-streaming/thumbnail.png
 media-session-artwork:
