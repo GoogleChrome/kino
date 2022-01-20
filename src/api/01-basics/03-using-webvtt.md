@@ -10,6 +10,7 @@ video-sources:
     type: video/mp4; codecs="av01.0.04M.08, mp4a.40.2"
   - src: https://storage.googleapis.com/kino-assets/using-webvtt/hevc.mp4
     type: video/mp4; codecs="hev1.1.6.L93.90,mp4a.40.2"
+    cast: true
   - src: https://storage.googleapis.com/kino-assets/using-webvtt/vp9.webm
     type: video/webm
 video-subtitles:
@@ -21,8 +22,8 @@ video-subtitles:
   - default: false
     kind: captions
     label: Česky
-    src: https://storage.googleapis.com/kino-assets/using-webvtt/cap-cz.vtt
-    srclang: cz
+    src: https://storage.googleapis.com/kino-assets/using-webvtt/cap-cs.vtt
+    srclang: cs
 thumbnail: https://storage.googleapis.com/kino-assets/using-webvtt/thumbnail.png
 media-session-artwork:
   - sizes: 96x96

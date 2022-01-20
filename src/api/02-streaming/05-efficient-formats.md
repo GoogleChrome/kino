@@ -8,6 +8,7 @@ length: '1:04'
 video-sources:
   - src: https://storage.googleapis.com/kino-assets/efficient-formats/manifest.mpd
     type: application/dash+xml
+    cast: true
   - src: https://storage.googleapis.com/kino-assets/efficient-formats/master.m3u8
     type: application/x-mpegURL
 url-rewrites:
@@ -22,8 +23,8 @@ video-subtitles:
   - default: false
     kind: captions
     label: Česky
-    src: https://storage.googleapis.com/kino-assets/efficient-formats/cap-cz.vtt
-    srclang: cz
+    src: https://storage.googleapis.com/kino-assets/efficient-formats/cap-cs.vtt
+    srclang: cs
 thumbnail: https://storage.googleapis.com/kino-assets/efficient-formats/thumbnail.png
 media-session-artwork:
   - sizes: 96x96

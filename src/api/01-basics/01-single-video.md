@@ -8,6 +8,7 @@ length: '1:04'
 video-sources:
   - src: https://storage.googleapis.com/kino-assets/single-video/video.mp4
     type: video/mp4; codecs="avc1.640032,mp4a.40.2"
+    cast: true
 thumbnail: https://storage.googleapis.com/kino-assets/single-video/thumbnail.png
 media-session-artwork:
   - sizes: 96x96

@@ -4,7 +4,8 @@
       "https://kinoweb-dev.web.app",
       "https://kinoweb-dev--staging-2ra3ji0i.web.app",
       "https://kinoweb.dev",
-      "http://localhost:5000"
+      "http://localhost:5000",
+      "https://www.gstatic.com"
     ],
     "responseHeader": [
       "Accept-Ranges",
