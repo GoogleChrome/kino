@@ -6,7 +6,7 @@ description: |
 date: April 2nd, 2021
 length: '1:04'
 video-sources:
-  - src: https://storage.googleapis.com/kino-assets/single-video/video.mp4
+  - src: /video/encrypted.mp4
     type: video/mp4; codecs="avc1.640032,mp4a.40.2"
     cast: true
 thumbnail: https://storage.googleapis.com/kino-assets/single-video/thumbnail.png
@@ -29,7 +29,20 @@ media-session-artwork:
   - sizes: 512x512
     src: https://storage.googleapis.com/kino-assets/single-video/artwork-512x512.png
     type: image/png
-
+encryption:
+  type: org.w3.clearkey
+  src: /video/encrypted-2.mp4
+  mimeCodec: video/mp4; codecs="avc1.640032, mp4a.40.2"
+  mediaKeySystemConfig:
+    initDataTypes:
+      - cenc
+    videoCapabilities:
+      - contentType: video/mp4; codecs="avc1.640032"
+    audioCapabilities:
+      - contentType: audio/mp4; codecs="mp4a.40.2"
+  key:
+    id: 279926496a7f5d25da69f2b3b216bfa6
+    value: ccc0f2b3b279926496a7f5d25da692f6
 ---
 
 ## Introduction
