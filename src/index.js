@@ -170,18 +170,38 @@ window.kinoInitGoogleCast = (function kinoInitGoogleCastIIFE() {
   return () => {
     if (!castButtonPromise) {
       castButtonPromise = new Promise((resolve) => {
-        const initCastApi = () => {
-          window.cast.framework.CastContext.getInstance().setOptions({
-            receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-          });
+        let resolved = false;
 
+        const resolveWithButton = () => {
           const castButton = document.createElement('button');
           const castCustomElement = document.createElement('google-cast-launcher');
 
           castButton.setAttribute('aria-label', 'Cast this video');
           castButton.appendChild(castCustomElement);
 
+          resolved = true;
           resolve(castButton);
+        };
+
+        const checkCastState = () => {
+          const castState = window.cast.framework.CastContext.getInstance().getCastState();
+
+          if (castState !== 'NO_DEVICES_AVAILABLE' && !resolved) {
+            resolveWithButton();
+          }
+        };
+
+        const initCastApi = () => {
+          window.cast.framework.CastContext.getInstance().setOptions({
+            receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+          });
+
+          checkCastState();
+
+          window.cast.framework.CastContext.getInstance().addEventListener(
+            window.cast.framework.CastContextEventType.CAST_STATE_CHANGED,
+            checkCastState,
+          );
         };
 
         window.__onGCastApiAvailable = (isAvailable) => {
