@@ -46,7 +46,7 @@ import ErrorPage from './js/pages/Error';
  * Settings
  */
 import { loadSetting } from './js/utils/settings';
-import { SETTING_KEY_TOGGLE_OFFLINE, SETTING_KEY_DARK_MODE } from './js/constants';
+import { SETTING_KEY_TOGGLE_OFFLINE, SETTING_KEY_DARK_MODE, CAST_BUTTON_HIDDEN_CLASSNAME } from './js/constants';
 
 /**
  * Custom Elements definition.
@@ -170,25 +170,20 @@ window.kinoInitGoogleCast = (function kinoInitGoogleCastIIFE() {
   return () => {
     if (!castButtonPromise) {
       castButtonPromise = new Promise((resolve) => {
-        let resolved = false;
+        const castButton = document.createElement('button');
+        const castCustomElement = document.createElement('google-cast-launcher');
 
-        const resolveWithButton = () => {
-          const castButton = document.createElement('button');
-          const castCustomElement = document.createElement('google-cast-launcher');
+        castButton.setAttribute('aria-label', 'Cast this video');
+        castButton.appendChild(castCustomElement);
+        castButton.classList.add(CAST_BUTTON_HIDDEN_CLASSNAME);
 
-          castButton.setAttribute('aria-label', 'Cast this video');
-          castButton.appendChild(castCustomElement);
-
-          resolved = true;
-          resolve(castButton);
-        };
-
-        const checkCastState = () => {
+        const applyCastState = () => {
           const castState = window.cast.framework.CastContext.getInstance().getCastState();
 
-          if (castState !== 'NO_DEVICES_AVAILABLE' && !resolved) {
-            resolveWithButton();
-          }
+          castButton.classList.toggle(
+            CAST_BUTTON_HIDDEN_CLASSNAME,
+            castState === 'NO_DEVICES_AVAILABLE',
+          );
         };
 
         const initCastApi = () => {
@@ -196,12 +191,13 @@ window.kinoInitGoogleCast = (function kinoInitGoogleCastIIFE() {
             receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
           });
 
-          checkCastState();
-
           window.cast.framework.CastContext.getInstance().addEventListener(
             window.cast.framework.CastContextEventType.CAST_STATE_CHANGED,
-            checkCastState,
+            applyCastState,
           );
+          applyCastState();
+
+          resolve(castButton);
         };
 
         window.__onGCastApiAvailable = (isAvailable) => {
