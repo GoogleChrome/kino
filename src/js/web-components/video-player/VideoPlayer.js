@@ -467,7 +467,6 @@ export default class VideoPlayer extends HTMLElement {
           // If another video is already in PiP, pause it and exit PiP mode.
           if (document.pictureInPictureElement instanceof VideoPlayer) {
             document.pictureInPictureElement.videoElement.pause();
-            await document.exitPictureInPicture();
           }
           await this.videoElement.requestPictureInPicture();
         } else {
