@@ -464,7 +464,7 @@ export default class VideoPlayer extends HTMLElement {
       pipButton.disabled = true;
       try {
         if (this !== document.pictureInPictureElement) {
-          // If another video is already in PiP, pause it and exit PiP mode.
+          // If another video is already in PiP, pause it.
           if (document.pictureInPictureElement instanceof VideoPlayer) {
             document.pictureInPictureElement.videoElement.pause();
           }
