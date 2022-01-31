@@ -131,91 +131,23 @@ export default class extends HTMLElement {
     this.videoElement = this.internal.root.querySelector('video');
     this.videoElement.addEventListener('error', this.handleVideoError.bind(this), true);
 
-    const pipButton = this.createPiPButton();
     const floatingButtonsBar = this.internal.root.querySelector('.floating-buttons');
+    const pipButton = this.createPiPButton();
 
     if (pipButton) {
       floatingButtonsBar.appendChild(pipButton);
     }
 
-    window.kinoInitGoogleCast().then((castButton) => {
-      floatingButtonsBar.appendChild(castButton);
+    if (this.internal.videoData.cast) {
+      window.kinoInitGoogleCast().then((castButton) => {
+        floatingButtonsBar.appendChild(castButton);
 
-      window.cast.framework.CastContext.getInstance().addEventListener(
-        window.cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
-        async (e) => {
-          if (e.sessionState === 'SESSION_STARTED' || e.sessionState === 'SESSION_RESUMED') {
-            const castableSources = this.internal.videoData['video-sources'].filter((source) => source.cast === true);
-
-            if (!castableSources) {
-              /* eslint-disable-next-line no-console */
-              console.error('[Google Cast] The media has no source suitable for casting.');
-              return;
-            }
-
-            const castSession = window.cast.framework.CastContext.getInstance().getCurrentSession();
-            const mediaInfo = new window.chrome.cast.media.MediaInfo(
-              castableSources[0].src,
-              castableSources[0].type,
-            );
-            const videoThumbnail = new window.chrome.cast.Image(this.internal.videoData.thumbnail);
-            const metadata = new window.chrome.cast.media.GenericMediaMetadata();
-
-            metadata.title = videoData.title;
-
-            /**
-             * @todo Add the Media Session artwork and define image dimensions explicitly.
-             */
-            metadata.images = [videoThumbnail];
-            mediaInfo.metadata = metadata;
-
-            /** @type {Array} */
-            const subtitles = this.internal.videoData['video-subtitles'] || [];
-            const defaultSubtitles = subtitles.find((subtitle) => subtitle.default);
-
-            /**
-             * AFAICT the Default Media Receiver doesn't implement any UI to
-             * select the subtitle track.
-             *
-             * We only add the subtitle track if there is a default one.
-             */
-            if (defaultSubtitles) {
-              const defaultSubtitlesTrack = new window.chrome.cast.media.Track(
-                1,
-                window.chrome.cast.media.TrackType.TEXT,
-              );
-
-              defaultSubtitlesTrack.trackContentId = defaultSubtitles.src;
-              defaultSubtitlesTrack.subtype = window.chrome.cast.media.TextTrackType.SUBTITLES;
-              defaultSubtitlesTrack.name = defaultSubtitles.label;
-              defaultSubtitlesTrack.language = defaultSubtitles.srclang;
-              defaultSubtitlesTrack.trackContentType = 'text/vtt';
-
-              mediaInfo.tracks = [defaultSubtitlesTrack];
-            }
-
-            const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
-
-            try {
-              await castSession.loadMedia(request);
-            } catch (error) {
-              /* eslint-disable-next-line no-console */
-              console.error(`[Google Cast] Error code: ${error}`);
-              return;
-            }
-
-            const targetName = castSession.getCastDevice().friendlyName;
-            this.internal.root.querySelector(`.${CAST_TARGET_NAME}`).innerText = targetName;
-            this.classList.toggle(CAST_HAS_TARGET_NAME, targetName);
-            this.classList.add(CAST_CLASSNAME);
-          }
-
-          if (e.sessionState === 'SESSION_ENDED') {
-            this.classList.remove(CAST_CLASSNAME);
-          }
-        },
-      );
-    });
+        window.cast.framework.CastContext.getInstance().addEventListener(
+          window.cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
+          this.initCast.bind(this),
+        );
+      });
+    }
 
     /**
      * Set up Media Session API integration.
@@ -447,6 +379,10 @@ export default class extends HTMLElement {
     if (!('pictureInPictureEnabled' in document)) {
       return null;
     }
+    if (!this.internal.videoData.pip) {
+      return null;
+    }
+
     const ENTER_PIP_SVG = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.25 15v6a1.5 1.5 0 0 1-1.5 1.5H3A1.5 1.5 0 0 1 1.5 21V8.25A1.5 1.5 0 0 1 3 6.75h3.75" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.75 3v7.5a1.5 1.5 0 0 0 1.5 1.5H21a1.5 1.5 0 0 0 1.5-1.5V3A1.5 1.5 0 0 0 21 1.5h-9.75A1.5 1.5 0 0 0 9.75 3Z" stroke="var(--accent)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="square"/><path d="M9 18.75V15H5.25M5.25 18.75 9 15" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     const LEAVE_PIP_SVG = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.25 9V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v12.75a1.5 1.5 0 0 0 1.5 1.5h3.75" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.25 9V5.25H9M9 9 5.25 5.25" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.75 21v-7.5a1.5 1.5 0 0 1 1.5-1.5H21a1.5 1.5 0 0 1 1.5 1.5V21a1.5 1.5 0 0 1-1.5 1.5h-9.75a1.5 1.5 0 0 1-1.5-1.5Z" stroke="var(--accent)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="square"/></svg>';
 
@@ -490,5 +426,83 @@ export default class extends HTMLElement {
     setPipButton();
 
     return pipButton;
+  }
+
+  /**
+   * Initializes Google Cast functionality.
+   *
+   * @param {SessionStateEventData} e SessionStateEventData instance.
+   * @returns {void}
+   */
+  async initCast(e) {
+    if (e.sessionState === 'SESSION_STARTED' || e.sessionState === 'SESSION_RESUMED') {
+      const castableSources = this.internal.videoData['video-sources'].filter((source) => source.cast === true);
+
+      if (!castableSources) {
+        /* eslint-disable-next-line no-console */
+        console.error('[Google Cast] The media has no source suitable for casting.');
+        return;
+      }
+
+      const castSession = window.cast.framework.CastContext.getInstance().getCurrentSession();
+      const mediaInfo = new window.chrome.cast.media.MediaInfo(
+        castableSources[0].src,
+        castableSources[0].type,
+      );
+      const videoThumbnail = new window.chrome.cast.Image(this.internal.videoData.thumbnail);
+      const metadata = new window.chrome.cast.media.GenericMediaMetadata();
+
+      metadata.title = this.internal.videoData.title;
+
+      /**
+       * @todo Add the Media Session artwork and define image dimensions explicitly.
+       */
+      metadata.images = [videoThumbnail];
+      mediaInfo.metadata = metadata;
+
+      /** @type {Array} */
+      const subtitles = this.internal.videoData['video-subtitles'] || [];
+      const defaultSubtitles = subtitles.find((subtitle) => subtitle.default);
+
+      /**
+       * AFAICT the Default Media Receiver doesn't implement any UI to
+       * select the subtitle track.
+       *
+       * We only add the subtitle track if there is a default one.
+       */
+      if (defaultSubtitles) {
+        const defaultSubtitlesTrack = new window.chrome.cast.media.Track(
+          1,
+          window.chrome.cast.media.TrackType.TEXT,
+        );
+
+        defaultSubtitlesTrack.trackContentId = defaultSubtitles.src;
+        defaultSubtitlesTrack.subtype = window.chrome.cast.media.TextTrackType.SUBTITLES;
+        defaultSubtitlesTrack.name = defaultSubtitles.label;
+        defaultSubtitlesTrack.language = defaultSubtitles.srclang;
+        defaultSubtitlesTrack.trackContentType = 'text/vtt';
+
+        mediaInfo.tracks = [defaultSubtitlesTrack];
+      }
+
+      const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
+
+      try {
+        await castSession.loadMedia(request);
+      } catch (error) {
+        /* eslint-disable-next-line no-console */
+        console.error(`[Google Cast] Error code: ${error}`);
+        return;
+      }
+
+      const targetName = castSession.getCastDevice().friendlyName;
+      this.internal.root.querySelector(`.${CAST_TARGET_NAME}`).innerText = targetName;
+      this.classList.toggle(CAST_HAS_TARGET_NAME, targetName);
+      this.classList.add(CAST_CLASSNAME);
+    }
+
+    if (e.sessionState === 'SESSION_ENDED') {
+      this.classList.remove(CAST_CLASSNAME);
+    }
   }
 }
