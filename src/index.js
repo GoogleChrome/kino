@@ -175,7 +175,6 @@ window.kinoInitGoogleCast = (function kinoInitGoogleCastIIFE() {
 
         castButton.setAttribute('aria-label', 'Cast this video');
         castButton.appendChild(castCustomElement);
-        castButton.classList.add(CAST_BUTTON_HIDDEN_CLASSNAME);
 
         const applyCastState = () => {
           const castState = window.cast.framework.CastContext.getInstance().getCastState();
