@@ -14,13 +14,72 @@
  * limitations under the License.
  */
 
-import getRepresentationMimeString from './getRepresentationMimeString';
-
 import {
   DEFAULT_AUDIO_PRIORITIES,
   DEFAULT_VIDEO_PRIORITIES,
   ALL_STREAM_TYPES,
 } from '../constants';
+import getDecodingInfo from './getDecodingInfo';
+import { getMediaConfigurationAudio, getMediaConfigurationVideo } from './getMediaConfiguration';
+
+/**
+ * Uses the Media Capabilities API to filter out media representations
+ * that don't match the provided set of requirements.
+ *
+ * @param {Array}           representations Media representations.
+ * @param {'audio'|'video'} contentType     Media type.
+ * @param {Array}           requirements    Array of requirements for Media Capabilities API.
+ * @returns {Promise<Array>} Set of representations matching the requirements.
+ */
+const selectRepresentationsByRequirements = async (
+  representations,
+  contentType,
+  requirements = [
+    {
+      supported: true,
+      smooth: true,
+      powerEfficient: true,
+    },
+    {
+      supported: true,
+      smooth: true,
+    },
+    {
+      supported: true,
+    },
+  ],
+) => {
+  // Strips away the first item from `requirements`, this allows us to call
+  // this method recursively later.
+  const currentRequirements = requirements.shift();
+  const matchedRepresentations = [];
+
+  for (const currentRepresentation of representations) {
+    const mediaConfiguration = contentType === 'audio'
+      ? getMediaConfigurationAudio(currentRepresentation)
+      : getMediaConfigurationVideo(currentRepresentation);
+
+    /* eslint-disable-next-line no-await-in-loop */
+    const decodingInfo = await getDecodingInfo(mediaConfiguration);
+
+    let matchesRequirements = true;
+    Object.entries(currentRequirements).forEach(([key, value]) => {
+      matchesRequirements = matchesRequirements && (decodingInfo[key] === value);
+    });
+
+    if (matchesRequirements) {
+      matchedRepresentations.push(currentRepresentation);
+    }
+  }
+
+  if (matchedRepresentations.length > 0) {
+    return matchedRepresentations;
+  }
+
+  return requirements.length > 0
+    ? selectRepresentationsByRequirements(representations, contentType, requirements)
+    : [];
+};
 
 /**
  * Fetch all representations present in the MPD file and filter
@@ -28,22 +87,13 @@ import {
  *
  * @param {object} parser MPD parser instance.
  * @param {object} opts   Options.
- * @returns {object[]} All representations that the current client is able to play.
+ * @returns {Promise<object[]>} All representations that the current client is able to play.
  */
-export default (parser, opts = {}) => {
-  const videoEl = document.createElement('video');
-  /**
-   * Returns whether the provided representation is playable by the current client.
-   *
-   * @param {object} representation Representation object returned by parser.queryRepresentations.
-   * @returns {boolean} Is this representation playable by the current client.
-   */
-  const canPlayFilter = (representation) => {
-    const testMime = getRepresentationMimeString(representation);
-    return videoEl.canPlayType(testMime) === 'probably';
+export default async (parser, opts = {}) => {
+  const representations = {
+    video: [],
+    audio: [],
   };
-
-  const representations = {};
 
   const priorities = {
     video: [...(opts.videoPriorities || DEFAULT_VIDEO_PRIORITIES)],
@@ -54,17 +104,20 @@ export default (parser, opts = {}) => {
    * Select sets of video and audio representations that are playable
    * in the client with respect to indicated priorities.
    */
-  ALL_STREAM_TYPES.forEach(
-    (contentType) => {
-      let query;
-      do {
-        query = priorities[contentType].shift() || '';
+  for (const contentType of ALL_STREAM_TYPES) {
+    let query;
 
-        representations[contentType] = parser.queryRepresentations(query, contentType);
-        representations[contentType] = representations[contentType].filter(canPlayFilter);
-      } while (representations[contentType].length === 0 && query);
-    },
-  );
+    do {
+      query = priorities[contentType].shift() || '';
+      const candidates = parser.queryRepresentations(query, contentType);
+
+      /* eslint-disable-next-line no-await-in-loop */
+      representations[contentType] = await selectRepresentationsByRequirements(
+        candidates,
+        contentType,
+      );
+    } while (representations[contentType].length === 0 && query);
+  }
 
   if (representations.video.length === 0) {
     throw new Error('[Streamer] No playable video representation found.');

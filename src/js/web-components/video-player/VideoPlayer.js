@@ -19,7 +19,13 @@ import Streamer from '../../classes/Streamer';
 import ParserMPD from '../../classes/ParserMPD';
 import selectSource from '../../utils/selectSource';
 
-import { MEDIA_SESSION_DEFAULT_ARTWORK } from '../../constants';
+import {
+  CAST_CLASSNAME,
+  CAST_HAS_TARGET_NAME,
+  CAST_TARGET_NAME,
+  MEDIA_SESSION_DEFAULT_ARTWORK,
+  PIP_CLASSNAME,
+} from '../../constants';
 
 export default class extends HTMLElement {
   /**
@@ -103,6 +109,15 @@ export default class extends HTMLElement {
       ${this.getSourceHTML()}
       ${this.getTracksHTML()}
     </video>
+    <div class="floating-buttons"></div>
+    <div class="pip-overlay">
+      <svg viewBox="0 0 129 128" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M108.5 48V16a8.001 8.001 0 0 0-8-8h-84a8 8 0 0 0-8 8v68a8 8 0 0 0 8 8h20" stroke="var(--icon)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M52.5 112V72a8 8 0 0 1 8-8h52a8 8 0 0 1 8 8v40a8 8 0 0 1-8 8h-52a8 8 0 0 1-8-8Z" stroke="var(--icon)" stroke-width="3" stroke-miterlimit="10" stroke-linecap="square"/></svg>
+      <p>This video is playing in picture in picture</p>
+    </div>
+    <div class="cast-overlay">
+      <svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-miterlimit="10"><path d="M34.133 107.201c0-13.253-10.747-24-24-24M53.333 107.2c0-23.861-19.339-43.2-43.2-43.2" fill="none" stroke="var(--icon)" stroke-width="8"/><path d="M10.133 112.001a4.8 4.8 0 1 0 0-9.6 4.8 4.8 0 0 0 0 9.6Z" fill="var(--icon)" fill-rule="nonzero"/><path d="M5.333 49.778V32c0-5.891 4.776-10.667 10.667-10.667h96c5.891 0 10.667 4.776 10.667 10.667v64c0 5.891-4.776 10.667-10.667 10.667H72.381" fill="none" stroke="var(--icon)" stroke-width="8"/></svg>
+      <p>Casting<span class="cast-target"> to <span class="cast-target-name"></span></span></p>
+    </div>
     `;
 
     while (this.internal.root.firstChild) {
@@ -115,6 +130,92 @@ export default class extends HTMLElement {
      */
     this.videoElement = this.internal.root.querySelector('video');
     this.videoElement.addEventListener('error', this.handleVideoError.bind(this), true);
+
+    const pipButton = this.createPiPButton();
+    const floatingButtonsBar = this.internal.root.querySelector('.floating-buttons');
+
+    if (pipButton) {
+      floatingButtonsBar.appendChild(pipButton);
+    }
+
+    window.kinoInitGoogleCast().then((castButton) => {
+      floatingButtonsBar.appendChild(castButton);
+
+      window.cast.framework.CastContext.getInstance().addEventListener(
+        window.cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
+        async (e) => {
+          if (e.sessionState === 'SESSION_STARTED' || e.sessionState === 'SESSION_RESUMED') {
+            const castableSources = this.internal.videoData['video-sources'].filter((source) => source.cast === true);
+
+            if (!castableSources) {
+              /* eslint-disable-next-line no-console */
+              console.error('[Google Cast] The media has no source suitable for casting.');
+              return;
+            }
+
+            const castSession = window.cast.framework.CastContext.getInstance().getCurrentSession();
+            const mediaInfo = new window.chrome.cast.media.MediaInfo(
+              castableSources[0].src,
+              castableSources[0].type,
+            );
+            const videoThumbnail = new window.chrome.cast.Image(this.internal.videoData.thumbnail);
+            const metadata = new window.chrome.cast.media.GenericMediaMetadata();
+
+            metadata.title = videoData.title;
+
+            /**
+             * @todo Add the Media Session artwork and define image dimensions explicitly.
+             */
+            metadata.images = [videoThumbnail];
+            mediaInfo.metadata = metadata;
+
+            /** @type {Array} */
+            const subtitles = this.internal.videoData['video-subtitles'] || [];
+            const defaultSubtitles = subtitles.find((subtitle) => subtitle.default);
+
+            /**
+             * AFAICT the Default Media Receiver doesn't implement any UI to
+             * select the subtitle track.
+             *
+             * We only add the subtitle track if there is a default one.
+             */
+            if (defaultSubtitles) {
+              const defaultSubtitlesTrack = new window.chrome.cast.media.Track(
+                1,
+                window.chrome.cast.media.TrackType.TEXT,
+              );
+
+              defaultSubtitlesTrack.trackContentId = defaultSubtitles.src;
+              defaultSubtitlesTrack.subtype = window.chrome.cast.media.TextTrackType.SUBTITLES;
+              defaultSubtitlesTrack.name = defaultSubtitles.label;
+              defaultSubtitlesTrack.language = defaultSubtitles.srclang;
+              defaultSubtitlesTrack.trackContentType = 'text/vtt';
+
+              mediaInfo.tracks = [defaultSubtitlesTrack];
+            }
+
+            const request = new window.chrome.cast.media.LoadRequest(mediaInfo);
+
+            try {
+              await castSession.loadMedia(request);
+            } catch (error) {
+              /* eslint-disable-next-line no-console */
+              console.error(`[Google Cast] Error code: ${error}`);
+              return;
+            }
+
+            const targetName = castSession.getCastDevice().friendlyName;
+            this.internal.root.querySelector(`.${CAST_TARGET_NAME}`).innerText = targetName;
+            this.classList.toggle(CAST_HAS_TARGET_NAME, targetName);
+            this.classList.add(CAST_CLASSNAME);
+          }
+
+          if (e.sessionState === 'SESSION_ENDED') {
+            this.classList.remove(CAST_CLASSNAME);
+          }
+        },
+      );
+    });
 
     /**
      * Set up Media Session API integration.
@@ -335,5 +436,59 @@ export default class extends HTMLElement {
         resolvePlayIntent();
       }
     });
+  }
+
+  /**
+   * Returns a button that controls the PiP functionality.
+   *
+   * @returns {HTMLButtonElement|null} Button element or null when PiP not supported.
+   */
+  createPiPButton() {
+    if (!('pictureInPictureEnabled' in document)) {
+      return null;
+    }
+    const ENTER_PIP_SVG = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.25 15v6a1.5 1.5 0 0 1-1.5 1.5H3A1.5 1.5 0 0 1 1.5 21V8.25A1.5 1.5 0 0 1 3 6.75h3.75" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.75 3v7.5a1.5 1.5 0 0 0 1.5 1.5H21a1.5 1.5 0 0 0 1.5-1.5V3A1.5 1.5 0 0 0 21 1.5h-9.75A1.5 1.5 0 0 0 9.75 3Z" stroke="var(--accent)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="square"/><path d="M9 18.75V15H5.25M5.25 18.75 9 15" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const LEAVE_PIP_SVG = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.25 9V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v12.75a1.5 1.5 0 0 0 1.5 1.5h3.75" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.25 9V5.25H9M9 9 5.25 5.25" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.75 21v-7.5a1.5 1.5 0 0 1 1.5-1.5H21a1.5 1.5 0 0 1 1.5 1.5V21a1.5 1.5 0 0 1-1.5 1.5h-9.75a1.5 1.5 0 0 1-1.5-1.5Z" stroke="var(--accent)" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="square"/></svg>';
+
+    const pipButton = document.createElement('button');
+    const setPipButton = () => {
+      pipButton.disabled = (this.videoElement.readyState === 0)
+        || !document.pictureInPictureEnabled
+        || this.videoElement.disablePictureInPicture;
+    };
+
+    pipButton.setAttribute('aria-label', 'Toggle picture in picture');
+    pipButton.innerHTML = ENTER_PIP_SVG;
+
+    pipButton.addEventListener('click', async () => {
+      pipButton.disabled = true;
+      try {
+        if (this !== document.pictureInPictureElement) {
+          await this.videoElement.requestPictureInPicture();
+        } else {
+          await document.exitPictureInPicture();
+        }
+      } catch (error) {
+        /* eslint-disable-next-line no-console */
+        console.error(error);
+      } finally {
+        pipButton.disabled = false;
+      }
+    });
+
+    this.videoElement.addEventListener('loadedmetadata', setPipButton);
+    this.videoElement.addEventListener('emptied', setPipButton);
+    this.videoElement.addEventListener('enterpictureinpicture', () => {
+      pipButton.innerHTML = LEAVE_PIP_SVG;
+      this.classList.add(PIP_CLASSNAME);
+    });
+    this.videoElement.addEventListener('leavepictureinpicture', () => {
+      pipButton.innerHTML = ENTER_PIP_SVG;
+      this.classList.remove(PIP_CLASSNAME);
+    });
+
+    setPipButton();
+
+    return pipButton;
   }
 }
