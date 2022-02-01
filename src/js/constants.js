@@ -137,3 +137,4 @@ export const PIP_CLASSNAME = 'picture-in-picture';
 export const CAST_CLASSNAME = 'cast';
 export const CAST_HAS_TARGET_NAME = 'cast-has-target';
 export const CAST_TARGET_NAME = 'cast-target-name';
+export const CAST_BUTTON_HIDDEN_CLASSNAME = 'hidden';
