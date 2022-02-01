@@ -27,7 +27,7 @@ import {
   PIP_CLASSNAME,
 } from '../../constants';
 
-export default class extends HTMLElement {
+export default class VideoPlayer extends HTMLElement {
   /**
    * @param {VideoDownloader} downloader Video downloader associated with the current video.
    */
@@ -464,6 +464,10 @@ export default class extends HTMLElement {
       pipButton.disabled = true;
       try {
         if (this !== document.pictureInPictureElement) {
+          // If another video is already in PiP, pause it.
+          if (document.pictureInPictureElement instanceof VideoPlayer) {
+            document.pictureInPictureElement.videoElement.pause();
+          }
           await this.videoElement.requestPictureInPicture();
         } else {
           await document.exitPictureInPicture();
