@@ -226,7 +226,11 @@ export default class DownloadManager {
    */
   forcePause() {
     this.pause();
-    this.internal.videoDownloader.downloading = false;
+
+    if (document) {
+      const pauseEvent = new CustomEvent('pausedownload', { detail: this.videoId });
+      document.dispatchEvent(pauseEvent);
+    }
   }
 
   /**

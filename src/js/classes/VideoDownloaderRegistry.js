@@ -27,6 +27,10 @@ export default class VideoDownloaderRegistry {
   constructor({ connectionStatus }) {
     this.instances = new Map();
     this.connectionStatus = connectionStatus;
+
+    if (document) {
+      document.addEventListener('pausedownload', this.onPauseDownload.bind(this));
+    }
   }
 
   /**
@@ -66,5 +70,19 @@ export default class VideoDownloaderRegistry {
    */
   destroyAll() {
     this.instances.clear();
+  }
+
+  /**
+   * When a pause request is received, we need to pause the download.
+   *
+   * @param {CustomEvent} e Pause event.
+   * @param {string} e.detail Video ID.
+   */
+  onPauseDownload(e) {
+    const downloaderInstance = this.get(e.detail);
+
+    if (downloaderInstance) {
+      downloaderInstance.downloading = false;
+    }
   }
 }
