@@ -78,13 +78,14 @@ These are the main components the Encrypted Media Extensions API interacts with:
 
 For a more detailed overview of the decryption flow make sure to check out the full data flow diagram in the Encrypted Media Extensions [specification].
 
+## Key systems
+
+## Encrypting media
+
+## Using EME
+
+
+
 [Encrypted Media Extensions API]: https://developer.mozilla.org/en-US/docs/Web/API/Encrypted_Media_Extensions_API
 [specification]: https://www.w3.org/TR/encrypted-media/#introduction
-
-## Encrypting videos
-
-Tools used to encode and encrypt media files in most commercial applications are called packagers. One of the widely used packagers is the [Shaka Packager]. If you plan on building a larger media application, make sure to check it out.
-
-However, to encrypt just a single video and to
-
 [Shaka Packager]: https://github.com/google/shaka-packager
