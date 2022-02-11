@@ -633,7 +633,7 @@ article pre code,
   max-width: 1200px;
   margin: 0 auto;
   overflow: hidden;
-  aspect-ratio: 16 / 9;
+  padding-bottom: 56.25%;
 }
 .video-container--overlay {
   display: none;
