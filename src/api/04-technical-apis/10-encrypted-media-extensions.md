@@ -38,7 +38,20 @@ media-session-artwork:
   - sizes: 512x512
     src: https://storage.googleapis.com/kino-assets/google-cast/artwork-512x512.png
     type: image/png
-cast: true
+encryption:
+  type: org.w3.clearkey
+  src: /video/encrypted-2.mp4
+  mimeCodec: video/mp4; codecs="avc1.640032, mp4a.40.2"
+  mediaKeySystemConfig:
+    initDataTypes:
+      - cenc
+    videoCapabilities:
+      - contentType: video/mp4; codecs="avc1.640032"
+    audioCapabilities:
+      - contentType: audio/mp4; codecs="mp4a.40.2"
+  key:
+    id: 279926496a7f5d25da69f2b3b216bfa6
+    value: ccc0f2b3b279926496a7f5d25da692f6
 ---
 
 ## Introduction
@@ -51,7 +64,7 @@ This default behavior is too permissive for many business models and use cases, 
 
 The simplest way of protecting any data from viewing it is encryption. Even if you download an encrypted media file, you are going to need a key to actually play it.
 
-**Try it:** [Download this video](https://storage.googleapis.com/kino-assets/encrypted-media-extensions/encrypted.mp4) and try playing it in any video player on your device. You'll notice you won't be able to. But the same video plays just fine on this page.
+**Try it:** [Download this video](https://storage.googleapis.com/kino-assets/encrypted-media-extensions/encrypted.mp4) and try playing it in any video player on your device. You'll notice you won't be able to. But when you run the same video in this application, it plays just fine.
 
 The [Encrypted Media Extensions API] allows web application developers to interact with a set of components that can make sure the decryption and playback only takes place for users that are allowed to access that particular piece of media content.
 
@@ -59,11 +72,19 @@ These are the main components the Encrypted Media Extensions API interacts with:
 
 * **Application:** Your video application, usually written in HTML5 and JS.
 * **License Server:** Static data or a web server returning the decrpytion keys.
-* **Content Decryption Module (CDM):** 3rd party software decrypting the media.
+* **Content Decryption Module (CDM):** Software or firmware decrypting the media.
 
-**Note:** Some CDM systems not only decrypt the media, but also decode a output it directly having a direct access to the graphics or audio hardware, never returning the decrypted data back to the browser.
+**Note:** Some CDM systems not only decrypt the media, but also decode and output it directly having a direct access to the device's hardware, never returning the decrypted data back to the browser.
 
 For a more detailed overview of the decryption flow make sure to check out the full data flow diagram in the Encrypted Media Extensions [specification].
 
 [Encrypted Media Extensions API]: https://developer.mozilla.org/en-US/docs/Web/API/Encrypted_Media_Extensions_API
 [specification]: https://www.w3.org/TR/encrypted-media/#introduction
+
+## Encrypting videos
+
+Tools used to encode and encrypt media files in most commercial applications are called packagers. One of the widely used packagers is the [Shaka Packager]. If you plan on building a larger media application, make sure to check it out.
+
+However, to encrypt just a single video and to
+
+[Shaka Packager]: https://github.com/google/shaka-packager

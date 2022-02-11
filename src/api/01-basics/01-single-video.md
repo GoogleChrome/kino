@@ -28,7 +28,6 @@ media-session-artwork:
   - sizes: 512x512
     src: https://storage.googleapis.com/kino-assets/single-video/artwork-512x512.png
     type: image/png
-
 ---
 
 ## Introduction

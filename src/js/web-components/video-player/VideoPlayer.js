@@ -26,6 +26,7 @@ import {
   MEDIA_SESSION_DEFAULT_ARTWORK,
   PIP_CLASSNAME,
 } from '../../constants';
+import decryptVideo from '../../utils/decryptVideo';
 
 export default class extends HTMLElement {
   /**
@@ -130,6 +131,10 @@ export default class extends HTMLElement {
      */
     this.videoElement = this.internal.root.querySelector('video');
     this.videoElement.addEventListener('error', this.handleVideoError.bind(this), true);
+
+    if (videoData.encryption) {
+      decryptVideo(this.videoElement, videoData.encryption);
+    }
 
     const floatingButtonsBar = this.internal.root.querySelector('.floating-buttons');
     const pipButton = this.createPiPButton();
