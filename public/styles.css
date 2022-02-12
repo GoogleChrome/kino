@@ -638,6 +638,9 @@ article pre code,
 .video-container--overlay {
   display: none;
 }
+.video-container.has-player {
+  padding-bottom: 0;
+}
 .has-overlay .video-container--overlay {
   position: absolute;
   width: 100%;

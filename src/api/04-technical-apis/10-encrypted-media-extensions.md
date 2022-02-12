@@ -40,7 +40,7 @@ media-session-artwork:
     type: image/png
 encryption:
   type: org.w3.clearkey
-  src: /video/encrypted-2.mp4
+  src: https://storage.googleapis.com/kino-assets/encrypted-media-extensions/encrypted.mp4
   mimeCodec: video/mp4; codecs="avc1.640032, mp4a.40.2"
   mediaKeySystemConfig:
     initDataTypes:

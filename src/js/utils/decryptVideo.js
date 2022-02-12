@@ -123,7 +123,15 @@ export default function decryptVideo(videoElement, encryption) {
 
       fetch(encryption.src).then((response) => {
         response.arrayBuffer().then((arrayBuffer) => {
-          sourceBuffer.addEventListener('updateend', () => mediaSource.endOfStream());
+          sourceBuffer.addEventListener(
+            'updateend',
+            () => {
+              if (!sourceBuffer.updating && mediaSource.readyState === 'open') {
+                mediaSource.endOfStream();
+              }
+            },
+            false,
+          );
           sourceBuffer.appendBuffer(arrayBuffer);
         });
       });
