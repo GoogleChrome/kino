@@ -56,9 +56,9 @@ encryption:
 
 ## Introduction
 
-Web developers use tags like `<video>` and `<audio>` to embed media files on web pages and browsers offer users few option of what to do with such embed. One of those options is to download the media file, share it with other and play it back locally at any later time.
+Web developers use tags like `<video>` and `<audio>` to embed media files on web pages. Browsers then offer users several options of what to do with these embeds. One of those options is to download the media file, share it with others and play it back locally at any later time.
 
-This default behavior is too permissive for many business models and use cases, though. This is where the Encrypted Media Extensions API comes into play.
+This default behavior is too permissive for many use cases, though. This is where the Encrypted Media Extensions API comes into play.
 
 ## Securing video playback
 
@@ -66,18 +66,18 @@ The simplest way of protecting any data from viewing it is encryption. Even if y
 
 **Try it:** [Download this video](https://storage.googleapis.com/kino-assets/encrypted-media-extensions/encrypted.mp4) and try playing it in any video player on your device. You'll notice you won't be able to. But when you run the same video in this application, it plays just fine.
 
-The [Encrypted Media Extensions API] allows web application developers to interact with a set of components that can make sure the decryption and playback only takes place for users that are allowed to access that particular piece of media content.
+The [Encrypted Media Extensions API] allows applications to decrypt media on the fly. It handles media keys and license exchange and it can also directly render the media.
 
-These are the main components the Encrypted Media Extensions API interacts with:
+The main components the Encrypted Media Extensions API interacts with are:
 
 * **Application:** Your video application, usually written in HTML5 and JS.
 * **Key System:** A decryption or protection system, e.g. Clear Key, Widevine etc.
 * **License Server:** Static data or a web server returning the decrpytion keys.
 * **Content Decryption Module (CDM):** Software or firmware decrypting the media.
 
-**Note:** Some CDM systems not only decrypt the media, but also decode and output it directly having a direct access to the device's hardware, never returning the decrypted data back to the browser.
+**Note:** Some CDM systems have direct access to the device's hardware. Those systems don't return decrypted data back to the browser. Instead they decrypt, decode and output the media themselves.
 
-For a more detailed overview of the decryption flow make sure to check out the full data flow diagram in the Encrypted Media Extensions [specification].
+Check out the diagram in the Encrypted Media Extensions [specification] for a detailed overview of the decryption flow.
 
 ## Encrypting video
 
@@ -154,7 +154,7 @@ mp4encrypt
 
 **Note:** The example above uses two different keys. One encrypts the video track (track #1), the other encrypts audio (track #2).
 
-Now your MP4 file is correctly fragmented and ready to be played back in the browser using the [Encrypted Media Extensions API].
+Now your MP4 file is encrypted and ready to be played back in the browser using the [Encrypted Media Extensions API].
 
 ## Encrypted Media Extensions API usage
 
