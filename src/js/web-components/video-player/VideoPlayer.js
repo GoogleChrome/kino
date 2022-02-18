@@ -25,8 +25,12 @@ import {
   CAST_TARGET_NAME,
   MEDIA_SESSION_DEFAULT_ARTWORK,
   PIP_CLASSNAME,
+  STATS_OVERLAY_CLASSNAME,
+  STATS_OVERLAY_DISPLAYED_CLASSNAME,
 } from '../../constants';
 import decryptVideo from '../../utils/decryptVideo';
+import { getMediaConfigurationVideo } from '../../utils/getMediaConfiguration';
+import getDecodingInfo from '../../utils/getDecodingInfo';
 
 export default class extends HTMLElement {
   /**
@@ -119,6 +123,7 @@ export default class extends HTMLElement {
       <svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-miterlimit="10"><path d="M34.133 107.201c0-13.253-10.747-24-24-24M53.333 107.2c0-23.861-19.339-43.2-43.2-43.2" fill="none" stroke="var(--icon)" stroke-width="8"/><path d="M10.133 112.001a4.8 4.8 0 1 0 0-9.6 4.8 4.8 0 0 0 0 9.6Z" fill="var(--icon)" fill-rule="nonzero"/><path d="M5.333 49.778V32c0-5.891 4.776-10.667 10.667-10.667h96c5.891 0 10.667 4.776 10.667 10.667v64c0 5.891-4.776 10.667-10.667 10.667H72.381" fill="none" stroke="var(--icon)" stroke-width="8"/></svg>
       <p>Casting<span class="cast-target"> to <span class="cast-target-name"></span></span></p>
     </div>
+    <div class="stats-overlay">STATS OVERLAY</div>
     `;
 
     while (this.internal.root.firstChild) {
@@ -161,6 +166,20 @@ export default class extends HTMLElement {
     this.videoElement.addEventListener('play', () => {
       if (!this.internal.mediaSessionIsInit) this.initMediaSession();
     });
+
+    /**
+     * Set up the stats overlay.
+     */
+    if (this.internal.videoData.stats) {
+      this.videoElement.addEventListener(
+        'play',
+        () => this.classList.add(STATS_OVERLAY_DISPLAYED_CLASSNAME),
+        { once: true },
+      );
+
+      this.videoElement.addEventListener('playing', this.updateStatsOverlay.bind(this));
+      this.videoElement.addEventListener('timeupdate', this.updateStatsOverlay.bind(this));
+    }
   }
 
   /**
@@ -509,5 +528,58 @@ export default class extends HTMLElement {
     if (e.sessionState === 'SESSION_ENDED') {
       this.classList.remove(CAST_CLASSNAME);
     }
+  }
+
+  /**
+   * Updates the video playback statistics rendered on top of the video.
+   */
+  async updateStatsOverlay() {
+    let capText = '';
+    let vqText = '';
+    let mediaText = '';
+
+    const statsOverlayEl = this.internal.root.querySelector(`.${STATS_OVERLAY_CLASSNAME}`);
+
+    /** @type {VideoPlaybackQuality} */
+    const vq = this.videoElement.getVideoPlaybackQuality();
+    const vqData = [
+      ['Total frames: ', vq.totalVideoFrames],
+      ['Dropped frames: ', vq.droppedVideoFrames],
+    ];
+    vqText = vqData.map(([label, value]) => `<div>${label}${value}</div>`).join('');
+
+    const reps = this.internal.streamer?.stream?.media?.representations;
+    const selectedReps = this.internal.streamer?.stream?.media?.lastRepresentationsIds;
+
+    if (reps && selectedReps) {
+      const videoId = selectedReps.video;
+      const videoRep = reps.video.find((rep) => rep.id === videoId);
+
+      if (videoRep) {
+        const videoConfiguration = getMediaConfigurationVideo(videoRep);
+        const decodingInfo = await getDecodingInfo(videoConfiguration);
+
+        const capData = [
+          ['Power efficient: ', decodingInfo.powerEfficient],
+          ['Smooth: ', decodingInfo.smooth],
+          ['Supported: ', decodingInfo.supported],
+        ];
+        capText = capData.map(([label, value]) => `<div>${label}${value}</div>`).join('');
+
+        const mediaData = [
+          ['Video codec: ', videoConfiguration.video.contentType],
+          ['Video resolution: ', `${videoConfiguration.video.width}x${videoConfiguration.video.height}`],
+        ];
+        mediaText = mediaData.map(([label, value]) => `<div>${label}${value}</div>`).join('');
+      }
+    }
+
+    statsOverlayEl.innerHTML = `
+      <h4>Media Info</h4>
+      ${mediaText}
+      <h4>Video Playback Quality API</h4>
+      ${vqText}
+      <h4>Media Capabilities API</h4>
+      ${capText}`;
   }
 }
