@@ -240,6 +240,10 @@ video.addEventListener(
 
 **Note:** The `<video>` source should not be a static file, instead web browsers usually require that the [Media Source Extensions API] is used to read the encrypted video data.
 
+## What's Next?
+
+[In the next article] we're going to open the topic of playback performance and talk about the Video Playback Quality API and the Media Capabilities API.
+
 [Encrypted Media Extensions API]: https://developer.mozilla.org/en-US/docs/Web/API/Encrypted_Media_Extensions_API
 [specification]: https://www.w3.org/TR/encrypted-media/#introduction
 [Shaka Packager]: https://github.com/google/shaka-packager
@@ -251,3 +255,4 @@ video.addEventListener(
 [PSSH box]: https://www.w3.org/TR/eme-stream-mp4/#init-data
 [license format]: https://www.w3.org/TR/encrypted-media/#clear-key-license-format
 [Media Source Extensions API]: /streaming-basics/#media-source-extensions
+[In the next article]: /playback-performance/

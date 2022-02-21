@@ -29,7 +29,7 @@ import {
   STATS_OVERLAY_DISPLAYED_CLASSNAME,
 } from '../../constants';
 import decryptVideo from '../../utils/decryptVideo';
-import { getMediaConfigurationVideo } from '../../utils/getMediaConfiguration';
+import { getMediaConfigurationAudio, getMediaConfigurationVideo } from '../../utils/getMediaConfiguration';
 import getDecodingInfo from '../../utils/getDecodingInfo';
 
 export default class extends HTMLElement {
@@ -553,11 +553,17 @@ export default class extends HTMLElement {
 
     if (reps && selectedReps) {
       const videoId = selectedReps.video;
-      const videoRep = reps.video.find((rep) => rep.id === videoId);
+      const audioId = selectedReps.audio;
 
-      if (videoRep) {
+      const videoRep = reps.video.find((rep) => rep.id === videoId);
+      const audioRep = reps.audio.find((rep) => rep.id === audioId);
+
+      if (videoRep && audioRep) {
         const videoConfiguration = getMediaConfigurationVideo(videoRep);
-        const decodingInfo = await getDecodingInfo(videoConfiguration);
+        const audioConfiguration = getMediaConfigurationAudio(audioRep);
+        const mediaConfiguration = { ...videoConfiguration, ...audioConfiguration };
+
+        const decodingInfo = await getDecodingInfo(mediaConfiguration);
 
         const capData = [
           ['Power efficient: ', decodingInfo.powerEfficient],
@@ -569,6 +575,10 @@ export default class extends HTMLElement {
         const mediaData = [
           ['Video codec: ', videoConfiguration.video.contentType],
           ['Video resolution: ', `${videoConfiguration.video.width}x${videoConfiguration.video.height}`],
+          ['Audio codec: ', audioConfiguration.audio.contentType],
+          ['Audio bitrate: ', audioConfiguration.audio.bitrate],
+          ['Audio sampling rate: ', audioConfiguration.audio.samplerate],
+          ['Audio channels: ', audioConfiguration.audio.channels],
         ];
         mediaText = mediaData.map(([label, value]) => `<div>${label}${value}</div>`).join('');
       }

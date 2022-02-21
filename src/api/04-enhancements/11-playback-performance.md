@@ -46,55 +46,87 @@ stats: true
 
 ## Introduction
 
-The simplest way of embedding a video on the web is using the HTML Video
-element (`<video>`). However, every browser supports a different set of video
-formats. Picking the right format will ensure your video has the highest
-possible browser compatibility and is going to play in almost every situation.
+Not all devices are able to play all video sources smoothly at all times.
 
-## Choosing the right format
+* Older hardware may not be able to decode high resolution video fast enough.
+* Mobile devices performance may be different in battery saving modes.
+* Not all devices can use hardware acceleration to decode all video codecs.
 
-Browsers usually support multiple video formats, but there is a limited overlap
-in their capabilities. If you only want to encode your videos in a single
-format, the safest choice is to use an [MP4 container] encapsulating `H.264`
-video and `AAC` audio.
+Assuming you have encoded your video in multiple resolutions and codecs, you should now decide which source you'll serve by default in each device context.
 
-### Basic code example
+To help you choose, there are two browser APIs able to give you insights into video playback performance:
 
-```html
-<video controls>
-  <source src="video.mp4" type="video/mp4">
-</video>
+* [Media Capabilities API]: To obtain device's media decoding capabilities.
+* [Video Playback Quality API]: To get playback quality metrics for a playing video.
+
+**Try it:** Play the video on this page. Notice the overlay that displays live values returned by the two APIs.
+
+## Media Capabilities API
+
+The [decodingInfo] method of the [Media Capabilities API] accepts a media configuration object and returns information about whether such media playback is going to be `supported`, `smooth` and `powerEfficient`.
+
+```js
+const isSupported = (
+  'mediaCapabilities' in navigator
+  && 'decodingInfo' in navigator.mediaCapabilities
+);
+
+// Note: Use `isSupported` to bypass the logic below
+//       if the Media Capabilities API is not supported.
+
+const mediaConfiguration = {
+    "type": "media-source", // Use "file" for a plain file playback.
+    "video": {
+        "contentType": "video/webm; codecs=\"vp09.00.40.08\"",
+        "width": 1920,
+        "height": 1080,
+        "bitrate": 3000000,
+        "framerate": 23.976023976023978
+    },
+    "audio": {
+        "contentType": "audio/mp4; codecs=\"mp4a.40.2\"",
+        "bitrate": 128000,
+        "samplerate": 44100,
+        "channels": 2
+    }
+}
+
+navigator.mediaCapabilities.decodingInfo(mediaConfiguration).then(
+  result => {
+    console.log(`Supported: ${result.supported}`);
+    console.log(`Smooth: ${result.smooth}`);
+    console.log(`Power efficient: ${result.powerEfficient}`);
+  }
+)
 ```
 
-This simple approach is enough to get you up and running. Your video will now
-play in all major web browsers. Notice the `controls` attribute that instructs
-browsers to allow users to control video playback, which includes volume,
-seeking, selecting captions, pause/resume playback etc.
+**Note:** There is also an [encodingInfo] method available in some browsers that will return the same type of information for media encoding capabilities of the current device.
 
-A single video source is simple to maintain, but it gives rise to some
-challenges. Users of your site are going to use different classes of devices
-to watch the video. A high resolution video is going to look great on desktop,
-but likely will take a long time to load on slower cellular networks.
+## Video Playback Quality API
 
-Take the video at the top of this page as an example, which has a `1280×720`
-resolution using the `H.264` codec with an effective bit rate of `1503 kb/s`.
-It looks decent on desktop while being small enough to not cause stuttering on
-good quality 3G networks. The video is clear, however, it's not a perfect fit
-for either use case and is why you should probably provide multiple video
-sources with a bitrate targeting the needs of your users.
+There is a [VideoPlaybackQuality object] associated with every `<video>` element. The `VideoPlaybackQuality` object contains a couple of key live video metrics that you can use to determine whether the current video playback is smooth.
 
-### Example FFmpeg command
+```js
+const video = document.querySelector('video');
+const vq = video.getVideoPlaybackQuality();
 
+// Print the number of total created frames
+// and dropped frames every second.
+setInterval(() => {
+  console.log(`Total frames: ${vq.totalVideoFrames}`);
+  console.log(`Dropped frames: ${vq.droppedVideoFrames}`);
+}, 1000);
 ```
-ffmpeg -i source.mp4 -b:v 1350k -c:v libx264 -c:a copy -filter:v "scale=1280:-1" -preset veryslow video.mp4
-```
+
+Data returned by the `VideoPlaybackQuality` object allows you to switch video sources to a less demanding one in cases when the target device struggles to decode the data stream in time.
 
 ## What's Next?
 
-Advanced codecs like `VP9` and `HEVC` generally produce smaller file sizes,
-which improves the visual quality and/or experience on slower networks. Next,
-we'll learn when and how to specify [multiple sources] within the HTML5
-`<video>` element.
+Next we're going to [explore the Background Fetch API]. You'll learn how to initiate and handle media downloads that run in the background, without depending on you web application being actively loaded by the browser.
 
-[MP4 container]: https://caniuse.com/mpeg4
-[multiple sources]: /multiple-sources/
+[Media Capabilities API]: https://developer.mozilla.org/en-US/docs/Web/API/MediaCapabilities
+[Video Playback Quality API]: https://developer.mozilla.org/en-US/docs/Web/API/VideoPlaybackQuality
+[decodingInfo]: https://developer.mozilla.org/en-US/docs/Web/API/MediaCapabilities/decodingInfo
+[encodingInfo]: https://developer.mozilla.org/en-US/docs/Web/API/MediaCapabilities/encodingInfo
+[VideoPlaybackQuality object]: https://developer.mozilla.org/en-US/docs/Web/API/VideoPlaybackQuality
+[explore the Background Fetch API]: /background-fetch-api/
