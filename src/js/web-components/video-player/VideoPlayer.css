@@ -38,6 +38,10 @@
   border: none;
 }
 
+:host .floating-buttons > button.hidden {
+  display: none;
+}
+
 button google-cast-launcher {
   height: 24px;
   width: auto;
