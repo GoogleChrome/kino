@@ -71,7 +71,7 @@ A minimal example of controlling the video's Picture-in-Picture state would only
 
 ## Checking for feature support
 
-[Picture-in-Picture API support] is spotty. Even in browsers that implement it, the feature may be disabled by the `picture-in-picture` Feature Policy. There is a handy `pictureInPictureEnabled` property that will be present on the `document` in browsers that implement the API and its value will be `true` if Picture-in-Picture mode is allowed.
+[Picture-in-Picture API support] is different from what you're probably used to. Even in browsers that implement it, the feature may be disabled by the `picture-in-picture` Feature Policy. There is a handy `pictureInPictureEnabled` property that will be present on the `document` in browsers that implement the API and its value will be `true` if Picture-in-Picture mode is allowed.
 
 Also be aware that any request to enter or leave the Picture-in-Picture mode could fail or may be declined by the browser for other reasons, so you should account for that:
 
@@ -125,7 +125,7 @@ When you play the video above, you can click the <span style="border-radius: 8px
 
 ## What's next?
 
-Playing videos in a floating window is useful for a local viewing session. However users ofter prefer to watch content on other devices such as their TVs. In the [next article] we'll talk about media casting – and Google Cast in particular.
+Playing videos in a floating window is useful for a local viewing session. However users often prefer to watch content on other devices such as their TVs. In the [next article] we'll talk about media casting – and Google Cast in particular.
 
 [Picture-in-Picture API support]: https://developer.mozilla.org/en-US/docs/Web/API/Picture-in-Picture_API#htmlvideoelement.requestpictureinpicture
 [Media Session API]: https://web.dev/media-session/

@@ -98,14 +98,14 @@ to attempt to manually start playback as soon as possible.
 </video>
 <script>
   const videoElement = document.querySelector('video');
-  videoElement.play();
+  videoElement.play().then(() => { /* video is playing */});
 </script>
 ```
 
 Similarly to the `autoplay` attribute, browsers may choose to not play the
 video in this situation, especially if it contains sound and is not muted.
 
-One useful benefit of calling the `play()` method is that it returns a Promise
+One useful benefit of calling the `play()` method is that it returns a promise
 that resolves when playback starts and rejects when it won't start for any
 reason. This gives you a chance to respond.
 
@@ -132,7 +132,7 @@ to use video controls rendered by the browser.
 
    /**
     * Note: In older browsers the `play()` method may not
-    *       return a Promise. If you need to support
+    *       return a promise. If you need to support
     *       pre-2019 browsers, you could do:
     *
     * Promise.resolve(videoElement.play())
@@ -140,7 +140,7 @@ to use video controls rendered by the browser.
     *     // Mute and try playing again.
     *   })
     *
-    * ... to wrap the non-Promise return values as Promises.
+    * ... to wrap the non-promise return values as promises.
 </script>
 ```
 
@@ -220,6 +220,7 @@ Find more in-depth information at the [Chrome Developers website].
 
 ## What's Next?
 
-TBD
+In the [next article], we are going explore the Picture-in-Picture API, which can be used to play videos and other media sources in a floating window that stays on top of other applications.
 
 [Chrome Developers website]: https://developer.chrome.com/blog/autoplay/
+[next article]: /picture-in-picture/

@@ -84,6 +84,7 @@ const generateLicense = (message) => {
  *
  * @param {HTMLMediaElement} videoElement                    Video element.
  * @param {object}           encryption                      Encryption data.
+ * @param {string}           encryption.src                  Encrypted video source URL.
  * @param {string}           encryption.type                 Encryption type.
  * @param {string}           encryption.mimeCodec            Media MIME type and codec string.
  * @param {object}           encryption.mediaKeySystemConfig Key system config.
@@ -134,7 +135,9 @@ export default function decryptVideo(videoElement, encryption) {
           );
           sourceBuffer.appendBuffer(arrayBuffer);
         });
-      });
+      })
+        /* eslint-disable-next-line no-console */
+        .catch((e) => console.error(`Encrypted media fetch failed with error: ${e}`));
     });
   } else {
     /* eslint-disable-next-line no-console */

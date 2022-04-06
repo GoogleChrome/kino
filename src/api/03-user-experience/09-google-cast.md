@@ -63,7 +63,7 @@ Before you can use Google Cast to stream your media to other devices, there are 
 
 ## Using the Cast Application Framework
 
-The [Cast Application Framework] is the part of Google Cast SDK which exposes objects, methods and events necessary for building web sender applications.
+The [Cast Application Framework] (CAF) is the part of Google Cast SDK which exposes objects, methods and events necessary for building web sender applications.
 
 ```html
 <script>
@@ -93,13 +93,13 @@ function initCastApi() {
     e => castVideo(e.sessionState),
   );
 
-  const castVideo = asnyc (state) => {
+  const castVideo = async (state) => {
     // 5. When the `session` state change event is `SESSION_STARTED`,
     //    we try to load the video.
     if (state === 'SESSION_STARTED') {
       const session = context.getCurrentSession();
       const mediaInfo = new chrome.cast.media.MediaInfo(
-        'http://localhost/video.mp4',                // Provide a URL.
+        'http://example.com/video.mp4',              // Provide a URL.
         'video/mp4; codecs="avc1.640032,mp4a.40.2"', // MIME + codecs.
       );
       const request = new chrome.cast.media.LoadRequest(mediaInfo);
@@ -129,18 +129,21 @@ The [Cast Application Framework] defines several [Metadata classes] that develop
 
 ```js
 const mediaInfo = new chrome.cast.media.MediaInfo(
-  'http://localhost/video.mp4',                // Provide a URL.
+  'http://example.com/video.mp4',              // Provide a URL.
   'video/mp4; codecs="avc1.640032,mp4a.40.2"', // MIME + codecs.
 );
 
 // Image URLs need to be "wrapped" by the Image class.
-const thumbnail = new chrome.cast.Image('http://localhost/thumb.jpg');
+const thumbnail = new chrome.cast.Image('http://example.com/thumb.jpg');
 
 // Our video is a short clip, but if it was a full-length movie,
 // we would use `MovieMediaMetadata` here.
 mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
 mediaInfo.metadata.title = 'My Dog Chasing Geese';
 mediaInfo.metadata.images = [ thumbnail ];
+
+// mediaInfo is later used to create a `LoadRequest`
+// const request = new chrome.cast.media.LoadRequest(mediaInfo);
 ```
 
 ## Captions and subtitles
@@ -149,7 +152,7 @@ Media can contain additional [tracks of different types]. You can use text track
 
 ```js
 const mediaInfo = new chrome.cast.media.MediaInfo(
-  'http://localhost/video.mp4',                // Provide a URL.
+  'http://example.com/video.mp4',              // Provide a URL.
   'video/mp4; codecs="avc1.640032,mp4a.40.2"', // MIME + codecs.
 );
 
@@ -159,7 +162,7 @@ const captionsTrack = new chrome.cast.media.Track(
   chrome.cast.media.TrackType.TEXT,
 );
 
-captionsTrack.trackContentId = 'http://localhost/captions-en.vtt';
+captionsTrack.trackContentId = 'http://example.com/captions-en.vtt';
 captionsTrack.subtype = chrome.cast.media.TextTrackType.CAPTIONS;
 captionsTrack.name = 'English CC';
 captionsTrack.language = 'en-US'; // RFC 5646 Language Tag.
@@ -169,6 +172,9 @@ captionsTrack.trackContentType = 'text/vtt';
 // how and whether additional tracks are exposed in the UI depends
 // on the receiver application implementation.
 mediaInfo.tracks = [ captionsTrack ];
+
+// mediaInfo is later used to create a `LoadRequest`
+// const request = new chrome.cast.media.LoadRequest(mediaInfo);
 ```
 
 ## UX considerations
@@ -219,15 +225,15 @@ To achieve this, we can listen for `SESSION_STATE_CHANGED` events and add or rem
     e => {
       switch (e.sessionState) {
         case 'SESSION_ENDED':
-          overlay.classList.remove('hidden');
+          overlay.classList.add('hidden');
           break;
         case 'SESSION_STARTED':
         case 'SESSION_RESUMED':
           const session = context.getCurrentSession();
           const targetName = session.getCastDevice().friendlyName;
 
-          overlay.classList.add('hidden');
-          target.innerText = ` to ${targetName}`;
+          overlay.classList.remove('hidden');
+          target.innerText = targetName ? ` to ${targetName}` : '';
       }
     },
   );

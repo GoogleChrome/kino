@@ -119,11 +119,10 @@ addEventListener('backgroundfetchsuccess', (event) => {
     const promises = records.map(async (record) => {
       const response = await record.responseReady;
 
-      // Maybe store the `Response` object using
-      // the Cache or IndexedDB API?
+      // TODO: Store the response object using the Cache or IndexedDB API
     });
 
-    // Wait until the promises settle.
+    // Wait until all responses are ready and saved locally
     await Promise.all(promises);
 
     // Use the `updateUI` method to change
