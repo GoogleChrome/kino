@@ -206,8 +206,8 @@ To achieve this, we can listen for `SESSION_STATE_CHANGED` events and add or rem
 
 <div class="video-wrapper">
   <video src="video.mp4"></video>
-  <div class="cast-overlay hidden">
-    Casting<span class="cast-target"></span>
+  <div class="cast-overlay" hidden>
+    Casting to <span class="cast-target"></span>
   </div>
 </div>
 
@@ -225,15 +225,14 @@ To achieve this, we can listen for `SESSION_STATE_CHANGED` events and add or rem
     e => {
       switch (e.sessionState) {
         case 'SESSION_ENDED':
-          overlay.classList.add('hidden');
+          overlay.setAttribute('hidden', '');
           break;
         case 'SESSION_STARTED':
         case 'SESSION_RESUMED':
           const session = context.getCurrentSession();
-          const targetName = session.getCastDevice().friendlyName;
 
-          overlay.classList.remove('hidden');
-          target.innerText = targetName ? ` to ${targetName}` : '';
+          target.innerText = session.getCastDevice().friendlyName;
+          overlay.removeAttribute('hidden');
       }
     },
   );
