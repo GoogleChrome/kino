@@ -1,7 +1,7 @@
 ---
 title: Playback Performance
 description: |
-  Use the Media Capabilities API and the Video Playback Quality API to estimate and measure playback efficiency and smoothness.
+  Use the Media Capabilities and the Video Playback Quality APIs to estimate and measure playback efficiency and smoothness.
 date: February 18, 2022
 length: '1:04'
 video-sources:
@@ -48,13 +48,13 @@ stats: true
 
 Not all devices are able to play all video sources smoothly at all times.
 
-* Older hardware may not be able to decode high resolution video fast enough.
-* Mobile devices performance may be different in battery saving modes.
+* Older hardware may not be able to decode high resolution video quickly enough.
+* Mobile device performance may be different in battery saving modes.
 * Not all devices can use hardware acceleration to decode all video codecs.
 
 Assuming you have encoded your video in multiple resolutions and codecs, you should now decide which source you'll serve by default in each device context.
 
-To help you choose, there are two browser APIs able to give you insights into video playback performance:
+To help you choose, there are two browser APIs able to give insights into video playback performance:
 
 * [Media Capabilities API]: To obtain device's media decoding capabilities.
 * [Video Playback Quality API]: To get playback quality metrics for a playing video.
@@ -104,7 +104,7 @@ navigator.mediaCapabilities.decodingInfo(mediaConfiguration).then(
 
 ## Video Playback Quality API
 
-There is a [VideoPlaybackQuality object] associated with every `<video>` element. The `VideoPlaybackQuality` object contains a couple of key live video metrics that you can use to determine whether the current video playback is smooth.
+There is a [VideoPlaybackQuality object] associated with every `<video>` element. The `VideoPlaybackQuality` object contains a couple of key, live video metrics you can use to determine whether the current video playback is smooth.
 
 ```js
 const video = document.querySelector('video');
@@ -118,11 +118,11 @@ setInterval(() => {
 }, 1000);
 ```
 
-Data returned by the `VideoPlaybackQuality` object allows you to switch video sources to a less demanding one in cases when the target device struggles to decode the data stream in time.
+Data returned by the `VideoPlaybackQuality` object allows you to switch video source to a less demanding one in cases when the target device struggles to decode the data stream in time.
 
 ## What's Next?
 
-Next we're going to [explore the Background Fetch API]. You'll learn how to initiate and handle media downloads that run in the background, without depending on you web application being actively loaded by the browser.
+Next we will [explore the Background Fetch API]. You'll learn how to initiate and handle media downloads that run in the background without depending on your web application being loaded by the browser.
 
 [Media Capabilities API]: https://developer.mozilla.org/en-US/docs/Web/API/MediaCapabilities
 [Video Playback Quality API]: https://developer.mozilla.org/en-US/docs/Web/API/VideoPlaybackQuality

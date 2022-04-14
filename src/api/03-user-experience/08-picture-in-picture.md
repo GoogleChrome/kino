@@ -1,7 +1,7 @@
 ---
 title: Picture-in-Picture
 description: |
-  Play your videos in a detached floating window that stays on top of other applications using the Picture-in-Picture API.
+  Play your videos in a detached, floating window that stays on top of other applications using the Picture-in-Picture API.
 date: January 31st, 2022
 length: '1:04'
 video-sources:
@@ -73,7 +73,7 @@ A minimal example of controlling the video's Picture-in-Picture state would only
 
 [Picture-in-Picture API support] is different from what you're probably used to. Even in browsers that implement it, the feature may be disabled by the `picture-in-picture` Feature Policy. There is a handy `pictureInPictureEnabled` property that will be present on the `document` in browsers that implement the API and its value will be `true` if Picture-in-Picture mode is allowed.
 
-Also be aware that any request to enter or leave the Picture-in-Picture mode could fail or may be declined by the browser for other reasons, so you should account for that:
+Be aware any request to enter or leave the Picture-in-Picture mode could fail or may be declined by the browser for other reasons, and so you should account for that:
 
 ```html
 <video src="video.mp4"></video>
@@ -125,7 +125,7 @@ When you play the video above, you can click the <span style="border-radius: 8px
 
 ## What's next?
 
-Playing videos in a floating window is useful for a local viewing session. However users often prefer to watch content on other devices such as their TVs. In the [next article] we'll talk about media casting – and Google Cast in particular.
+Playing videos in a floating window is useful for a local viewing session. However, users often prefer to watch content on other devices such as their televisions. In the [next article] we'll talk about media casting – and Google Cast in particular.
 
 [Picture-in-Picture API support]: https://developer.mozilla.org/en-US/docs/Web/API/Picture-in-Picture_API#htmlvideoelement.requestpictureinpicture
 [Media Session API]: https://web.dev/media-session/

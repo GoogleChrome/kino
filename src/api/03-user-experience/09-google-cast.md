@@ -50,7 +50,7 @@ When one device controls media content playback on another device, we call it **
 
 ## Basic concepts
 
-Before you can use Google Cast to stream your media to other devices, there are a few basic concepts you should understand first:
+Before you can use Google Cast to stream your media to other devices, there are a few basic concepts you should understand:
 
 * **Sender application**: A mobile or web application that uses Google Cast SDK to discover target devices on the network and to initialize and remotely control playback of media being cast to receiver.
 * **Receiver application**: A web application that runs on a Google Cast compatible device such as a Chromecast dongle or a Chromecast built-in TV or speaker and implements the media player UI and handles messages from the *Sender application*.
@@ -123,7 +123,7 @@ function initCastApi() {
 
 ## Metadata
 
-Receiver applications may expose additional information about the media in their UI, or provide additional features depending on metadata passed to them.
+Receiver applications may expose additional information about the media in their UI or provide additional features depending on metadata passed to them.
 
 The [Cast Application Framework] defines several [Metadata classes] that developers can use to convey information like the content title, thumbnail, release dates, authors etc.
 
@@ -148,7 +148,7 @@ mediaInfo.metadata.images = [ thumbnail ];
 
 ## Captions and subtitles
 
-Media can contain additional [tracks of different types]. You can use text tracks to provide captions or subitles for your videos.
+Media can contain additional [tracks of different types]. You can use text tracks to provide captions or subtitles for your videos.
 
 ```js
 const mediaInfo = new chrome.cast.media.MediaInfo(
@@ -181,7 +181,7 @@ mediaInfo.tracks = [ captionsTrack ];
 
 When the casting session starts, video playback pauses in the sender application and the `<google-cast-launcher>` changes its styling to indicate the session in progress.
 
-However in many cases it is useful to provide additional indication. One of the common patterns is rendering a video overlay along with displaying a name of the device the media is being casted to.
+However, in many cases it is useful to provide additional indication. One of the common patterns is to render a video overlay along with displaying a name of the device to which the media is being cast.
 
 To achieve this, we can listen for `SESSION_STATE_CHANGED` events and add or remove an overlay element when session is started and ended:
 
@@ -242,7 +242,7 @@ To achieve this, we can listen for `SESSION_STATE_CHANGED` events and add or rem
 
 ## What's next?
 
-In the [next article], we are going to shift gears and talk about media encryption and the Encrypted Media Extensions API.
+In the [next article], we will shift gears and talk about media encryption and the Encrypted Media Extensions API.
 
 [Default Media Web Receiver]: https://developers.google.com/cast/docs/web_receiver#default_media_web_receiver
 [Styled Media Web Receiver]: https://developers.google.com/cast/docs/web_receiver#styled_media_web_receiver

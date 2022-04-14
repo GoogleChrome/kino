@@ -1,7 +1,7 @@
 ---
 title: Encrypted Media Extensions
 description: |
-  Protect your content by encrypting it, then use the Encrypted Media Extensions API to decrypt it securely within your application.
+  Protect your content by encrypting it, then use the Encrypted Media Extensions API to securely decrypt it within your application.
 date: January 31st, 2022
 length: '1:04'
 video-sources:
@@ -56,17 +56,17 @@ encryption:
 
 ## Introduction
 
-Web developers use tags like `<video>` and `<audio>` to embed media files on web pages. Browsers then offer users several options of what to do with these embeds. One of those options is to download the media file, share it with others and play it back locally at any later time.
+Web developers use tags like `<video>` and `<audio>` to embed media files on web pages. Browsers then offer users options of what to do with these embeds. One of those options is to download the media file, share it with others and play it back locally at any later time.
 
 This default behavior is too permissive for many use cases, though. This is where the Encrypted Media Extensions API comes into play.
 
 ## Securing video playback
 
-The simplest way of protecting any data from viewing it is encryption. Even if you download an encrypted media file, you are going to need a key to actually play it.
+The simplest way to protect any data from being viewable is encryption. Even if you download an encrypted media file, you are going to need a key to actually play it.
 
 **Try it:** [Download this video](https://storage.googleapis.com/kino-assets/encrypted-media-extensions/encrypted.mp4) and try playing it in any video player on your device. You'll notice you won't be able to. But when you run the same video in this application, it plays just fine.
 
-The [Encrypted Media Extensions API] allows applications to decrypt media on the fly. It handles media keys and license exchange and it can also directly render the media.
+The [Encrypted Media Extensions API] allows applications to decrypt media on the fly. It handles media keys and license exchange and can also directly render the media.
 
 The main components the Encrypted Media Extensions API interacts with are:
 
@@ -84,7 +84,7 @@ Check out the diagram in the Encrypted Media Extensions [specification] for a de
 To encrypt a video file, you need a few things:
 
 * The **video** in an appropriate format.
-* One of more **cipher keys** to be used for encyption.
+* One of more **cipher keys** to be used for encyrption.
 * Decision on which **encryption method** you want to use.
 
 We already [discussed video formats] and determined that a safe common denominator for most simple use cases is using the Common Media Application Format (CMAF), i.e. fragmented MP4 files.
@@ -152,17 +152,17 @@ mp4encrypt
   fragmented.mp4 encrypted.mp4
 ```
 
-**Note:** The example above uses two different keys. One encrypts the video track (track #1), the other encrypts audio (track #2).
+**Note:** The example above uses two different keys. One encrypts the video track (track #1) and the other encrypts audio (track #2).
 
 Now your MP4 file is encrypted and ready to be played back in the browser using the [Encrypted Media Extensions API].
 
 ## Encrypted Media Extensions API usage
 
-When web browsers download the `encrypted.mp4` file, they will figure out the file is encrypted. The [PSSH box] included in the MP4 file also contains list of IDs of keys necessary to decrypt the video.
+When web browsers download the `encrypted.mp4` file, they will determine the file is encrypted. The [PSSH box] included in the MP4 file also contains list of IDs of keys necessary to decrypt the video.
 
-This information is sent to the ClearKey CDM, which in turn requests a license – i.e. the actual keys – from our application. In our case the decryption keys are stored in the application as plain text.
+This information is sent to the ClearKey CDM, which in turn requests a license (i.e. the actual keys) from our application. In our case, the decryption keys are stored as plain text in the application.
 
-This allows us to satisfy the license request directly without the use of any license server.
+This allows us to directly satisfy the license request without the use of any license server.
 
 ```js
 /**
@@ -238,7 +238,7 @@ video.addEventListener(
 );
 ```
 
-**Note:** The `<video>` source should not be a static file, instead web browsers usually require that the [Media Source Extensions API] is used to read the encrypted video data.
+**Note:** The `<video>` source should not be a static file. Instead web browsers usually require that the [Media Source Extensions API] is used to read the encrypted video data.
 
 ## What's Next?
 

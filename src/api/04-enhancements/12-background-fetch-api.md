@@ -45,11 +45,11 @@ media-session-artwork:
 
 ## Introduction
 
-Web applications use the [Fetch API] to fetch resources, including file downloads from the network. However if the user closes the application web page or navigates away from it, all in progress `fetch` requests are interrupted and the download halts.
+Web applications use the [Fetch API] to fetch resources, including file downloads, from the network. However if the user closes the application web page or navigates away, all in progress `fetch` requests are interrupted and the download halts.
 
 The [Background Fetch API] allows web applications to offload a download operation to the browser. The browser exposes some UI to indicate that a download is in progress. When all files are downloaded, it exposes the downloaded data to your service worker.
 
-[Background Fetch API] allows you to batch many files into a single download operation. This is especially useful for downloading media, especially for downloading streaming formats like MPEG DASH that often serve a single media item split into tens or even hundreds of chunks, each in its own file.
+[Background Fetch API] allows you to batch files into a single download operation. This is especially useful for downloading media, particularly for downloading streaming formats like MPEG DASH that often serve a single media item split into tens or even hundreds of chunks, each in its own file.
 
 ## Initiate the download
 
@@ -101,7 +101,7 @@ navigator.serviceWorker.ready.then(async (swReg) => {
 
 ## Access downloaded data
 
-Once the background fetch is initialized, the browser is going to expose some kind of progress indication to the user. The download will now continue even if the user closes the application or navigates away.
+Once the background fetch is initialized, the browser will expose some kind of progress indication to the user. The download will now continue even if the user closes the application or navigates away.
 
 After all files finish downloading, the browser is going to trigger a `backgroundfetchsuccess` event in your service worker context. This gives you an opportunity to access the downloaded data.
 
@@ -134,7 +134,7 @@ addEventListener('backgroundfetchsuccess', (event) => {
 });
 ```
 
-**Note:** In case one or more of the downloaded files can't be fetched or when the user actively aborts the download operation, a `backgroundfetchfailure` or `backgroundfetchabort` respectively is going to be triggered instead.
+**Note:** In case one or more of the downloaded files can't be fetched or when the user actively aborts the download operation, a `backgroundfetchfailure` or `backgroundfetchabort` respectively will be triggered instead.
 
 ## Tracking progress
 
@@ -156,7 +156,7 @@ bgFetch.addEventListener('progress', () => {
 
 ## Try it!
 
-Go to [Kino Settings] and enable the _Download videos in the background_ feature. Then try downloading any of the videos using the _Make available offline_ button under any of the videos on this site. If your [browser supports the Background Fetch API], you'll notice it downloads the video using it's own UI.
+Go to [Kino Settings] and enable the _Download videos in the background_ feature. Then try to download any of the videos using the _Make available offline_ button under any of the videos on this site. If your [browser supports the Background Fetch API], you'll notice it downloads the video using its own UI.
 
 [Fetch API]: https://developers.google.com/web/updates/2015/03/introduction-to-fetch
 [Background Fetch API]: https://wicg.github.io/background-fetch/

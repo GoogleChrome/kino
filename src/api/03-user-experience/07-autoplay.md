@@ -67,12 +67,12 @@ a video is using the `autoplay` attribute.
 </video>
 ```
 
-However, browsers might not honor the attribute for various reasons, likely
-because it contains sound. Automatic playback of videos with sound often leads
-to poor user experience and browsers nowadays use multiple signals to determine
+Browsers might not honor the attribute for various reasons, likely
+because a given video contains sound. Automatic playback of videos with sound often leads
+to poor user experience and browsers use multiple signals to determine
 if playback with sound should be allowed.
 
-To improve your chances of browsers starting the playback, you can choose to
+To improve the chance of browsers starting playback, choose to
 play the video muted.
 
 ```html
@@ -83,7 +83,7 @@ play the video muted.
 </video>
 ```
 
-**Note:** Unless you provide your own UI for the video controls, make sure the
+**Note:** Unless you provide your own UI for the video controls, make sure
 to also use the `controls` attribute to let the browser render the default video
 controls.
 
@@ -102,16 +102,15 @@ to attempt to manually start playback as soon as possible.
 </script>
 ```
 
-Similarly to the `autoplay` attribute, browsers may choose to not play the
+As with the `autoplay` attribute, browsers may choose to not play the
 video in this situation, especially if it contains sound and is not muted.
 
-One useful benefit of calling the `play()` method is that it returns a promise
+One benefit of calling the `play()` method is that it returns a promise
 that resolves when playback starts and rejects when it won't start for any
 reason. This gives you a chance to respond.
 
-One good strategy is to mute the video and re-attempt the playback. Then, if
-that fails, render a custom play button or not do anything and let the user
-to use video controls rendered by the browser.
+A good strategy is to mute the video and re-attempt the playback. If
+that fails, render a custom play button or don't do anything and let the user use video controls rendered by the browser.
 
 ```html
 <video controls>
@@ -208,7 +207,7 @@ with sound is handily available.
 
 Browsers use various heuristics to determine whether automatic playback with
 sound is expected by the user or not. These heuristics differ between browsers,
-but here a few example use cases where autoplay with sound is likely:
+but here are a few example use cases where autoplay with sound is likely:
 
 * When the newly loaded page is a result of internal navigation initiated by
   the user, e.g. click, tap etc.
