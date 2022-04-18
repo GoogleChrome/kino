@@ -199,9 +199,6 @@ To achieve this, we can listen for `SESSION_STATE_CHANGED` events and add or rem
     background: #222;
     color: white;
   }
-  .hidden {
-    display: none;
-  }
 </style>
 
 <div class="video-wrapper">
