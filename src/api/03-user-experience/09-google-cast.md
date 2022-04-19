@@ -186,11 +186,8 @@ However, in many cases it is useful to provide additional indication. One of the
 To achieve this, we can listen for `SESSION_STATE_CHANGED` events and add or remove an overlay element when session is started and ended:
 
 ```html
-<div class="video-wrapper">
-  <video src="video.mp4"></video>
-  <div class="cast-overlay" hidden>
-    Casting to <span class="cast-target"></span>
-  </div>
+<div class="cast-overlay" hidden>
+  Casting to <span class="cast-target"></span>
 </div>
 
 <script>
@@ -212,7 +209,6 @@ To achieve this, we can listen for `SESSION_STATE_CHANGED` events and add or rem
         case 'SESSION_STARTED':
         case 'SESSION_RESUMED':
           const session = context.getCurrentSession();
-
           target.innerText = session.getCastDevice().friendlyName;
           overlay.removeAttribute('hidden');
       }
