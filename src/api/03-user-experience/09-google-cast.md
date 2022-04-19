@@ -186,21 +186,6 @@ However, in many cases it is useful to provide additional indication. One of the
 To achieve this, we can listen for `SESSION_STATE_CHANGED` events and add or remove an overlay element when session is started and ended:
 
 ```html
-<style>
-  .video-wrapper {
-    position: relative;
-    display: inline-block;
-  }
-  .cast-overlay {
-    position: absolute;
-    display: grid;
-    place-content: center;
-    inset: 0;
-    background: #222;
-    color: white;
-  }
-</style>
-
 <div class="video-wrapper">
   <video src="video.mp4"></video>
   <div class="cast-overlay" hidden>
