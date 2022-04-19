@@ -86,11 +86,46 @@ video {
   display: inline;
 }
 
+.stats-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  right: auto;
+  bottom: auto;
+  max-height: 65%;
+  max-width: 100%;
+  overflow: auto;
+  z-index: 1;
+  background-color: var(--code-background);
+  color: var(--icon);
+  padding: 1em;
+  opacity: 0.9;
+  box-sizing: border-box;
+}
+
+.stats-overlay h4 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.stats-overlay h4:first-child {
+  margin-top: 0;
+}
+
+:host(.stats-overlay-visible) .stats-overlay {
+  display: block;
+}
+
 @media (min-width: 720px) {
   :host(.picture-in-picture) .pip-overlay {
     row-gap: 32px;
   }
   :host(.cast) .cast-overlay {
     row-gap: 32px;
+  }
+  .stats-overlay {
+    inset: 1em;
+    right: auto;
+    bottom: auto;
   }
 }
