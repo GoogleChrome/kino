@@ -46,7 +46,7 @@ import ErrorPage from './js/pages/Error';
  * Settings
  */
 import { loadSetting } from './js/utils/settings';
-import { SETTING_KEY_TOGGLE_OFFLINE, SETTING_KEY_DARK_MODE } from './js/constants';
+import { SETTING_KEY_TOGGLE_OFFLINE, SETTING_KEY_DARK_MODE, CAST_BUTTON_HIDDEN_CLASSNAME } from './js/constants';
 
 /**
  * Custom Elements definition.
@@ -152,3 +152,65 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
   });
 }
+
+/**
+ * Create a global closure that ensures that Google Cast
+ * is only initialized once and allows the cast button
+ * to be reused across pages.
+ */
+window.kinoInitGoogleCast = (function kinoInitGoogleCastIIFE() {
+  let castButtonPromise = false;
+
+  /**
+   * Initializes Google Cast Web Sender and returns a promise resolving
+   * with a cast button.
+   *
+   * @returns {Promise<HTMLElement>} Custom <google-cast-launcher> element.
+   */
+  return () => {
+    if (!castButtonPromise) {
+      castButtonPromise = new Promise((resolve) => {
+        const castButton = document.createElement('button');
+        const castCustomElement = document.createElement('google-cast-launcher');
+
+        castButton.setAttribute('aria-label', 'Cast this video');
+        castButton.appendChild(castCustomElement);
+
+        const applyCastState = () => {
+          const castState = window.cast.framework.CastContext.getInstance().getCastState();
+
+          castButton.classList.toggle(
+            CAST_BUTTON_HIDDEN_CLASSNAME,
+            castState === 'NO_DEVICES_AVAILABLE',
+          );
+        };
+
+        const initCastApi = () => {
+          window.cast.framework.CastContext.getInstance().setOptions({
+            receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+          });
+
+          window.cast.framework.CastContext.getInstance().addEventListener(
+            window.cast.framework.CastContextEventType.CAST_STATE_CHANGED,
+            applyCastState,
+          );
+          applyCastState();
+
+          resolve(castButton);
+        };
+
+        window.__onGCastApiAvailable = (isAvailable) => {
+          if (isAvailable) {
+            initCastApi();
+          }
+        };
+
+        const scriptEl = document.createElement('script');
+        scriptEl.type = 'text/javascript';
+        scriptEl.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';
+        document.head.appendChild(scriptEl);
+      });
+    }
+    return castButtonPromise;
+  };
+}());

@@ -1,6 +1,7 @@
 :host {
   display: flex;
   align-items: center;
+  position: relative;
 }
 
 :host *:focus {
@@ -9,7 +10,122 @@
   outline-color: var(--accent);
 }
 
+:host .floating-buttons {
+  display: grid;
+  grid-auto-flow: column;
+  column-gap: 16px;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: auto; /* In order to not interfere with the mobile slide out menu. */
+}
+
+@media (min-width: 720px) {
+  :host .floating-buttons {
+    top: 32px;
+    right: 32px;
+  }
+}
+
+:host .floating-buttons > * {
+  border-radius: 8px;
+  background-color: var(--accent-background);
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border: none;
+}
+
+:host .floating-buttons > button.hidden {
+  display: none;
+}
+
+button google-cast-launcher {
+  height: 24px;
+  width: auto;
+  --connected-color: var(--accent);
+}
+
 video {
   width: 100%;
   height: auto;
+}
+
+.pip-overlay,
+.cast-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background-color: var(--code-background);
+  color: var(--icon);
+  z-index: 1;
+  font-size: clamp(12px, 4vw, 24px);
+}
+
+.pip-overlay svg,
+.cast-overlay svg {
+  align-self: end;
+  width: clamp(40px, 20vw, 128px);
+  height: auto;
+}
+
+:host(.picture-in-picture) .pip-overlay,
+:host(.cast) .cast-overlay {
+  display: grid;
+  justify-items: center;
+  row-gap: 16px;
+}
+
+.cast-overlay .cast-target {
+  display: none;
+}
+
+:host(.cast-has-target) .cast-overlay .cast-target {
+  display: inline;
+}
+
+.stats-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  right: auto;
+  bottom: auto;
+  max-height: 65%;
+  max-width: 100%;
+  overflow: auto;
+  z-index: 1;
+  background-color: var(--code-background);
+  color: var(--icon);
+  padding: 1em;
+  opacity: 0.9;
+  box-sizing: border-box;
+}
+
+.stats-overlay h4 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.stats-overlay h4:first-child {
+  margin-top: 0;
+}
+
+:host(.stats-overlay-visible) .stats-overlay {
+  display: block;
+}
+
+@media (min-width: 720px) {
+  :host(.picture-in-picture) .pip-overlay {
+    row-gap: 32px;
+  }
+  :host(.cast) .cast-overlay {
+    row-gap: 32px;
+  }
+  .stats-overlay {
+    inset: 1em;
+    right: auto;
+    bottom: auto;
+  }
 }

@@ -23,7 +23,7 @@
  * There may be adjacent caches used for other purposes and we
  * want to let the SW know which caches it should purge on upgrade.
  */
-export const SW_CACHE_NAME = 'static-assets-v1.0.0-beta4';
+export const SW_CACHE_NAME = 'static-assets-v1.0.0-beta5';
 export const SW_CACHE_FORMAT = /^static-assets-v[a-z0-9.-]+$/;
 
 /**
@@ -119,8 +119,28 @@ export const ALL_STREAM_TYPES = ['audio', 'video'];
  */
 export const SETTING_KEY_TOGGLE_OFFLINE = 'toggle-offline';
 export const SETTING_KEY_DARK_MODE = 'dark-mode';
+export const SETTING_KEY_BG_FETCH_API = 'allow-bg-fetch-api';
 
 /**
  * Event name signalling that data in IDB has changes.
  */
 export const IDB_DATA_CHANGED_EVENT = 'idb-data-changed';
+
+/**
+ * Picture in picture.
+ */
+export const PIP_CLASSNAME = 'picture-in-picture';
+
+/**
+ * Casting.
+ */
+export const CAST_CLASSNAME = 'cast';
+export const CAST_HAS_TARGET_NAME = 'cast-has-target';
+export const CAST_TARGET_NAME = 'cast-target-name';
+export const CAST_BUTTON_HIDDEN_CLASSNAME = 'hidden';
+
+/**
+ * Stats overlay.
+ */
+export const STATS_OVERLAY_CLASSNAME = 'stats-overlay';
+export const STATS_OVERLAY_DISPLAYED_CLASSNAME = 'stats-overlay-visible';

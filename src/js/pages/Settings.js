@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SETTING_KEY_DARK_MODE } from '../constants';
+import { SETTING_KEY_DARK_MODE, SETTING_KEY_BG_FETCH_API } from '../constants';
 
 /**
  * @param {RouterContext} routerContext Context object passed by the Router.
@@ -24,6 +24,20 @@ export default (routerContext) => {
     mainContent,
     connectionStatus,
   } = routerContext;
+
+  const backgroundFetchSettingMarkup = !('BackgroundFetchManager' in window)
+    ? ''
+    : `<div class="settings--option">
+    <div class="setting--option__icon">
+    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"><path d="M12 4.34v11.127M16.081 19.66H7.919M7.919 11.386 12 15.467M16.081 11.386 12 15.467" fill="none" stroke="var(--accent)" stroke-width="1.5"/></svg>
+    </div>
+    <div>
+      <p class="setting--option__title">Download videos in the background</p>
+      <p class="setting--option__desc">Use Background Fetch API to download videos in the background.</p>
+    </div>
+    <toggle-button setting="${SETTING_KEY_BG_FETCH_API}"></toggle-button>
+  </div>`;
+
   mainContent.innerHTML = `<div class="container settings">
       <header class="page-header">
         <h1>Settings</h1>
@@ -55,6 +69,7 @@ export default (routerContext) => {
         </div>
         <toggle-button setting="${SETTING_KEY_DARK_MODE}"></toggle-button>
       </div>
+      ${backgroundFetchSettingMarkup}
 <!--      <div class="settings--option">-->
 <!--        <toggle-button></toggle-button>-->
 <!--        <div>-->

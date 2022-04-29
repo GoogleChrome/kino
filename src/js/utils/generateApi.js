@@ -68,7 +68,7 @@ const generateApiData = async () => {
   // eslint-disable-next-line
   for await (const file of getFiles(apiSrcPath)) {
     const fileName = path.basename(file);
-    const categoryName = path.basename(path.dirname(file));
+    const categoryName = path.basename(path.dirname(file)).replace(/^[0-9]+-/, '');
     const textData = fs.readFileSync(file, 'utf8');
     const fmContent = frontMatter(textData);
 

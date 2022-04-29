@@ -12,6 +12,7 @@
   --icon: #F7F7F8;
   --footer-text: #5a585b;
   --accent-background: #12292B;
+  --accent-background-alpha: #12292BCC;
   --accent: #00C9DB;
   --accent-text: #fff;
   --separator: #3D3B3F;
@@ -56,6 +57,7 @@
     --icon: #858287;
     --footer-text: #5a585b;
     --accent-background: #ECEFFF;
+    --accent-background-alpha: #ECEFFFCC;
     --accent: #3740FF;
     --accent-text: #000;
     --separator: #E6E4E7;
@@ -543,11 +545,15 @@ main {
  * Single Video
  */
 article {
+  width: 100%;
+  box-sizing: border-box;
   padding-bottom: calc(var(--gutter) * 3);
   margin-bottom: calc(var(--gutter) * 3);
   border-bottom: 1px solid var(--separator);
+  overflow: hidden;
 }
 article .video-content {
+  width: 100%;
   max-width: 760px;
   margin-left: auto;
   margin-right: auto;
@@ -611,69 +617,82 @@ h3[id*="example"]{
   font-size: 24px;
   margin-bottom: calc(var(--gutter) / 2);
 }
-article pre,
+article pre code,
 .code-sample .code-sample--content {
-  max-width: 760px;
-  white-space: pre-wrap;
+  display: block;
   font-size: 18px;
   font-family: monospace;
   padding: var(--gutter);
   border: 1px solid var(--code-border);
   background: var(--code-background);
-  overflow-y: auto;
+  overflow-x: auto;
 }
 .video-container {
-  --play-button-size: 112px;
-  --aspect-ratio-16-9-padding: 56.25%;
-
+  position: relative;
   border-radius: 8px;
   max-width: 1200px;
   margin: 0 auto;
   overflow: hidden;
+  padding-bottom: 56.25%;
 }
-.video-container--image {
-  height: 0;
-  padding-bottom: var(--aspect-ratio-16-9-padding);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-items: center;
-  flex-flow: column nowrap;
+.video-container--overlay {
+  display: none;
 }
-.video-container--image picture img,
-.video-container--image > img {
+.video-container.has-player {
+  padding-bottom: 0;
+}
+.has-overlay .video-container--overlay {
+  position: absolute;
   width: 100%;
-  height: auto;
-
-  /*
-   * Centers the button without using absolute positioning.
-   *
-   * This helps to avoid stacking issues and clashes with fixed navigation.
-   */
-  margin-bottom: calc(-1 * (var(--aspect-ratio-16-9-padding) / 2) - (var(--play-button-size) / 2));
+  height: 100%;
+  inset: 0;
+  display: grid;
+  place-items: center center;
 }
-.video-container .play {
-  color: #000;
-  background: transparent;
-  border-radius: 50%;
-  width: var(--play-button-size);
-  height: var(--play-button-size);
-  padding: 0;
+.has-overlay .video-container--overlay > * {
+  grid-column: 1;
+  grid-row: 1;
+  max-width: 100%;
+  height: auto;
+}
+.has-overlay .video-container--overlay button {
+  color: var(--accent);
+  background: var(--accent-background-alpha);
+  position: relative;
+  z-index: 100;
   border: none;
   cursor: pointer;
+}
+button.action--play {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  padding: 0;
+  background: #fff;
+  box-shadow: 0 0 30px rgba(0, 0, 0, .5);
+}
+button.action--unmute {
+  display: grid;
+  grid-template-rows: auto auto;
+  justify-items: center;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+button.action--unmute path {
+  stroke: var(--accent);
 }
 .video-container .video-container--player {
   display: none;
   height: 720px;
 }
-.video-container.has-player .video-container--image {
-  display: none;
-}
 .video-container.has-player .video-container--player {
   display: block;
   height: auto;
 }
-.video--disabled .video-container--image,
+.video--disabled .video-container--overlay,
 .video--disabled video-downloader {
   filter: grayscale(1);
   pointer-events: none;

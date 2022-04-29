@@ -8,8 +8,12 @@ length: '1:04'
 video-sources:
   - src: https://storage.googleapis.com/kino-assets/streaming-basics/manifest.mpd
     type: application/dash+xml
+    cast: true
   - src: https://storage.googleapis.com/kino-assets/streaming-basics/master.m3u8
     type: application/x-mpegURL
+url-rewrites:
+  - online: https://storage.googleapis.com/kino-assets/streaming-basics/manifest.mpd
+    offline: https://storage.googleapis.com/kino-assets/streaming-basics/manifest-offline.mpd
 video-subtitles:
   - default: true
     kind: captions
@@ -19,9 +23,28 @@ video-subtitles:
   - default: false
     kind: captions
     label: Česky
-    src: https://storage.googleapis.com/kino-assets/streaming-basics/cap-cz.vtt
-    srclang: cz
+    src: https://storage.googleapis.com/kino-assets/streaming-basics/cap-cs.vtt
+    srclang: cs
 thumbnail: https://storage.googleapis.com/kino-assets/streaming-basics/thumbnail.png
+media-session-artwork:
+  - sizes: 96x96
+    src: https://storage.googleapis.com/kino-assets/streaming-basics/artwork-96x96.png
+    type: image/png
+  - sizes: 128x128
+    src: https://storage.googleapis.com/kino-assets/streaming-basics/artwork-128x128.png
+    type: image/png
+  - sizes: 192x192
+    src: https://storage.googleapis.com/kino-assets/streaming-basics/artwork-192x192.png
+    type: image/png
+  - sizes: 256x256
+    src: https://storage.googleapis.com/kino-assets/streaming-basics/artwork-256x256.png
+    type: image/png
+  - sizes: 384x384
+    src: https://storage.googleapis.com/kino-assets/streaming-basics/artwork-384x384.png
+    type: image/png
+  - sizes: 512x512
+    src: https://storage.googleapis.com/kino-assets/streaming-basics/artwork-512x512.png
+    type: image/png
 ---
 
 ## Introduction

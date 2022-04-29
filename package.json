@@ -1,6 +1,6 @@
 {
   "name": "kino",
-  "version": "1.0.0-beta4",
+  "version": "1.0.0-beta5",
   "description": "A sample offline streaming video PWA built for web.dev/media",
   "main": "src/index.js",
   "author": "Google",
@@ -36,6 +36,7 @@
     "rollup": "^2.50.4",
     "rollup-plugin-execute": "^1.1.1",
     "rollup-plugin-import-css": "^2.0.1",
+    "rollup-plugin-svg": "^2.0.0",
     "rollup-plugin-terser": "^7.0.2",
     "tmpl": ">=1.0.5"
   }

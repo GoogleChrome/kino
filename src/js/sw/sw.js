@@ -26,6 +26,9 @@ import {
 
 import getIDBConnection from '../classes/IDBConnection';
 import assetsToCache from './cache';
+import BackgroundFetch from '../classes/BackgroundFetch';
+import DownloadManager from '../classes/DownloadManager';
+import StorageManager from '../classes/StorageManager';
 
 /**
  * Respond to a request to fetch offline video file and construct a response stream.
@@ -217,3 +220,68 @@ const fetchHandler = async (event) => {
 self.addEventListener('install', precacheAssets);
 self.addEventListener('activate', clearOldCaches);
 self.addEventListener('fetch', fetchHandler);
+
+if ('BackgroundFetchManager' in self) {
+  /**
+   * When Background Fetch API is used to download a file
+   * for offline viewing, Channel Messaging API is used
+   * to signal that a video is fully saved to IDB back
+   * to the UI.
+   *
+   * Because the operation is initiated from the UI, the
+   * `MessageChannel` instance is created there and one of
+   * the newly created channel ports is then sent to the
+   * service worker and stored in this variable.
+   *
+   * @type {MessagePort}
+   */
+  let messageChannelPort;
+
+  self.addEventListener(
+    'message',
+    (event) => {
+      if (event.data.type === 'channel-port') {
+        [messageChannelPort] = event.ports;
+      }
+    },
+  );
+
+  const bgFetchHandler = async (e) => {
+    /** @type {BackgroundFetchRegistration} */
+    const bgFetchRegistration = e.registration;
+    const records = await bgFetchRegistration.matchAll();
+    const urls = records.map((record) => record.request.url);
+
+    if (urls.length === 0) {
+      return;
+    }
+
+    const responsePromises = records.map((record) => record.responseReady);
+    const responses = await Promise.all(responsePromises);
+    const bgFetch = new BackgroundFetch();
+
+    bgFetch.fromRegistration(bgFetchRegistration);
+
+    /**
+     * The `DownloadManager` reads binary data from passed response objects
+     * and routes the data to the `StorageManager` that saves it along with any
+     * metadata to IndexedDB.
+     */
+    const downloadManager = new DownloadManager(bgFetch.videoId);
+    const storageManager = new StorageManager(bgFetch.videoId);
+    const boundStoreChunkHandler = storageManager.storeChunk.bind(storageManager);
+
+    await downloadManager.prepareFileMeta(urls);
+    downloadManager.attachFlushHandler(boundStoreChunkHandler);
+    downloadManager.attachFlushHandler((fileMeta, fileChunk, isDone) => {
+      // If we have a message channel open, signal back to the UI when we're done.
+      if (isDone && messageChannelPort) {
+        messageChannelPort.postMessage('done');
+      }
+    });
+
+    // Start the download, i.e. pump binary data out of the response objects.
+    downloadManager.run(responses);
+  };
+  self.addEventListener('backgroundfetchsuccess', bgFetchHandler);
+}
