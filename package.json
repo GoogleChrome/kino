@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "private": true,
   "scripts": {
-    "cors": "gsutil cors set cors.json gs://kino-assets",
+    "cors": "gcloud storage buckets update --cors-file=cors.json gs://kino-assets",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "postinstall": "husky install",
