@@ -61,9 +61,9 @@ one to play.
 
 ```html
 <video>
-  <source src="av1.mp4" type="video/mp4; codecs=\"av01.0.04M.08\"">
-  <source src="hevc.mp4" type="video/mp4; codecs=\"hvc1\"">
-  <source src="vp9.mp4" type="video/webm; codecs=\"vp9\"">
+  <source src="av1.mp4" type="video/mp4" codecs="av01.0.04M.08">
+  <source src="hevc.mp4" type="video/mp4" codecs="hvc1">
+  <source src="vp9.mp4" type="video/webm" codecs="vp9">
   <source src="h264.mp4" type="video/mp4">
 </video>
 ```
