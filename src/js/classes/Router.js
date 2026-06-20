@@ -121,7 +121,7 @@ export default class Router {
 
     window.scrollTo(0, 0);
     this.context.path = targetUrl.pathname;
-    this.context.mainContent.innerHTML = '';
+    this.context.mainContent.innerText = '';
     this.context.footer.classList.toggle('visible', false);
     this.currentPage = targetUrl;
     foundRoute.callback(this.context);
